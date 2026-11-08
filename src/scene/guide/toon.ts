@@ -8,26 +8,21 @@ import {
 } from 'three';
 
 export const PALETTE = {
-  fur: '#5c211d',
-  furLight: '#7a2f27',
-  furDark: '#3f1613',
-  furStreak: '#94402f',
+  fur: '#642521',
+  furLight: '#8a3529',
+  furDark: '#4a1a17',
   face: '#ffa36d',
   faceShade: '#c67348',
-  faceEdge: '#e2885a',
-  mouth: '#6e3020',
-  lash: '#5a2418',
-  hat: '#e04a12',
-  hatShade: '#b8330f',
-  hatCuff: '#d84410',
-  overalls: '#e0561c',
-  overallsLine: '#b23d0e',
+  mouth: '#8c4630',
+  hat: '#df4612',
+  hatCuff: '#c23a0e',
+  overalls: '#d9481a',
   gold: '#fdd63a',
   goldDeep: '#d9a521',
   eyeWhite: '#fff4e4',
   iris: '#3b1d12',
-  thirdEye: '#bdf3ee',
-  thirdIris: '#5ec7b7',
+  thirdEye: '#c9f6ef',
+  thirdIris: '#4fb3a5',
   cloud: '#b8fff6',
   cloudLine: '#22c3e6',
   cloudDeep: '#5fd7e8',
@@ -44,18 +39,6 @@ export function toonGradient() {
   gradient.generateMipmaps = false;
   gradient.needsUpdate = true;
   return gradient;
-}
-
-let furGradient: DataTexture | null = null;
-/** Softer, darker bands for fur, so maroon stays maroon under the warm key light. */
-export function furToonGradient() {
-  if (furGradient) return furGradient;
-  furGradient = new DataTexture(new Uint8Array([70, 120, 165, 200]), 4, 1, RedFormat);
-  furGradient.minFilter = NearestFilter;
-  furGradient.magFilter = NearestFilter;
-  furGradient.generateMipmaps = false;
-  furGradient.needsUpdate = true;
-  return furGradient;
 }
 
 export function toon(color: ColorRepresentation, extra: MeshToonMaterialParameters = {}) {
@@ -123,13 +106,11 @@ export function thirdEyeTexture() {
     ctx.closePath();
     ctx.fillStyle = PALETTE.thirdEye;
     ctx.fill();
-    ctx.lineWidth = h * 0.06;
-    ctx.strokeStyle = '#4fb8b0';
+    ctx.lineWidth = h * 0.07;
+    ctx.strokeStyle = PALETTE.faceShade;
     ctx.stroke();
-    ctx.save();
-    ctx.clip();
-    ctx.beginPath(); ctx.arc(cx, cy, h * 0.3, 0, Math.PI * 2); ctx.fillStyle = PALETTE.thirdIris; ctx.fill();
-    ctx.restore();
+    ctx.beginPath(); ctx.arc(cx, cy, h * 0.22, 0, Math.PI * 2); ctx.fillStyle = PALETTE.thirdIris; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + h * 0.06, cy - h * 0.07, h * 0.06, 0, Math.PI * 2); ctx.fillStyle = '#ffffff'; ctx.fill();
   });
 }
 
@@ -261,140 +242,4 @@ export function glowTexture(rgb = '255,214,120') {
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, w);
   });
-}
-
-
-/**
- * The face, painted like the illustration: warm peach with darker edges, arched
- * brow creases, small nose-bridge wrinkles, under-eye lines, cheek folds and the
- * big tan lower lip. Mapped by front projection onto the sculpted face mask
- * (unit coords x, y in -1..1).
- */
-export function faceTexture() {
-  return canvasTexture(1024, 1024, (ctx, W, H) => {
-    const X = (x: number) => (x * 0.5 + 0.5) * W;
-    const Y = (y: number) => (1 - (y * 0.5 + 0.5)) * H;
-    ctx.fillStyle = PALETTE.face;
-    ctx.fillRect(0, 0, W, H);
-    // darker towards the edges of the mask
-    const edge = ctx.createRadialGradient(X(0), Y(0.05), W * 0.3, X(0), Y(0.05), W * 0.52);
-    edge.addColorStop(0, 'rgba(226,136,90,0)');
-    edge.addColorStop(1, 'rgba(198,115,72,0.85)');
-    ctx.fillStyle = edge;
-    ctx.fillRect(0, 0, W, H);
-    // big lower lip / chin, darker tan, under the mouth line
-    ctx.fillStyle = PALETTE.faceShade;
-    ctx.beginPath();
-    ctx.moveTo(X(-0.58), Y(-0.42));
-    ctx.quadraticCurveTo(X(0), Y(-0.48), X(0.58), Y(-0.42));
-    ctx.quadraticCurveTo(X(0.5), Y(-0.86), X(0), Y(-0.9));
-    ctx.quadraticCurveTo(X(-0.5), Y(-0.86), X(-0.58), Y(-0.42));
-    ctx.fill();
-
-    const stroke = (pts: [number, number][], width: number, color: string) => {
-      ctx.strokeStyle = color === PALETTE.faceShade ? '#b65f3a' : color;
-      ctx.lineWidth = width * 1.8;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.beginPath();
-      ctx.moveTo(X(pts[0][0]), Y(pts[0][1]));
-      if (pts.length === 3) ctx.quadraticCurveTo(X(pts[1][0]), Y(pts[1][1]), X(pts[2][0]), Y(pts[2][1]));
-      else for (const [x, y] of pts.slice(1)) ctx.lineTo(X(x), Y(y));
-      ctx.stroke();
-    };
-    for (const s of [1, -1]) {
-      // brow creases: an arch over each eye, and a shorter one above it
-      stroke([[s * 0.13, 0.12], [s * 0.36, 0.34], [s * 0.66, 0.18]], 9, PALETTE.faceShade);
-      stroke([[s * 0.22, 0.3], [s * 0.4, 0.42], [s * 0.58, 0.32]], 6, PALETTE.faceShade);
-      // eye crease (upper lid fold) and under-eye lines
-      stroke([[s * 0.2, 0.1], [s * 0.42, 0.16], [s * 0.66, 0.06]], 5, '#d98252');
-      stroke([[s * 0.22, -0.08], [s * 0.42, -0.1], [s * 0.62, -0.04]], 5, '#ffc7a0');
-      stroke([[s * 0.24, -0.15], [s * 0.42, -0.19], [s * 0.6, -0.12]], 4, '#e3925f');
-      // cheek folds framing the muzzle
-      stroke([[s * 0.2, -0.2], [s * 0.42, -0.26], [s * 0.66, -0.42]], 7, PALETTE.faceShade);
-      stroke([[s * 0.36, -0.16], [s * 0.58, -0.22], [s * 0.76, -0.36]], 5, '#d98252');
-      // mouth-corner lines
-      stroke([[s * 0.56, -0.34], [s * 0.66, -0.42], [s * 0.6, -0.52]], 5, PALETTE.faceShade);
-    }
-    // nose-bridge wrinkles
-    stroke([[-0.07, 0.14], [0, 0.17], [0.07, 0.14]], 4, PALETTE.faceShade);
-    stroke([[-0.06, 0.06], [0, 0.09], [0.06, 0.06]], 4, PALETTE.faceShade);
-    stroke([[-0.04, 0.0], [0, 0.02], [0.04, 0.0]], 3, '#d98252');
-    // soft shading around the nose
-    const nose = ctx.createRadialGradient(X(0), Y(-0.16), 2, X(0), Y(-0.16), W * 0.08);
-    nose.addColorStop(0, 'rgba(198,115,72,0.55)');
-    nose.addColorStop(1, 'rgba(198,115,72,0)');
-    ctx.fillStyle = nose;
-    ctx.fillRect(0, 0, W, H);
-  });
-}
-
-/** Burnt-orange knit: soft vertical stitch columns and a few fold shadows. */
-export function knitTexture(base: string = PALETTE.hat, line = 'rgba(150, 40, 8, 0.28)', ribs = false) {
-  const t = canvasTexture(512, 512, (ctx, W, H) => {
-    ctx.fillStyle = base;
-    ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = line;
-    ctx.lineWidth = ribs ? 7 : 3;
-    const step = ribs ? 18 : 12;
-    for (let x = 0; x < W; x += step) {
-      ctx.beginPath();
-      for (let y = 0; y <= H; y += 16) ctx.lineTo(x + Math.sin(y * 0.05 + x) * (ribs ? 0.5 : 1.5), y);
-      ctx.stroke();
-    }
-    if (!ribs) {
-      const rnd = seeded(5);
-      ctx.strokeStyle = 'rgba(140, 34, 6, 0.35)';
-      ctx.lineWidth = 6;
-      ctx.lineCap = 'round';
-      for (let i = 0; i < 9; i++) {
-        const x = rnd() * W, y = rnd() * H * 0.6;
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.quadraticCurveTo(x + 30, y + 20, x + 70 + rnd() * 40, y + 6);
-        ctx.stroke();
-      }
-    }
-  });
-  t.wrapS = t.wrapT = RepeatWrapping;
-  return t;
-}
-
-/** Corduroy for the dungarees. */
-export function corduroyTexture() {
-  const t = canvasTexture(256, 256, (ctx, W, H) => {
-    ctx.fillStyle = PALETTE.overalls;
-    ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = PALETTE.overallsLine;
-    ctx.globalAlpha = 0.45;
-    ctx.lineWidth = 3;
-    for (let x = 4; x < W; x += 11) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-  });
-  t.wrapS = t.wrapT = RepeatWrapping;
-  return t;
-}
-
-/** Painted fur: dense downward strands in the painting's maroons, for the base fur shapes. */
-export function furTexture() {
-  const t = canvasTexture(512, 512, (ctx, W, H) => {
-    const rnd = seeded(9);
-    ctx.fillStyle = PALETTE.fur;
-    ctx.fillRect(0, 0, W, H);
-    const tones = [PALETTE.furDark, PALETTE.furDark, PALETTE.furLight, PALETTE.furStreak];
-    ctx.lineCap = 'round';
-    for (let i = 0; i < 900; i++) {
-      const x = rnd() * W, y = rnd() * H, len = 18 + rnd() * 40;
-      ctx.strokeStyle = tones[Math.floor(rnd() * tones.length)];
-      ctx.globalAlpha = 0.5 + rnd() * 0.5;
-      ctx.lineWidth = 1.5 + rnd() * 2.5;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.quadraticCurveTo(x + (rnd() - 0.5) * 10, y + len * 0.5, x + (rnd() - 0.5) * 14, y + len);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  });
-  t.wrapS = t.wrapT = RepeatWrapping;
-  t.repeat.set(3, 2);
-  return t;
 }

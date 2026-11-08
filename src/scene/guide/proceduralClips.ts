@@ -7,14 +7,13 @@
 // produces, so everything downstream is shared.
 
 import {
-  Matrix4, AnimationClip, Euler, NumberKeyframeTrack, Quaternion, QuaternionKeyframeTrack, Vector3,
+  AnimationClip, Euler, NumberKeyframeTrack, Quaternion, QuaternionKeyframeTrack, Vector3,
   VectorKeyframeTrack, type Object3D,
 } from 'three';
 import { BONES } from './contract';
 
 type V3 = [number, number, number];
-/** r: Euler degrees. aim: limb direction. toes/top: orient a foot by where its toes and its top face. */
-export interface BonePose { r?: V3; aim?: V3; twist?: number; p?: V3; toes?: V3; top?: V3 }
+export interface BonePose { r?: V3; aim?: V3; twist?: number; p?: V3 }
 export type Pose = Record<string, BonePose>;
 type Morphs = Partial<Record<'eyesClosed' | 'smile', number>>;
 interface Key { t: number; pose: Pose; morph?: Morphs; ease?: 'inOut' | 'in' | 'out' | 'linear' }
@@ -60,12 +59,12 @@ const curl = (deg: number, side: 'L' | 'R' | 'both' = 'both'): Pose => {
 
 // ── key poses ──────────────────────────────────────────────
 const SEATED: Pose = merge(
-  { hips: { p: [0, 0.27, 0] }, spine: { r: [4, 0, 0] }, chest: { r: [2, 0, 0] }, neck: { r: [2, 0, 0] }, head: { r: [8, 0, 0] } },
-  sym('thigh', { aim: [0.9, -0.1, 0.42] }),
-  { shin_L: { aim: [-0.9, -0.1, 0.42] }, shin_R: { aim: [0.88, -0.24, 0.41] } },
-  { foot_L: { toes: [-0.45, -0.7, 0.55], top: [0, 0.35, -0.9] }, foot_R: { toes: [0.45, -0.7, 0.55], top: [0, 0.35, -0.9] } },
-  sym('upperarm', { aim: [0.2, -0.95, 0.24] }),
-  sym('forearm', { aim: [-0.6, -0.25, 0.76], twist: 70 }),
+  { hips: { p: [0, 0.255, 0] }, spine: { r: [5, 0, 0] }, chest: { r: [3, 0, 0] }, neck: { r: [4, 0, 0] }, head: { r: [12, 0, 0] } },
+  sym('thigh', { aim: [0.62, -0.02, 0.78] }),
+  { shin_L: { aim: [-0.76, -0.14, 0.6] }, shin_R: { aim: [0.74, -0.22, 0.56] } },
+  sym('foot', { r: [-20, 0, -35] }),
+  sym('upperarm', { aim: [0.24, -0.9, 0.36] }),
+  sym('forearm', { aim: [-0.5, 0.02, 0.86], twist: 80 }),
   curl(30),
 );
 const AWAKE: Pose = merge(SEATED, { spine: { r: [3, 0, 0] }, chest: { r: [-2, 0, 0] }, neck: { r: [0, 0, 0] }, head: { r: [-2, 0, 0] } });
@@ -77,7 +76,7 @@ const BECKON: Pose = merge(AWAKE, {
   hand_R: { r: [-15, 0, 0] },
 });
 const CROUCH: Pose = merge(AWAKE, {
-  hips: { p: [0, 0.285, 0.03] }, spine: { r: [22, 0, 0] }, chest: { r: [12, 0, 0] }, neck: { r: [-6, 0, 0] }, head: { r: [-14, 0, 0] },
+  hips: { p: [0, 0.27, 0.03] }, spine: { r: [22, 0, 0] }, chest: { r: [12, 0, 0] }, neck: { r: [-6, 0, 0] }, head: { r: [-14, 0, 0] },
 }, sym('upperarm', { aim: [0.32, -0.92, -0.05] }), sym('forearm', { aim: [0.12, -0.96, 0.18], twist: 0 }), curl(5));
 const LIFT: Pose = merge(AWAKE, {
   hips: { p: [0, 0.42, 0.06], r: [25, 0, 0] }, spine: { r: [8, 0, 0] }, chest: { r: [0, 0, 0] }, neck: { r: [-8, 0, 0] }, head: { r: [-18, 0, 0] },
@@ -97,7 +96,7 @@ const CLIPS: { name: string; duration: number; loop: boolean; keys: Key[]; lag?:
     name: 'seated_idle', duration: 4, loop: true,
     keys: [
       { t: 0, pose: SEATED, morph: { eyesClosed: 1, smile: 0.1 } },
-      { t: 2, pose: merge(SEATED, { hips: { p: [0, 0.277, 0] }, spine: { r: [2, 0, 0] }, chest: { r: [0, 0, 0] }, head: { r: [6, 0, 0] } }, sym('upperarm', { aim: [0.33, -0.87, 0.36] })), morph: { eyesClosed: 1, smile: 0.12 } },
+      { t: 2, pose: merge(SEATED, { hips: { p: [0, 0.262, 0] }, spine: { r: [3, 0, 0] }, chest: { r: [0, 0, 0] }, head: { r: [10, 0, 0] } }, sym('upperarm', { aim: [0.27, -0.89, 0.36] })), morph: { eyesClosed: 1, smile: 0.12 } },
       { t: 4, pose: SEATED, morph: { eyesClosed: 1, smile: 0.1 } },
     ],
   },
@@ -159,7 +158,7 @@ const CLIPS: { name: string; duration: number; loop: boolean; keys: Key[]; lag?:
     name: 'perch_idle', duration: 5, loop: true,
     keys: [
       { t: 0, pose: AWAKE, morph: { smile: 0.55 } },
-      { t: 1.6, pose: merge(AWAKE, { chest: { r: [-1, 4, 0] }, head: { r: [-2, 6, 4] }, hips: { p: [0, 0.277, 0] } }), morph: { smile: 0.6 } },
+      { t: 1.6, pose: merge(AWAKE, { chest: { r: [-1, 4, 0] }, head: { r: [-2, 6, 4] }, hips: { p: [0, 0.262, 0] } }), morph: { smile: 0.6 } },
       { t: 3.2, pose: merge(AWAKE, { chest: { r: [1, -4, 0] }, head: { r: [0, -6, -3] } }), morph: { smile: 0.5 } },
       { t: 5, pose: AWAKE, morph: { smile: 0.55 } },
     ],
@@ -183,13 +182,6 @@ function resolve(pose: Pose, bones: Record<string, Object3D>): Resolved {
       const dir = new Vector3(...bp.aim).normalize().applyQuaternion(parentQ.clone().invert());
       local.setFromUnitVectors(DOWN, dir);
       if (bp.twist) local.multiply(new Quaternion().setFromAxisAngle(Y, bp.twist * D));
-    } else if (bp.toes && bp.top) {
-      const z = new Vector3(...bp.toes).normalize();
-      const y = new Vector3(...bp.top);
-      y.addScaledVector(z, -y.dot(z)).normalize();
-      const x = new Vector3().crossVectors(y, z);
-      const want = new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(x, y, z));
-      local.copy(parentQ.clone().invert().multiply(want));
     } else if (bp.r) {
       local.setFromEuler(new Euler(bp.r[0] * D, bp.r[1] * D, bp.r[2] * D));
     }
