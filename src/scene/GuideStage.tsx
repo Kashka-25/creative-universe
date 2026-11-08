@@ -10,6 +10,7 @@ import { qualityTier } from '../intro/capability';
 import { Director } from './Director';
 import { Actor } from './Actor';
 import { Emblem, HeldCloud, Sky, Trail } from './Scenery';
+import { Metamorphosis } from './Metamorphosis';
 
 export interface GuideStageProps {
   state: IntroState;
@@ -49,6 +50,7 @@ export default function GuideStage({ state, send, onReady, onContextLost, active
         <HeldCloud state={state} />
       </Suspense>
       <Trail state={state} />
+      <Metamorphosis state={state} quality={quality} />
     </Canvas>
   );
 }

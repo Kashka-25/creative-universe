@@ -34,6 +34,8 @@ function CloudCard({ seed, tail = null, w, position, opacityRef, bumps }: {
   );
 }
 
+const GONE = new Set<IntroState>(['emerging', 'revealing', 'done']);
+
 export function Emblem({ state }: { state: IntroState }) {
   const g = useRef<Group>(null!);
   const backdrop = useRef<Mesh>(null!);
@@ -56,11 +58,13 @@ export function Emblem({ state }: { state: IntroState }) {
   useFrame(({ clock }) => {
     g.current.position.copy(home.pos);
     g.current.scale.setScalar(home.scale);
-    g.current.visible = home.visible;
+    // His little world gives way to the painting's own sun, bolt and clouds as he transforms.
+    g.current.visible = home.visible && !GONE.has(state);
     const t = clock.elapsedTime;
     g.current.position.y += Math.sin(t * 0.8) * 0.012 * home.scale;
     backdrop.current.rotation.z = Math.sin(t * 0.25) * 0.02;
-    sunMat.opacity = state === 'boot' || state === 'loading' ? 0.0 : 1;
+    const sunTarget = state === 'boot' || state === 'loading' || state === 'opening' ? 0 : 1;
+    sunMat.opacity += (sunTarget - sunMat.opacity) * Math.min(1, (state === 'opening' ? 3 : 20) * (1 / 60));
   });
 
   return (
@@ -159,7 +163,7 @@ export function Sky({ state, quality }: { state: IntroState; quality: 'high' | '
   );
 }
 
-/** Gold sparks shed behind him while he flies and lands. */
+/** Gold sparks rising off him as the light gathers. */
 export function Trail({ state }: { state: IntroState }) {
   const N = 90;
   const data = useMemo(() => {
@@ -172,7 +176,7 @@ export function Trail({ state }: { state: IntroState }) {
   }, []);
   const ref = useRef<Points>(null!);
   useFrame((_, dt) => {
-    const emitting = state === 'rising' || state === 'flying' || state === 'revealing';
+    const emitting = state === 'gathering';
     const a = data.geo.getAttribute('position') as BufferAttribute;
     if (emitting) {
       data.acc += dt * 60;

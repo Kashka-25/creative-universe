@@ -2,7 +2,11 @@
 
 ## The experience
 
-The guide wakes on his cloud, looks at you, beckons, and flies past the camera. The portfolio rises in around you, and **the same 3D guide swoops back and lands in the hero**, sitting in front of his sun and lightning bolt like the emblem painting. He keeps watching your pointer while you're there. One persistent WebGL layer, one character, no cut between "intro" and "site".
+The little guide wakes on his cloud, looks at you and beckons. When you follow him he goes through a **metamorphosis**: light gathers round him in turquoise and gold curls, weaves into a glowing cocoon that pulses twice like a heartbeat, and unfurls like the painting's cloud scrolls. His **true form**, Cassidy's painting, emerges in his place and glides into the homepage hero. That's his home.
+
+In the hero he is the **living painting** (`src/living/`): the painting itself, very gently warped in a shader. He breathes, his head moves a little, his third eye glows, the sun breathes, the clouds drift, and now and then (or when you hover over him or tap him) he lifts the cloud in his hands towards you. Nothing is repainted, so it stays exactly Cassidy's painting. His eyes stay closed, as painted. Reduced motion, no WebGL or a load failure show the same painting, still.
+
+The 3D layer only lives for the welcome. Returning visitors never load it: they go straight to the living painting.
 
 ## Layers
 
@@ -28,10 +32,10 @@ The **animation** (Blender → GLB) and the **content** (starter pack → JSON) 
 `src/intro/machine.ts` is a small, generic, tested finite state machine: events, guards, global transitions, timed transitions, and an injectable clock. `src/intro/introMachine.ts` holds the story:
 
 ```
-boot → loading → seated → awakening → acknowledging → beckoning → rising → flying → revealing → done
+boot → loading → seated → awakening → acknowledging → beckoning → gathering → chrysalis → opening → emerging → revealing → done
         │                                                  (waits for "Follow him", or 9 s)
         └→ lite (illustrated welcome) → liteFlight → revealing → done
-boot → done                  returning visitor / deep link: guide already perched
+boot → done                  returning visitor / deep link: straight to the living painting
 SKIP from anywhere → revealing
 ```
 

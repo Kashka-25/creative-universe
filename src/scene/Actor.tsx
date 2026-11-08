@@ -1,12 +1,14 @@
 // The guide himself: loads the Blender GLB if one is registered
 // (public/models/manifest.json), otherwise builds the stand-in. Then plays the
-// story's clips, flies him along his path and lands him in the portfolio.
+// story's clips. During the metamorphosis he settles, is wrapped in the
+// cocoon (Metamorphosis.tsx) and gives way to his true form, the painting.
 
 import { use, useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
-import { CatmullRomCurve3, Group, MathUtils, Quaternion, Vector3, type Object3D } from 'three';
-import { beats, type IntroEvent, type IntroState } from '../intro/introMachine';
+import { Group, Quaternion, Vector3, type Object3D } from 'three';
+import { beats, METAMORPHOSIS_STATES, type IntroEvent, type IntroState } from '../intro/introMachine';
+import { COCOON_GROW } from './Metamorphosis';
 import { asset } from '../content';
 import { GuideAnimator } from './guide/GuideAnimator';
 import { buildProceduralGuide } from './guide/proceduralGuide';
@@ -46,10 +48,7 @@ function GltfActor({ url, ...props }: ActorProps & { url: string }) {
   return <ActorBody model={model} {...props} />;
 }
 
-const FLIGHT_SECONDS = 2.3;
-const LANDING_SECONDS = 1.9;
-const easeOutCubic = (x: number) => 1 - (1 - x) ** 3;
-const smooth = (x: number) => x * x * (3 - 2 * x);
+const smooth = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 
 function ActorBody({ model, state, send, onReady }: ActorProps & { model: GuideModel }) {
   const group = useRef<Group>(null!);
@@ -59,9 +58,6 @@ function ActorBody({ model, state, send, onReady }: ActorProps & { model: GuideM
   if (import.meta.env.DEV) (window as unknown as { __guide: unknown }).__guide = { object: model.object, animator };
   const prev = useRef<IntroState>('boot');
   const since = useRef(0);
-  const flight = useRef<CatmullRomCurve3 | null>(null);
-  const landing = useRef<{ from: Vector3; scale: number; landClipStarted: boolean } | null>(null);
-  const passed = useRef(false);
   const ready = useRef(0);
   const perchFallback = !animator.has('perch_idle');
   const nodes = useMemo(() => {
@@ -74,8 +70,7 @@ function ActorBody({ model, state, send, onReady }: ActorProps & { model: GuideM
   // Clip-completion events feed the story.
   useEffect(() => {
     animator.onFinished((clip) => {
-      if (clip === 'land') { playPerch(0.5); send({ type: 'LANDED' }); return; }
-      if (clip === 'wake' || clip === 'acknowledge' || clip === 'rise') send({ type: 'CLIP_DONE', clip });
+      if (clip === 'wake' || clip === 'acknowledge') send({ type: 'CLIP_DONE', clip });
     });
     return () => animator.onFinished(() => {});
   }, [animator]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -95,36 +90,13 @@ function ActorBody({ model, state, send, onReady }: ActorProps & { model: GuideM
       case 'awakening': animator.play('wake', { fade: 0.3 }); break;
       case 'acknowledging': animator.play('acknowledge', { fade: 0.4 }); break;
       case 'beckoning': animator.play('beckon', { fade: 0.6 }); break;
-      case 'rising': animator.play('rise', { fade: 0.35 }); break;
-      case 'flying': {
-        animator.play('fly', { fade: 0.3 });
-        const p0 = group.current.position.clone();
-        const cz = camera.position.z;
-        flight.current = new CatmullRomCurve3([
-          p0,
-          p0.clone().add(new Vector3(0.05, 0.45, 0.6)),
-          new Vector3(0.3, 0.85, 1.6),
-          new Vector3(0.55, 1.0, cz - 0.1),
-          new Vector3(0.95, 1.2, cz + 2.4),
-        ]);
-        passed.current = false;
-        break;
-      }
-      case 'revealing':
-        if (from === 'flying') {
-          // swoop in from above and behind the sun, land on the cloud in the hero
-          landing.current = { from: new Vector3(2.4, 2.3, -1.6), scale: 1, landClipStarted: false };
-          animator.play('fly', { fade: 0.2 });
-        } else {
-          landing.current = null;
-          playPerch(0.3);
-          window.setTimeout(() => send({ type: 'LANDED' }), 700);
-        }
-        break;
+      // The metamorphosis: he closes his eyes and settles into his lotus pose
+      // while the light gathers; the cocoon then hides him (Metamorphosis.tsx).
+      case 'gathering': animator.play('seated_idle', { fade: 0.9 }); break;
+      case 'revealing': break;
       case 'done':
         if (from === 'boot') animator.snap(perchFallback ? 'seated_idle' : 'perch_idle');
         else if (from !== 'revealing') playPerch();
-        landing.current = null;
         break;
     }
   }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -140,45 +112,21 @@ function ActorBody({ model, state, send, onReady }: ActorProps & { model: GuideM
     const beat = beats[state];
 
     // ── where is he? ──
-    if (state === 'flying' && flight.current) {
-      const u = Math.min(1, since.current / FLIGHT_SECONDS);
-      const e = u * u * (2.2 - 1.2 * u);
-      g.position.copy(flight.current.getPointAt(e));
-      ahead.current.copy(flight.current.getPointAt(Math.min(1, e + 0.02)));
-      g.lookAt(ahead.current);
-      g.scale.setScalar(1);
-      if (!passed.current && (g.position.z > camera.position.z - 0.3 || u >= 1)) {
-        passed.current = true;
-        send({ type: 'PASSED' });
-      }
-    } else if (state === 'revealing' && landing.current) {
-      const L = landing.current;
-      const u = Math.min(1, since.current / LANDING_SECONDS);
-      const e = easeOutCubic(u);
-      const start = ahead.current.copy(L.from).multiplyScalar(Math.max(home.scale, 0.4)).add(home.pos);
-      g.position.lerpVectors(start, home.pos, e);
-      g.position.y += Math.sin(Math.PI * u) * 0.35 * home.scale;
-      g.scale.setScalar(MathUtils.lerp(L.scale, home.scale, smooth(u)));
-      // face the way he travels, then turn to the visitor as he settles
-      const travel = new Vector3().subVectors(home.pos, start);
-      const yaw = Math.atan2(travel.x, travel.z);
-      q.current.setFromAxisAngle(new Vector3(0, 1, 0), yaw);
-      g.quaternion.copy(q.current).slerp(new Quaternion(), smooth(Math.min(1, u * 1.4)));
-      if (!L.landClipStarted && u > 0.42) {
-        L.landClipStarted = true;
-        if (animator.has('land')) animator.play('land', { fade: 0.35 });
-        else animator.play('rise', { fade: 0.35, reverse: true, reportAs: 'land' });
-      }
-    } else {
-      g.position.copy(home.pos);
-      if (state === 'rising') g.position.y += smooth(Math.min(1, since.current / 1.7)) * 0.12;
-      g.scale.setScalar(home.scale);
-      g.quaternion.slerp(q.current.identity(), 1 - Math.exp(-dt * 6));
+    g.position.copy(home.pos);
+    g.scale.setScalar(home.scale);
+    g.quaternion.slerp(q.current.identity(), 1 - Math.exp(-dt * 6));
+    if (state === 'gathering') g.position.y += smooth(since.current / 2) * 0.06 * home.scale; // lifted a little by the light
+    if (state === 'chrysalis') {
+      g.position.y += 0.06 * home.scale;
+      g.scale.multiplyScalar(1 - 0.08 * smooth(since.current / COCOON_GROW));
     }
-    g.visible = home.visible || state === 'flying' || state === 'revealing';
+    // Inside the cocoon, and from then on, his little form is gone: the painting is his true form.
+    const transformed = (state === 'chrysalis' && since.current > COCOON_GROW + 0.1) || METAMORPHOSIS_STATES.slice(2).includes(state)
+      || state === 'revealing' || state === 'done';
+    g.visible = home.visible && !transformed;
 
     // ── who is he looking at? ──
-    if (state === 'done' || state === 'revealing') {
+    if (state === 'done') {
       // the visitor's pointer, projected just in front of the screen
       lookTarget.current.set(pointer.x, pointer.y, 0.6).unproject(camera);
     } else {
@@ -189,7 +137,7 @@ function ActorBody({ model, state, send, onReady }: ActorProps & { model: GuideM
       lookTarget: lookTarget.current,
       lookWeight: beat?.look ?? 0,
       glow: beat?.glow ?? 0,
-      eyesOpen: perchFallback && (state === 'done' || state === 'revealing'),
+      eyesOpen: perchFallback && state === 'done',
     });
 
     // ── report positions for the camera and scenery ──

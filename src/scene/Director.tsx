@@ -7,7 +7,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { MathUtils, Vector3, type PerspectiveCamera } from 'three';
 import { beats, type IntroState, type ShotName } from '../intro/introMachine';
 import { pointer, stage } from './stage';
-import { home, probe } from './rigState';
+import { home } from './rigState';
 
 interface Shot { pos: [number, number, number]; target: [number, number, number] }
 
@@ -15,8 +15,7 @@ const SHOTS: Record<ShotName, Shot> = {
   establish: { pos: [0, 0.85, 5.2], target: [0, 0.62, 0] },
   approach: { pos: [0.35, 0.95, 3.7], target: [0, 0.72, 0] },
   portrait: { pos: [0.15, 0.92, 2.6], target: [0, 0.78, 0] },
-  lift: { pos: [0, 0.82, 3.4], target: [0, 0.95, 0] },
-  flyby: { pos: [0.1, 0.95, 3.0], target: [0, 0.9, 0] },
+  cocoon: { pos: [0, 0.78, 4.1], target: [0, 0.66, 0] },
   perch: { pos: [0, 0.9, 6.5], target: [0, 0.9, 0] },
 };
 
@@ -65,10 +64,9 @@ export function Director({ state }: { state: IntroState }) {
       pos.x += pointer.x * 0.15;
       pos.y += pointer.y * 0.08;
     }
-    if (shotName === 'flyby') tgt.lerp(probe.body, 0.65);
 
     const snap = first.current;
-    const k = snap ? 1 : 1 - Math.exp(-dt * (shotName === 'flyby' ? 3 : 1.6));
+    const k = snap ? 1 : 1 - Math.exp(-dt * 1.6);
     cam.position.lerp(pos, k);
     look.current.lerp(tgt, k);
     cam.lookAt(look.current);

@@ -156,3 +156,23 @@
 @media (prefers-reduced-motion: reduce) {
   .lite-intro.is-liteFlight .lite-intro__guide { animation: none; opacity: 0; transition: opacity 600ms; }
 }
+
+/* His true form emerging from the cocoon, then gliding home to the hero. */
+.emerging {
+  position: fixed;
+  z-index: 61;
+  pointer-events: none;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.emerging__inner { width: 100%; height: 100%; animation: emerge 1400ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.emerging.is-going-home { transition: transform 1.7s cubic-bezier(0.45, 0, 0.2, 1); }
+@keyframes emerge {
+  from { opacity: 0; transform: scale(0.93); filter: blur(10px) brightness(1.5); }
+  60% { opacity: 1; filter: blur(0) brightness(1.15); }
+  to { opacity: 1; transform: scale(1); filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .emerging__inner { animation: none; }
+  .emerging.is-going-home { transition: none; }
+}

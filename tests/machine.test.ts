@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMachine, type Scheduler } from '../src/intro/machine';
-import { createIntroMachine } from '../src/intro/introMachine';
+import { createIntroMachine, INTRO_STATES, METAMORPHOSIS, METAMORPHOSIS_STATES } from '../src/intro/introMachine';
 
 /** A scheduler we drive by hand: no real timers in tests. */
 function fakeClock() {
@@ -68,7 +68,7 @@ describe('createMachine', () => {
 });
 
 describe('intro story', () => {
-  it('plays the whole welcome: wake, acknowledge, beckon, follow, rise, fly, land', () => {
+  it('plays the whole welcome: wake, acknowledge, beckon, follow, metamorphosis, home', () => {
     const clock = fakeClock();
     const m = createIntroMachine(clock.schedule);
     m.send({ type: 'FULL' });
@@ -82,13 +82,22 @@ describe('intro story', () => {
     m.send({ type: 'CLIP_DONE', clip: 'acknowledge' });
     expect(m.state).toBe('beckoning');
     m.send({ type: 'FOLLOW' });
-    m.send({ type: 'CLIP_DONE', clip: 'rise' });
-    expect(m.state).toBe('flying');
-    m.send({ type: 'PASSED' });
-    expect(m.state).toBe('revealing');
-    m.send({ type: 'LANDED' });
+    expect(m.state).toBe('gathering');
+    for (const [beat, next] of [['gathering', 'chrysalis'], ['chrysalis', 'opening'], ['opening', 'emerging'], ['emerging', 'revealing']] as const) {
+      expect(m.state).toBe(beat);
+      clock.advance(METAMORPHOSIS[beat]);
+      expect(m.state).toBe(next);
+    }
+    m.send({ type: 'LANDED' }); // the painting reached his home in the hero
     expect(m.state).toBe('done');
-    expect(m.history).toEqual(['boot', 'loading', 'seated', 'awakening', 'acknowledging', 'beckoning', 'rising', 'flying', 'revealing', 'done']);
+    expect(m.history).toEqual(['boot', 'loading', 'seated', 'awakening', 'acknowledging', 'beckoning', 'gathering', 'chrysalis', 'opening', 'emerging', 'revealing', 'done']);
+  });
+
+  it('keeps the metamorphosis short and covering the page throughout', () => {
+    const total = Object.values(METAMORPHOSIS).reduce((a, b) => a + b, 0);
+    expect(total).toBeGreaterThan(6000);
+    expect(total).toBeLessThan(11000);
+    for (const s of METAMORPHOSIS_STATES) expect(INTRO_STATES).toContain(s);
   });
 
   it('never traps a visitor: every beat times out', () => {

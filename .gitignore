@@ -7,3 +7,6 @@ dist/
 *.blend2
 blender/**/__pycache__/
 public/models/test-guide.glb
+# build outputs of the Blender pipeline (PR #3); never commit them here
+blender/guide.blend
+blender/reference/guide-reference-chimp.png

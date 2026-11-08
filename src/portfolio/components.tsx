@@ -4,6 +4,7 @@ import { asset, statusLabel, worksIn, type Realm, type Work } from '../content';
 import { useIntro } from '../intro/IntroProvider';
 import { stage } from '../scene/stage';
 import { RealmEmblem } from './ornaments';
+import { LivingPainting } from '../living/LivingPainting';
 
 export function StatusPill({ status }: { status?: string }) {
   if (!status) return null;
@@ -68,22 +69,25 @@ export function realmCount(r: Realm) {
 }
 
 /**
- * The spot in the hero where the guide sits. With 3D running, this is an empty
- * window the scene draws into. Otherwise it shows the painting itself.
+ * The guide's home in the hero: the living painting. After the welcome's
+ * metamorphosis the painting glides in here (EmergingPainting); this one is
+ * already drawing underneath, hidden, and takes over when it lands.
  */
 export function HeroStage() {
-  const { mode, sceneFailed, guideReady, state } = useIntro();
+  const { handoff, state, covering } = useIntro();
   const ref = useRef<HTMLDivElement>(null);
-  const live = mode === 'full' && !sceneFailed;
   useEffect(() => {
-    if (!live) return;
     stage.set(ref.current);
     return () => stage.set(null);
-  }, [live]);
-  const showArt = !live || (!guideReady && state === 'done');
+  }, []);
+  // While his painting emerges in the welcome, this copy starts up hidden underneath, so nothing is left to load when he lands.
+  const arriving = handoff && (state === 'revealing' || state === 'emerging');
+  // When his painting glides in from the welcome, this copy takes over in place: no second fade.
+  const arrived = useRef(false);
+  if (arriving) arrived.current = true;
   return (
-    <div className={`hero-stage ${showArt ? 'hero-stage--art' : ''}`} ref={ref} aria-hidden>
-      {showArt && <img src={asset('art/guide.webp')} alt="" className="hero-stage__art" />}
+    <div className={`hero-stage ${arriving ? 'is-arriving' : ''}`} ref={ref} aria-hidden>
+      {(!covering || arriving) && <LivingPainting className={`hero-stage__living ${arrived.current ? 'is-instant' : ''}`} fadeIn={arrived.current ? 0 : 700} />}
     </div>
   );
 }

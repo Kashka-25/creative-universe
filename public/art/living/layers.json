@@ -1,0 +1,50 @@
+{
+  "$comment": "Made by blender/scripts/living_layers.py from blender/reference/guide-reference.png. Positions are 0..1 from the top left.",
+  "size": [
+    1000,
+    1562
+  ],
+  "aspect": 0.64026,
+  "thirdEye": [
+    0.499,
+    0.2133
+  ],
+  "neck": [
+    0.498,
+    0.3588
+  ],
+  "sun": [
+    0.6024,
+    0.149
+  ],
+  "head": {
+    "c": [
+      0.498,
+      0.2256
+    ],
+    "r": [
+      0.284,
+      0.1526
+    ]
+  },
+  "chest": {
+    "c": [
+      0.498,
+      0.4659
+    ],
+    "r": [
+      0.284,
+      0.1169
+    ]
+  },
+  "hands": {
+    "c": [
+      0.5056,
+      0.526
+    ],
+    "r": [
+      0.1724,
+      0.0974
+    ]
+  }
+}

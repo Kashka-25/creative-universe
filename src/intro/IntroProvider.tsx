@@ -10,6 +10,7 @@ import { createIntroMachine, beats, INTRO_STATES, type IntroEvent, type IntroSta
 import { detectCapability, introAlreadySeen, markIntroSeen, type IntroMode } from './capability';
 import { stage } from '../scene/stage';
 import { LiteIntro } from './LiteIntro';
+import { EmergingPainting } from '../living/EmergingPainting';
 
 const GuideStage = lazy(() => import('../scene/GuideStage'));
 
@@ -22,6 +23,8 @@ interface IntroContextValue {
   sceneFailed: boolean;
   /** The intro is covering the page. */
   covering: boolean;
+  /** The 3D welcome played, so his painting glides home from the cocoon (not from the illustrated welcome). */
+  handoff: boolean;
   send: (e: IntroEvent) => void;
   replay: () => void;
 }
@@ -127,6 +130,8 @@ export function IntroProvider({ children }: { children: ReactNode }) {
   }, [covering, state]);
 
   const fail = useCallback(() => {
+    // Closing the 3D layer after the welcome also loses its context: that's not a failure.
+    if (machine.state === 'done') return;
     setSceneFailed(true);
     machine.send({ type: machine.state === 'loading' || machine.state === 'boot' ? 'LOAD_FAILED' : 'SKIP' });
   }, [machine]);
@@ -137,12 +142,17 @@ export function IntroProvider({ children }: { children: ReactNode }) {
   }, [machine]);
 
   const use3D = mode === 'full' && !sceneFailed;
+  // Did the 3D welcome actually start? (A slow load can still fall back to the illustrated one.)
+  const [played3D, setPlayed3D] = useState(false);
+  useEffect(() => { if (state === 'seated') setPlayed3D(true); else if (state === 'lite') setPlayed3D(false); }, [state]);
+  const handoff = use3D && played3D;
   const beat = beats[state];
-  const value: IntroContextValue = { state, mode, guideReady, sceneFailed, covering, send, replay };
+  const value: IntroContextValue = { state, mode, guideReady, sceneFailed, covering, handoff, send, replay };
 
   return (
     <IntroContext.Provider value={value}>
-      {use3D && (
+      {/* The 3D layer only lives for the welcome: afterwards his home is the living painting in the hero. */}
+      {use3D && (covering || state === 'revealing') && (
         <div className={`stage-layer is-${covering ? 'intro' : state === 'revealing' ? 'revealing' : 'perch'} ${stageActive ? '' : 'is-idle'}`}>
           <div className="stage-sky" aria-hidden />
           <SceneBoundary onError={fail}>
@@ -153,7 +163,9 @@ export function IntroProvider({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      {(state === 'lite' || state === 'liteFlight' || (state === 'revealing' && !use3D)) && (
+      {handoff && (state === 'emerging' || state === 'revealing') && <EmergingPainting state={state} send={send} />}
+
+      {(state === 'lite' || state === 'liteFlight' || (state === 'revealing' && !handoff)) && (
         <LiteIntro state={state} send={send} />
       )}
 
