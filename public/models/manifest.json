@@ -1,3 +1,6 @@
 {
-  "guide": null
+  "guide": {
+    "src": "models/guide.glb",
+    "version": "5855f1c10c"
+  }
 }
