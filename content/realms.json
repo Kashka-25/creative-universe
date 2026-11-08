@@ -1,0 +1,65 @@
+{
+  "$comment": "The six realms of the world. Titles, nav labels and blurbs are site copy: edit freely. 'kind: works' lists works placed in it; 'kind: page' is a page of its own. guideEmote: the gesture the guide makes when he arrives in the realm.",
+  "realms": [
+    {
+      "id": "digital",
+      "kind": "works",
+      "title": "Digital Creations",
+      "nav": "Digital",
+      "blurb": "Digital homes for people and their ideas.",
+      "emblem": "window",
+      "accent": "teal",
+      "guideEmote": "emote_tap"
+    },
+    {
+      "id": "ventures",
+      "kind": "works",
+      "title": "Ventures & Brands",
+      "nav": "Ventures",
+      "blurb": "Worlds, scents and keepsakes you can hold, and places to heal.",
+      "emblem": "seed",
+      "accent": "ochre",
+      "guideEmote": "emote_tada"
+    },
+    {
+      "id": "music",
+      "kind": "works",
+      "title": "Music & Sound",
+      "nav": "Music",
+      "blurb": "Songs, sound and listening.",
+      "emblem": "wave",
+      "accent": "rose",
+      "guideEmote": "emote_groove"
+    },
+    {
+      "id": "books",
+      "kind": "works",
+      "title": "Books & Literature",
+      "nav": "Books",
+      "blurb": "Stories, writing and words.",
+      "emblem": "book",
+      "accent": "olive",
+      "guideEmote": "emote_read"
+    },
+    {
+      "id": "art",
+      "kind": "works",
+      "title": "Art & Experiments",
+      "nav": "Art",
+      "blurb": "Drawings, studies and things still taking shape.",
+      "emblem": "brush",
+      "accent": "lavender",
+      "guideEmote": "emote_paint"
+    },
+    {
+      "id": "about",
+      "kind": "page",
+      "title": "About & Contact",
+      "nav": "About",
+      "blurb": "Who tends this world, and how to reach them.",
+      "emblem": "eye",
+      "accent": "amber",
+      "guideEmote": "wave"
+    }
+  ]
+}

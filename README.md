@@ -1,0 +1,40 @@
+# Cassidy's Creative Universe
+
+An artist portfolio introduced by Cassidy's guide, the meditating chimp from the Atlantean Gardens emblem. He wakes on his cloud, looks at you, beckons, flies past the camera, and lands in the portfolio, where he stays and watches you explore.
+
+Built with Vite, React 19, Three.js (React Three Fiber) and a Blender → glTF pipeline.
+
+## Run it
+
+```bash
+npm install
+```
+
+```bash
+npm run dev
+```
+
+Open http://localhost:5288. Useful switches: `?intro=full`, `?intro=lite`, `?intro=off`, `&debug=1`.
+
+| Command | What it does |
+| --- | --- |
+| `npm run build` | content + typecheck + production build into `dist/` (deployable to any static host) |
+| `npm test` | state machine, content pipeline and GLB contract tests |
+| `npm run content` | rebuild site content from `content/` |
+| `npm run content:import` | re-copy the starter pack from YOUrigin, then rebuild |
+| `npm run optimize:guide` | compress an exported guide GLB |
+| `npm run check:guide -- --register` | validate the GLB against the contract and switch the site to it |
+| `npm run test:guide-pipeline` | self-test of the GLB path without Blender |
+
+## Where things are
+
+- **The guide in Blender:** [blender/README.md](blender/README.md). Modelling, face shape keys, rig, the six story clips, export.
+- **How it fits together:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+- **Adding work and editing realms:** [docs/CONTENT.md](docs/CONTENT.md).
+- **The contract between Blender and the site:** [contract/guide-contract.json](contract/guide-contract.json).
+
+## Status
+
+- The 3D guide on the site today is a **stand-in** built from primitives in your painting's colours. It's rigged and animated to the same contract as the Blender model, so exporting the real one is a drop-in swap.
+- Blender wasn't installed on the machine this was built on, so the Blender scripts haven't been run yet. The web side of the GLB path has been verified with a generated test model.
+- Music & Sound, Books & Literature and Art & Experiments are empty until works are added. Contact links aren't set yet.

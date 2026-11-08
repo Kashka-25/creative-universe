@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+# Blender autosaves and backups (keep the .blend itself)
+*.blend1
+*.blend2
+blender/**/__pycache__/
+public/models/test-guide.glb

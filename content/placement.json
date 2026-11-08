@@ -1,0 +1,10 @@
+{
+  "$comment": "Which realm each starter-pack work lives in. 'bySection' places a whole starter-pack section; 'byWork' overrides single works (use the slug). A work with no placement stops the content build with a clear message, so nothing silently disappears.",
+  "bySection": {
+    "Human Development & Digital Ecosystems": "digital",
+    "Creative Ventures & Worlds": "ventures",
+    "Healing & Wellbeing": "ventures",
+    "Client Work": "digital"
+  },
+  "byWork": {}
+}

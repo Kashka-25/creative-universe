@@ -1,0 +1,77 @@
+/* Design tokens. Core colours are sampled from the guide painting
+   (fur, beanie, sun, clouds) and set on warm parchment. */
+:root {
+  /* paper */
+  --parchment: #f5ead3;
+  --parchment-2: #efe1c4;
+  --parchment-3: #e5d0a8;
+  --card: #fbf4e4;
+
+  /* ink: the painting's fur, darkened for text */
+  --ink: #3a1714;
+  --ink-soft: #6a3a2c;
+  --ink-faint: #8e6a57;
+  --rule: rgba(100, 37, 33, 0.18);
+
+  /* from the painting */
+  --fur: #642521;
+  --ember: #df4612;
+  --ember-deep: #b5370b;
+  --sun: #fdd63a;
+  --gold: #a87a12;        /* text-safe gold on parchment */
+  --gold-soft: #e2b43a;
+  --aqua: #b8fff6;
+  --cyan: #22c3e6;
+  --cyan-ink: #0f6f80;    /* text-safe cyan */
+  --face: #ffa36d;
+
+  /* project colours named in the starter pack */
+  --c-jade: #3e8f6e;
+  --c-ochre: #c08422;
+  --c-olive: #7a772c;
+  --c-sky: #4a88b0;
+  --c-moss: #5c763a;
+  --c-rose: #c05c66;
+  --c-lavender: #8770b0;
+  --c-teal: #1c8a8a;
+  --c-amber: #cf7f22;
+
+  --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Figtree Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --step--1: clamp(0.84rem, 0.8rem + 0.15vw, 0.92rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.1rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.45vw, 1.45rem);
+  --step-2: clamp(1.5rem, 1.3rem + 0.9vw, 2rem);
+  --step-3: clamp(2rem, 1.6rem + 1.8vw, 3rem);
+  --step-4: clamp(2.6rem, 1.9rem + 3.4vw, 4.8rem);
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+  --space-6: 6.5rem;
+  --gutter: clamp(16px, 4vw, 48px);
+  --measure: 62ch;
+  --page: 1180px;
+
+  --radius: 18px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 10px 30px -16px rgba(80, 30, 10, 0.45);
+  --shadow-lift: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 22px 40px -18px rgba(80, 30, 10, 0.5);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .38 0 0 0 0 .2 0 0 0 0 .1 0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme: light;
+}
+
+[data-colour='jade'] { --accent: var(--c-jade); }
+[data-colour='ochre'] { --accent: var(--c-ochre); }
+[data-colour='olive'] { --accent: var(--c-olive); }
+[data-colour='sky'] { --accent: var(--c-sky); }
+[data-colour='moss'] { --accent: var(--c-moss); }
+[data-colour='rose'] { --accent: var(--c-rose); }
+[data-colour='lavender'] { --accent: var(--c-lavender); }
+[data-colour='teal'] { --accent: var(--c-teal); }
+[data-colour='amber'] { --accent: var(--c-amber); }

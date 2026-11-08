@@ -1,0 +1,20 @@
+{
+  "$comment": "Copy this file to e.g. content/works/my-album.json (files starting with _ are ignored). Required: title, realm, description. realm is one of: digital, ventures, music, books, art. cover is a path relative to this folder (put the image in content/works/media/) or a data URI. Then run: npm run content",
+  "title": "Title of the work",
+  "realm": "music",
+  "category": "Album",
+  "colour": "rose",
+  "status": "complete",
+  "description": "One or two sentences for the card.",
+  "portfolioDescription": "The longer description shown on the work's own page.",
+  "link": "https://example.com",
+  "cover": "media/my-album.webp",
+  "year": "2026",
+  "media": [
+    { "kind": "audio", "src": "https://example.com/track.mp3", "title": "Track name" },
+    { "kind": "embed", "src": "https://open.spotify.com/embed/album/...", "title": "Listen" }
+  ],
+  "gallery": [
+    { "src": "media/my-album-back.webp", "alt": "Back cover" }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "name": "cassidy-creative-universe",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Cassidy's Creative Universe: an artist portfolio with a Blender + Three.js guided introduction.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5288",
+    "build": "npm run content && tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview --port 5289",
+    "content": "node scripts/build-content.mjs",
+    "content:import": "node scripts/build-content.mjs --import C:/Users/cassi/YOUrigin/starters/cassidy-ventures.json",
+    "check:guide": "node scripts/check-guide.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "optimize:guide": "node scripts/optimize-guide.mjs",
+    "test:guide-pipeline": "node scripts/make-test-guide.mjs public/models/test-guide.glb && node scripts/optimize-guide.mjs public/models/test-guide.glb && node scripts/check-guide.mjs public/models/test-guide.glb"
+  },
+  "dependencies": {
+    "@fontsource-variable/figtree": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.5",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.187.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "meshoptimizer": "^1.3.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
+  }
+}

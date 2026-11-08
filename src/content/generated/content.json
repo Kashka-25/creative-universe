@@ -1,0 +1,251 @@
+{
+  "$generated": "by scripts/build-content.mjs. Do not edit: change content/ and rebuild.",
+  "owner": {
+    "name": "Cassidy Dugan",
+    "line": "Founder and creative builder",
+    "intro": "I build things where human growth, imagination and craft meet. Some are digital homes for people and their ideas; some are worlds, scents and keepsakes you can hold; some are places to heal. This is a selection of the ventures I'm shaping now.",
+    "packTitle": "Selected ventures",
+    "packKey": "cassidy-ventures-v1"
+  },
+  "about": {
+    "portrait": "art/guide.webp",
+    "portraitAlt": "Cassidy’s guide: a shaggy chimp in an orange-red beanie and dungarees, eyes closed in meditation, a turquoise third eye on his forehead, gold hoops in his ears, cradling a turquoise cloud, with the sun and a lightning bolt behind him.",
+    "contact": []
+  },
+  "realms": [
+    {
+      "id": "digital",
+      "kind": "works",
+      "title": "Digital Creations",
+      "nav": "Digital",
+      "blurb": "Digital homes for people and their ideas.",
+      "emblem": "window",
+      "accent": "teal",
+      "guideEmote": "emote_tap"
+    },
+    {
+      "id": "ventures",
+      "kind": "works",
+      "title": "Ventures & Brands",
+      "nav": "Ventures",
+      "blurb": "Worlds, scents and keepsakes you can hold, and places to heal.",
+      "emblem": "seed",
+      "accent": "ochre",
+      "guideEmote": "emote_tada"
+    },
+    {
+      "id": "music",
+      "kind": "works",
+      "title": "Music & Sound",
+      "nav": "Music",
+      "blurb": "Songs, sound and listening.",
+      "emblem": "wave",
+      "accent": "rose",
+      "guideEmote": "emote_groove"
+    },
+    {
+      "id": "books",
+      "kind": "works",
+      "title": "Books & Literature",
+      "nav": "Books",
+      "blurb": "Stories, writing and words.",
+      "emblem": "book",
+      "accent": "olive",
+      "guideEmote": "emote_read"
+    },
+    {
+      "id": "art",
+      "kind": "works",
+      "title": "Art & Experiments",
+      "nav": "Art",
+      "blurb": "Drawings, studies and things still taking shape.",
+      "emblem": "brush",
+      "accent": "lavender",
+      "guideEmote": "emote_paint"
+    },
+    {
+      "id": "about",
+      "kind": "page",
+      "title": "About & Contact",
+      "nav": "About",
+      "blurb": "Who tends this world, and how to reach them.",
+      "emblem": "eye",
+      "accent": "amber",
+      "guideEmote": "wave"
+    }
+  ],
+  "works": [
+    {
+      "slug": "you",
+      "collection": "Human Development & Digital Ecosystems",
+      "source": "starter:cassidy-ventures-v1",
+      "title": "YOU",
+      "category": "Human development",
+      "colour": "jade",
+      "status": "building",
+      "description": "A human development and community ecosystem: personal growth, community, guided journeys, events, a marketplace and gamification.",
+      "portfolioDescription": "A home for growing, together. YOU brings personal development and community into one place: guided journeys to follow at your own pace, events to meet in person, a marketplace for people who help others grow, and a playful layer that notices progress and makes it feel worth celebrating.",
+      "link": "https://kashka-25.github.io/you-app-build/",
+      "realm": "digital",
+      "cover": {
+        "src": "content/covers/you.e5d96b75.webp",
+        "width": 1600,
+        "height": 900
+      }
+    },
+    {
+      "slug": "yourigin",
+      "collection": "Human Development & Digital Ecosystems",
+      "source": "starter:cassidy-ventures-v1",
+      "title": "YOUrigin",
+      "category": "Creative technology",
+      "colour": "ochre",
+      "status": "building",
+      "description": "A personal creative operating environment for ideas, writing, lyrics, research, Projects and Works.",
+      "portfolioDescription": "A personal creative operating environment. YOUrigin gives ideas, writing, lyrics and research somewhere to land the moment they arrive, then helps them grow into Projects and finished Works. It is private by design, works offline, and keeps a whole creative life in one calm place.",
+      "link": "https://kashka-25.github.io/YOUrigin/",
+      "realm": "digital",
+      "cover": {
+        "src": "content/covers/yourigin.de9c245f.webp",
+        "width": 1600,
+        "height": 900
+      }
+    },
+    {
+      "slug": "commyounity",
+      "collection": "Human Development & Digital Ecosystems",
+      "source": "starter:cassidy-ventures-v1",
+      "title": "CommYOUnity",
+      "category": "Community technology",
+      "colour": "olive",
+      "status": "building",
+      "description": "A small app for the people living and working at Terra Sangha, an eight-hectare community on the land in Portugal.",
+      "portfolioDescription": "A shared home, in an app, for the people living and working at Terra Sangha, an eight-hectare community on the land in Portugal. CommYOUnity brings together community tasks and rotas, shared expenses, a calendar of arrivals and gatherings, a noticeboard, and GratitYOUde, a simple way to thank one another.",
+      "realm": "digital",
+      "cover": {
+        "src": "content/covers/commyounity.44c25a9f.webp",
+        "width": 1600,
+        "height": 900
+      }
+    },
+    {
+      "slug": "wandering",
+      "collection": "Human Development & Digital Ecosystems",
+      "source": "starter:cassidy-ventures-v1",
+      "title": "Wandering",
+      "category": "Travel & connection",
+      "colour": "sky",
+      "status": "building",
+      "description": "A modern explorer's atlas for documenting adventures, planning journeys, preserving memories and discovering where friends are.",
+      "portfolioDescription": "A modern explorer's atlas. Wandering keeps a private map of where you've been, where you dream of going and the journeys you're planning, alongside a separate map of friends who choose to share where they are, so it's easier to meet in real life.",
+      "realm": "digital"
+    },
+    {
+      "slug": "atlantean-gardens",
+      "collection": "Creative Ventures & Worlds",
+      "source": "starter:cassidy-ventures-v1",
+      "title": "Atlantean Gardens",
+      "category": "Worldbuilding & botanical design",
+      "colour": "moss",
+      "status": "building",
+      "description": "A botanical brand and imaginative world with characters, realms, strain collections and an interactive Atlas.",
+      "portfolioDescription": "A botanical brand that is also a world. Atlantean Gardens pairs its strain collections with the characters and realms they come from, all mapped in an interactive Atlas, so every product opens a door into a larger story.",
+      "link": "https://kashka-25.github.io/Atlantean-Gardens/",
+      "realm": "ventures",
+      "cover": {
+        "src": "content/covers/atlantean-gardens.b5831fef.webp",
+        "width": 1600,
+        "height": 900
+      }
+    },
+    {
+      "slug": "sweet-vital-nectar",
+      "collection": "Creative Ventures & Worlds",
+      "source": "starter:cassidy-ventures-v1",
+      "title": "Sweet Vital Nectar",
+      "category": "Fragrance",
+      "colour": "rose",
+      "status": "building",
+      "description": "A fragrance brand: personal scent and botanical roll-on perfumes.",
+      "portfolioDescription": "A fragrance brand about personal scent. Sweet Vital Nectar makes botanical roll-on perfumes: small, warm and close to the skin.",
+      "realm": "ventures",
+      "cover": {
+        "src": "content/covers/sweet-vital-nectar.87809cb1.webp",
+        "width": 1600,
+        "height": 900
+      }
+    },
+    {
+      "slug": "hopeium",
+      "collection": "Healing & Wellbeing",
+      "source": "starter:cassidy-ventures-v1",
+      "title": "Hopeium",
+      "category": "Wellbeing",
+      "colour": "lavender",
+      "status": "idea",
+      "description": "A human-centred wellbeing and therapy concept: a warm home for growth.",
+      "portfolioDescription": "A warm home for growth. Hopeium is a human-centred wellbeing and therapy concept, designed to feel welcoming from the first moment, with simplicity and kindness put ahead of clinical distance.",
+      "link": "https://kashka-25.github.io/HOPEIUM/",
+      "realm": "ventures",
+      "cover": {
+        "src": "content/covers/hopeium.868c7c0a.webp",
+        "width": 1600,
+        "height": 900
+      }
+    },
+    {
+      "slug": "empatherapy",
+      "collection": "Healing & Wellbeing",
+      "source": "starter:cassidy-ventures-v1",
+      "title": "Empatherapy",
+      "category": "Therapeutic wellbeing",
+      "colour": "teal",
+      "status": "building",
+      "description": "A therapeutic and wellbeing venture, including the Empatherapy healing fund initiative.",
+      "portfolioDescription": "Therapy and wellbeing grounded in empathy. Alongside its sessions, Empatherapy gives 10% of session revenue to its own Healing Fund.",
+      "link": "https://empatherapy.co/",
+      "realm": "ventures",
+      "cover": {
+        "src": "content/covers/empatherapy.d7135987.webp",
+        "width": 1600,
+        "height": 900
+      }
+    },
+    {
+      "slug": "chantillys-tallow",
+      "collection": "Client Work",
+      "source": "starter:cassidy-ventures-v1",
+      "title": "Chantilly's Tallow",
+      "category": "Client work",
+      "colour": "moss",
+      "status": "complete",
+      "description": "Grass-fed, organic tallow skincare, handcrafted on a farm in Gippsland.",
+      "portfolioDescription": "Grass-fed, organic tallow skincare, handcrafted on a farm in Gippsland with ethical, sustainable practices. A client project I assisted with.",
+      "link": "https://chantillytallow.com/",
+      "realm": "digital",
+      "cover": {
+        "src": "content/covers/chantillys-tallow.ba8d0d21.webp",
+        "width": 1600,
+        "height": 900
+      }
+    },
+    {
+      "slug": "refocus-counselling",
+      "collection": "Client Work",
+      "source": "starter:cassidy-ventures-v1",
+      "title": "ReFocus Counselling",
+      "category": "Client work",
+      "colour": "amber",
+      "status": "complete",
+      "description": "Counselling with Julie Santall, helping people transform past pain into lasting strength.",
+      "portfolioDescription": "Counselling with Julie Santall, who brings more than 35 years of experience to helping people transform past pain into lasting strength and rewrite their own story. A client project I assisted with.",
+      "link": "https://www.refocuscounselling.com/",
+      "realm": "digital",
+      "cover": {
+        "src": "content/covers/refocus-counselling.cd98805d.webp",
+        "width": 1600,
+        "height": 900
+      }
+    }
+  ]
+}
