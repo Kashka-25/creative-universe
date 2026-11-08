@@ -7,12 +7,12 @@
 // so they never accumulate into the animation.
 
 import {
-  AnimationMixer, LoopOnce, LoopRepeat, Quaternion, Euler, Vector3, MathUtils,
+  AdditiveAnimationBlendMode, AnimationMixer, AnimationUtils, LoopOnce, LoopRepeat, Quaternion, Euler, Vector3, MathUtils,
   type AnimationAction, type AnimationClip, type Material, type Mesh, type Object3D,
 } from 'three';
 import { guideContract, type ClipName } from './contract';
 
-type Name = ClipName | 'perch_idle' | 'land';
+type Name = ClipName | 'perch_idle' | 'land' | 'stand_idle' | 'hover_idle' | 'walk';
 
 export interface FrameContext {
   /** World-space point to look at, or null. */
@@ -26,13 +26,17 @@ export interface FrameContext {
 }
 
 const LOOPING = new Set<string>([
-  ...guideContract.clips.filter((c) => c.loop).map((c) => c.name),
+  ...[...guideContract.clips, ...guideContract.optionalClips].filter((c) => c.loop).map((c) => c.name),
   'perch_idle',
 ]);
+
+/** Gestures are upper body only: these tracks are dropped so his legs keep doing what the idle does. */
+const LOWER_BODY = /^(root|thigh_[LR]|shin_[LR]|foot_[LR])\./;
 
 export class GuideAnimator {
   readonly mixer: AnimationMixer;
   private actions = new Map<string, AnimationAction>();
+  private gestures = new Map<string, AnimationAction>();
   private current: AnimationAction | null = null;
   private currentName: Name | null = null;
   private onDone: ((clip: Name) => void) | null = null;
@@ -54,7 +58,7 @@ export class GuideAnimator {
   private q = new Quaternion();
   private e = new Euler();
 
-  constructor(private root: Object3D, clips: AnimationClip[]) {
+  constructor(private root: Object3D, private clips: AnimationClip[]) {
     this.mixer = new AnimationMixer(root);
     for (const clip of clips) this.actions.set(clip.name, this.mixer.clipAction(clip));
     this.mixer.addEventListener('finished', (ev) => {
@@ -109,6 +113,34 @@ export class GuideAnimator {
     if (this.current && this.current !== next) this.current.crossFadeTo(next, fade, false);
     this.current = next;
     this.currentName = reportAs ?? name;
+    return true;
+  }
+
+  /**
+   * Layers a gesture (contract `gestures`, e.g. wave, point) over whatever is
+   * playing, as additive animation relative to its first frame, so one gesture
+   * works whether he is sitting, standing or hovering. Returns false if the
+   * model has no such clip.
+   */
+  gesture(name: string, { fade = 0.2 }: { fade?: number } = {}) {
+    let action = this.gestures.get(name);
+    if (!action) {
+      const clip = this.clips.find((c) => c.name === name);
+      if (!clip) return false;
+      const upper = clip.clone();
+      upper.name = `${name}__gesture`;
+      upper.tracks = upper.tracks.filter((t) => !LOWER_BODY.test(t.name));
+      AnimationUtils.makeClipAdditive(upper);
+      action = this.mixer.clipAction(upper);
+      action.blendMode = AdditiveAnimationBlendMode;
+      action.setLoop(LoopOnce, 1);
+      action.clampWhenFinished = false;
+      this.gestures.set(name, action);
+    }
+    action.reset();
+    action.setEffectiveWeight(1);
+    action.fadeIn(fade);
+    action.play();
     return true;
   }
 

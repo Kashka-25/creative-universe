@@ -1,5 +1,22 @@
 # Likeness pass: 3D guide vs the original painting
 
+## Blender model (8 Nov 2026)
+
+`blender-sheet.png` shows the painting beside Blender renders of the scripted model (`npm run guide:build`): seated front, three-quarter and side, then awake, wave, walk and react. On the site he's drawn with the same toon bands and ink outline as the stand-in, so he looks flatter and more painted than in these renders.
+
+**Matches the painting:** the palette; the ribbed beanie worn low on the forehead; the turquoise third eye just under the cuff; calm closed eyes and a long level mouth; gold hoops (a cluster on his right ear, a big hoop on his left); the coin pendant; the bib and straps; shaggy maroon fur; peach hands and feet; the seated pose.
+
+**Still different (worth a hand-sculpt or a second pass):**
+
+1. The face mask is larger, rounder and paler than painted. The painting's face is smaller in the head, wrapped deeper in fur, with darker edge shading.
+2. The beanie crown stands taller and tidier. The painted crown slumps further to his right, with a bigger slouch hanging behind that ear.
+3. The body is less of a pyramid. The painting has broader, shaggier shoulders and a wider crossed-leg base.
+4. The hands hold out open palms. In the painting they clasp the cloud.
+5. The fur reads as clumps; the painting's strokes are finer and longer at the silhouette.
+6. About 58k triangles (budget guide: 30–40k). The GLB is 0.93 MB, well under the 6 MB limit. Trim the fur first if phones struggle.
+
+## The code stand-in (7 Nov 2026)
+
 Source of truth: `blender/reference/guide-reference.png`. Sheets in this folder are rendered from the live 3D model by the character studio (`npm run dev`, then open `#/studio` and press "Save sheet").
 
 - `sheet-closed.png`: reference · front · three-quarter · side, eyes closed as painted

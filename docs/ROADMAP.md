@@ -35,7 +35,10 @@ The ecosystem audit and architecture proposal are done.
 
 - [ ] Routes: `/explore` (map of the universe), `/world/:id` (project destination with an "Enter" link), `/journey` (creative timeline), `/contact`
 - [ ] Companion behaviours: travel between spots, realm gestures, one line per place, click reactions
-- [ ] Blender: install it, sculpt the guide from `blender/README.md`, export, then `npm run check:guide -- --register`
+- [x] Blender: model, rig, face shape keys and 19 clips built by script, exported and registered (`npm run guide:build`). He's live in the intro and the hero.
+- [x] Clips for the companion: `stand_idle`, `hover_idle`, `walk`, and gestures (`point`, `wave`, `react`, `look_around`, realm emotes) layered over any idle (`GuideAnimator.gesture`)
+- [ ] Likeness second pass (see `docs/likeness/NOTES.md`): face size, beanie slouch, shoulders, clasped hands
+- [ ] Wire the companion: follow the visitor between pages, gesture on arrival, one line per place
 - [ ] Entry key and demo access to YOU and YOUrigin (blank or example user, never real data); needs its own design pass first
 
 ## Phase 6 — Testing

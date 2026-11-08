@@ -10,6 +10,7 @@ import { beats, type IntroEvent, type IntroState } from '../intro/introMachine';
 import { asset } from '../content';
 import { GuideAnimator } from './guide/GuideAnimator';
 import { buildProceduralGuide } from './guide/proceduralGuide';
+import { stylizeGuide } from './guide/gltfStyle';
 import type { GuideModel } from './guide/types';
 import { pointer } from './stage';
 import { home, probe } from './rigState';
@@ -42,7 +43,11 @@ function ProceduralActor(props: ActorProps) {
 
 function GltfActor({ url, ...props }: ActorProps & { url: string }) {
   const gltf = useGLTF(url, false, true);
-  const model = useMemo<GuideModel>(() => ({ kind: 'gltf', object: gltf.scene, clips: gltf.animations, dispose() {} }), [gltf]);
+  const model = useMemo<GuideModel>(() => {
+    // useGLTF caches the scene, so style it once.
+    if (!gltf.scene.userData.stylized) { stylizeGuide(gltf.scene); gltf.scene.userData.stylized = true; }
+    return { kind: 'gltf', object: gltf.scene, clips: gltf.animations, dispose() {} };
+  }, [gltf]);
   return <ActorBody model={model} {...props} />;
 }
 

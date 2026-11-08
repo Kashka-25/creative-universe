@@ -14,6 +14,8 @@ export const guideContract = contract as unknown as {
   morphs: { required: string[]; optional: string[] };
   materials: { optional: Record<string, string> };
   clips: ClipSpec[];
+  optionalClips: { name: string; loop: boolean; seconds: number; beat: string }[];
+  gestures: { name: string; seconds: number; beat: string }[];
 };
 
 export const clipSpec = (name: ClipName) => guideContract.clips.find((c) => c.name === name)!;

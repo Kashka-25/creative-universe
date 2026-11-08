@@ -47,4 +47,4 @@ Kronk Booth's notes live in [projects/kronk-booth/](projects/kronk-booth/README.
 - `npm test` runs the tests.
 - `npm run build` builds the site.
 - `npm run content:import` re-reads `../YOUrigin/starters/cassidy-ventures.json`.
-- Blender work starts from [blender/README.md](blender/README.md).
+- `npm run guide:build` rebuilds the 3D guide in Blender and registers the GLB. Blender work starts from [blender/README.md](blender/README.md).

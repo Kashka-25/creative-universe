@@ -1,5 +1,29 @@
 # The guide in Blender
 
+## Quick path: build him from the scripts (Nov 2026)
+
+```bash
+npm run guide:build
+```
+
+This one command bakes the site's clips (`blender/clips.json`), builds the whole character in Blender (`blender/scripts/build_guide.py` writes `blender/guide.blend`), exports and compresses `public/models/guide.glb`, checks it against the contract and switches the site to it. Blender 5.2 is found automatically, or set `BLENDER` to its path.
+
+What the build makes:
+
+- **GuideRig:** the contract bones in the stand-in's rest pose (`src/scene/guide/rest.ts`). Every bone points up with roll 0, so each bone's axes are the character's own (+X his left, +Y up, +Z towards you). That's why the site's look-at, blinking and gestures drive him unchanged.
+- **guide_head:** face, skull, ears, eyelids, mouth and teeth, with the shape keys `eyesClosed`, `smile`, `grin`, `squint`, `mouthOpen` and `browsUp`.
+- **guide_body:** torso and dungarees, arms with long-fingered hands, legs with big feet and toes, the beanie, the jewellery and the eyes.
+- **guide_fur:** shaggy fur clumps.
+- **19 actions:** the story clips plus `stand_idle`, `hover_idle`, `walk`, and the gestures `point`, `wave`, `react`, `look_around` and the five realm emotes. Each action carries the face too. Clips are authored once, in `src/scene/guide/proceduralClips.ts`, so the stand-in and the Blender model always move the same way.
+
+To see him without the site: `blender blender/guide.blend --background --python blender/scripts/render_turnaround.py -- OUT_DIR [clip] [frame]` writes front, three-quarter and side renders. `docs/likeness/blender-sheet.png` compares him with the painting.
+
+The build replaces the character each time it runs. To hand-sculpt on top of it, work in a copy of `guide.blend` and export that copy with `export_guide.py` (sections 2 to 6 below). Keep the bone names and the up-pointing bone axes.
+
+---
+
+## By hand (the original plan)
+
 This folder holds the **source** of the 3D guide. Nothing here is served to visitors. The website only ever loads the exported file in `public/models/`.
 
 ```

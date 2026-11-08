@@ -187,6 +187,11 @@
       "beat": "Happy surprise when clicked: arms up, little bounce, big grin."
     },
     {
+      "name": "look_around",
+      "seconds": 3,
+      "beat": "Curious: looks to his left, then his right, then back to you. Head, neck and a little chest."
+    },
+    {
       "name": "emote_tap",
       "seconds": 1.6,
       "beat": "Digital Creations: taps the air with a finger, like a screen."

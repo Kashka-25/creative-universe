@@ -14,7 +14,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "optimize:guide": "node scripts/optimize-guide.mjs",
-    "test:guide-pipeline": "node scripts/make-test-guide.mjs public/models/test-guide.glb && node scripts/optimize-guide.mjs public/models/test-guide.glb && node scripts/check-guide.mjs public/models/test-guide.glb"
+    "test:guide-pipeline": "node scripts/make-test-guide.mjs public/models/test-guide.glb && node scripts/optimize-guide.mjs public/models/test-guide.glb && node scripts/check-guide.mjs public/models/test-guide.glb",
+    "guide:clips": "rolldown scripts/export-guide-clips.ts -o node_modules/.cache/guide-clips.mjs -p node -e three --no-codeSplitting && node node_modules/.cache/guide-clips.mjs",
+    "guide:build": "node scripts/build-guide.mjs"
   },
   "dependencies": {
     "@fontsource-variable/figtree": "^5.3.0",
