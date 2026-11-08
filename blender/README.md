@@ -16,6 +16,8 @@ What the build makes:
 - **guide_fur:** shaggy fur clumps.
 - **19 actions:** the story clips plus `stand_idle`, `hover_idle`, `walk`, and the gestures `point`, `wave`, `react`, `look_around` and the five realm emotes. Each action carries the face too. Clips are authored once, in `src/scene/guide/proceduralClips.ts`, so the stand-in and the Blender model always move the same way.
 
+**Painted from the painting.** After building him, the pipeline lines him up with the painting (`fit_reference.py`, saved to `blender/reference/alignment.json`) and paints him with it (`paint_from_reference.py`), so from the front his face, fur and clothes are Cassidy's brushwork. `blender/guide.blend` is a build output and isn't committed; `npm run guide:build` makes it.
+
 To see him without the site: `blender blender/guide.blend --background --python blender/scripts/render_turnaround.py -- OUT_DIR [clip] [frame]` writes front, three-quarter and side renders. `docs/likeness/blender-sheet.png` compares him with the painting.
 
 The build replaces the character each time it runs. To hand-sculpt on top of it, work in a copy of `guide.blend` and export that copy with `export_guide.py` (sections 2 to 6 below). Keep the bone names and the up-pointing bone axes.

@@ -31,7 +31,7 @@ await doc.transform(
   weld(),
   resample({ tolerance: 1e-4 }),
   reorder({ encoder: MeshoptEncoder }),
-  quantize(),
+  quantize({ quantizeTexcoord: 16 }), // baked texture islands are small: keep UVs precise
 );
 doc.createExtension(EXTMeshoptCompression).setRequired(true).setEncoderOptions({ method: EXTMeshoptCompression.EncoderMethod.FILTER });
 await io.write(output, doc);

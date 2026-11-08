@@ -7,3 +7,7 @@ dist/
 *.blend2
 blender/**/__pycache__/
 public/models/test-guide.glb
+# made from the painting by blender/scripts/reference_masks.py (npm run guide:build)
+blender/reference/guide-reference-chimp.png
+# a build output of npm run guide:build (8 MB with the painted textures)
+blender/guide.blend

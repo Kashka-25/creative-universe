@@ -1,5 +1,15 @@
 # Likeness pass: 3D guide vs the original painting
 
+## Painted from the painting (8 Nov 2026, second pass)
+
+`painted-sheet.png`: the painting, the first Blender model, and the model now. Two changes made the jump:
+
+1. **His proportions were fitted to the painting.** `blender/scripts/fit_reference.py` lines him up on the third eye and mouth and overlays his outline on the painting. Fixes it led to: a smaller, narrower head (`HEAD_SCALE`, `HEAD_WIDTH`); a longer torso and bigger arms and legs (`src/scene/guide/rest.ts`), so his body is the painting's heavy pyramid with the feet hanging below the seat; shoulders sloping down from the chin; bigger ears at mouth level; a lower beanie.
+2. **He's painted with the painting itself.** `blender/scripts/paint_from_reference.py` projects the painting onto him from the front and bakes it into his textures. Clouds, sun and bolt are cut out first (`reference_masks.py`). Surfaces hidden or turned away keep the built texture. Each part only takes its own colours (fur takes maroon, the beanie and dungarees orange, skin peach), so small pose differences don't smear one part onto another.
+
+**Still different:** his hands are open (painted: clasping the cloud), so the painted hands aren't used; the beanie crown is tidier than the painted slouch; the sides and back are the built textures, since the painting only shows his front. A turnaround drawing (side and back) would let the same projection paint those too.
+
+
 ## Blender model (8 Nov 2026)
 
 `blender-sheet.png` shows the painting beside Blender renders of the scripted model (`npm run guide:build`): seated front, three-quarter and side, then awake, wave, walk and react. On the site he's drawn with the same toon bands and ink outline as the stand-in, so he looks flatter and more painted than in these renders.

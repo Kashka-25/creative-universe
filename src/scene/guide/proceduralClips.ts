@@ -61,7 +61,7 @@ const curl = (deg: number, side: 'L' | 'R' | 'both' = 'both'): Pose => {
 
 // ── key poses ──────────────────────────────────────────────
 const SEATED: Pose = merge(
-  { hips: { p: [0, 0.27, 0] }, spine: { r: [4, 0, 0] }, chest: { r: [2, 0, 0] }, neck: { r: [2, 0, 0] }, head: { r: [8, 0, 0] } },
+  { hips: { p: [0, 0.15, 0] }, spine: { r: [4, 0, 0] }, chest: { r: [2, 0, 0] }, neck: { r: [2, 0, 0] }, head: { r: [8, 0, 0] } },
   sym('thigh', { aim: [0.9, -0.1, 0.42] }),
   { shin_L: { aim: [-0.9, -0.1, 0.42] }, shin_R: { aim: [0.88, -0.24, 0.41] } },
   { foot_L: { toes: [-0.45, -0.7, 0.55], top: [0, 0.35, -0.9] }, foot_R: { toes: [0.45, -0.7, 0.55], top: [0, 0.35, -0.9] } },
@@ -78,10 +78,10 @@ const BECKON: Pose = merge(AWAKE, {
   hand_R: { r: [-15, 0, 0] },
 });
 const CROUCH: Pose = merge(AWAKE, {
-  hips: { p: [0, 0.285, 0.03] }, spine: { r: [22, 0, 0] }, chest: { r: [12, 0, 0] }, neck: { r: [-6, 0, 0] }, head: { r: [-14, 0, 0] },
+  hips: { p: [0, 0.165, 0.03] }, spine: { r: [22, 0, 0] }, chest: { r: [12, 0, 0] }, neck: { r: [-6, 0, 0] }, head: { r: [-14, 0, 0] },
 }, sym('upperarm', { aim: [0.32, -0.92, -0.05] }), sym('forearm', { aim: [0.12, -0.96, 0.18], twist: 0 }), curl(5));
 const LIFT: Pose = merge(AWAKE, {
-  hips: { p: [0, 0.42, 0.06], r: [25, 0, 0] }, spine: { r: [8, 0, 0] }, chest: { r: [0, 0, 0] }, neck: { r: [-8, 0, 0] }, head: { r: [-18, 0, 0] },
+  hips: { p: [0, 0.34, 0.06], r: [25, 0, 0] }, spine: { r: [8, 0, 0] }, chest: { r: [0, 0, 0] }, neck: { r: [-8, 0, 0] }, head: { r: [-18, 0, 0] },
 }, sym('thigh', { aim: [0.2, -0.85, 0.45] }), sym('shin', { aim: [0.1, -0.95, -0.25] }), sym('foot', { r: [20, 0, 0] }),
   sym('upperarm', { aim: [0.75, 0.25, 0.3] }), sym('forearm', { aim: [0.6, 0.5, 0.4], twist: 0 }), curl(10));
 const FLY: Pose = merge({
@@ -98,14 +98,14 @@ const foot = (side: 'L' | 'R', toes: V3, top: V3 = [0, 1, 0]): Pose => {
   return { [`foot_${side}`]: { toes: [toes[0] * s, toes[1], toes[2]], top } };
 };
 const STAND: Pose = merge(
-  { hips: { p: [0, 0.55, 0] }, spine: { r: [6, 0, 0] }, chest: { r: [2, 0, 0] }, neck: { r: [-4, 0, 0] }, head: { r: [-4, 0, 0] } },
+  { hips: { p: [0, 0.6, 0] }, spine: { r: [6, 0, 0] }, chest: { r: [2, 0, 0] }, neck: { r: [-4, 0, 0] }, head: { r: [-4, 0, 0] } },
   sym('thigh', { aim: [0.07, -1, 0.12] }), sym('shin', { aim: [0.04, -1, -0.1] }),
   foot('L', [0.15, 0, 1]), foot('R', [0.15, 0, 1]),
   sym('upperarm', { aim: [0.3, -0.94, 0.14] }), sym('forearm', { aim: [0.14, -0.94, 0.3], twist: 40 }),
   curl(25),
 );
 const HOVER: Pose = merge(
-  { hips: { p: [0, 0.6, 0] }, spine: { r: [2, 0, 0] }, chest: { r: [0, 0, 0] }, neck: { r: [-2, 0, 0] }, head: { r: [-2, 0, 0] } },
+  { hips: { p: [0, 0.65, 0] }, spine: { r: [2, 0, 0] }, chest: { r: [0, 0, 0] }, neck: { r: [-2, 0, 0] }, head: { r: [-2, 0, 0] } },
   sym('thigh', { aim: [0.12, -0.9, 0.42] }), sym('shin', { aim: [0.06, -1, -0.12] }),
   foot('L', [0.2, -0.45, 1], [0, 1, 0.4]), foot('R', [0.2, -0.45, 1], [0, 1, 0.4]),
   sym('upperarm', { aim: [0.55, -0.82, 0.12] }), sym('forearm', { aim: [0.35, -0.8, 0.45], twist: 30 }),
@@ -154,7 +154,7 @@ const WAVE_UP: Pose = merge(STAND, {
   upperarm_R: { aim: [-0.82, 0.45, 0.35] }, forearm_R: { aim: [-0.12, 0.97, 0.2], twist: -100 },
 }, curl(5, 'R'));
 const ARMS_UP: Pose = merge(STAND, {
-  hips: { p: [0, 0.6, 0] }, chest: { r: [-6, 0, 0] }, head: { r: [-12, 0, 0] },
+  hips: { p: [0, 0.65, 0] }, chest: { r: [-6, 0, 0] }, head: { r: [-12, 0, 0] },
 }, sym('upperarm', { aim: [0.7, 0.65, 0.3] }), sym('forearm', { aim: [0.35, 0.9, 0.25], twist: -40 }), curl(5));
 const TADA: Pose = merge(STAND, {
   chest: { r: [-8, 0, 0] }, head: { r: [-8, 0, 0] },
@@ -181,7 +181,7 @@ const CLIPS: { name: string; duration: number; loop: boolean; keys: Key[]; lag?:
     name: 'seated_idle', duration: 4, loop: true,
     keys: [
       { t: 0, pose: SEATED, morph: { eyesClosed: 1, smile: 0.1 } },
-      { t: 2, pose: merge(SEATED, { hips: { p: [0, 0.277, 0] }, spine: { r: [2, 0, 0] }, chest: { r: [0, 0, 0] }, head: { r: [6, 0, 0] } }, sym('upperarm', { aim: [0.33, -0.87, 0.36] })), morph: { eyesClosed: 1, smile: 0.12 } },
+      { t: 2, pose: merge(SEATED, { hips: { p: [0, 0.157, 0] }, spine: { r: [2, 0, 0] }, chest: { r: [0, 0, 0] }, head: { r: [6, 0, 0] } }, sym('upperarm', { aim: [0.33, -0.87, 0.36] })), morph: { eyesClosed: 1, smile: 0.12 } },
       { t: 4, pose: SEATED, morph: { eyesClosed: 1, smile: 0.1 } },
     ],
   },
@@ -243,7 +243,7 @@ const CLIPS: { name: string; duration: number; loop: boolean; keys: Key[]; lag?:
     name: 'perch_idle', duration: 5, loop: true,
     keys: [
       { t: 0, pose: AWAKE, morph: { smile: 0.55 } },
-      { t: 1.6, pose: merge(AWAKE, { chest: { r: [-1, 4, 0] }, head: { r: [-2, 6, 4] }, hips: { p: [0, 0.277, 0] } }), morph: { smile: 0.6 } },
+      { t: 1.6, pose: merge(AWAKE, { chest: { r: [-1, 4, 0] }, head: { r: [-2, 6, 4] }, hips: { p: [0, 0.157, 0] } }), morph: { smile: 0.6 } },
       { t: 3.2, pose: merge(AWAKE, { chest: { r: [1, -4, 0] }, head: { r: [0, -6, -3] } }), morph: { smile: 0.5 } },
       { t: 5, pose: AWAKE, morph: { smile: 0.55 } },
     ],
@@ -253,7 +253,7 @@ const CLIPS: { name: string; duration: number; loop: boolean; keys: Key[]; lag?:
     name: 'stand_idle', duration: 3, loop: true,
     keys: [
       { t: 0, pose: STAND, morph: { smile: 0.45 } },
-      { t: 1.5, pose: merge(STAND, { hips: { p: [0, 0.545, 0] }, chest: { r: [0, 3, 0] }, head: { r: [-3, 5, 2] } }, sym('upperarm', { aim: [0.32, -0.93, 0.17] })), morph: { smile: 0.5 } },
+      { t: 1.5, pose: merge(STAND, { hips: { p: [0, 0.595, 0] }, chest: { r: [0, 3, 0] }, head: { r: [-3, 5, 2] } }, sym('upperarm', { aim: [0.32, -0.93, 0.17] })), morph: { smile: 0.5 } },
       { t: 3, pose: STAND, morph: { smile: 0.45 } },
     ],
   },
@@ -262,7 +262,7 @@ const CLIPS: { name: string; duration: number; loop: boolean; keys: Key[]; lag?:
     lag: { shin_L: 0.15, shin_R: 0.2, forearm_L: 0.1, forearm_R: 0.12 },
     keys: [
       { t: 0, pose: HOVER, morph: { smile: 0.5 } },
-      { t: 1.2, pose: merge(HOVER, { hips: { p: [0, 0.63, 0] } }, sym('upperarm', { aim: [0.6, -0.78, 0.15] })), morph: { smile: 0.55 } },
+      { t: 1.2, pose: merge(HOVER, { hips: { p: [0, 0.68, 0] } }, sym('upperarm', { aim: [0.6, -0.78, 0.15] })), morph: { smile: 0.55 } },
       { t: 2.4, pose: HOVER, morph: { smile: 0.5 } },
     ],
   },
@@ -270,11 +270,11 @@ const CLIPS: { name: string; duration: number; loop: boolean; keys: Key[]; lag?:
     name: 'walk', duration: 1, loop: true,
     lag: { head: 0.04, forearm_L: 0.05, forearm_R: 0.05 },
     keys: [
-      { t: 0, pose: stride('L', 0.53), morph: { smile: 0.45 } },
-      { t: 0.25, pose: passing('L', 0.56), morph: { smile: 0.45 } },
-      { t: 0.5, pose: stride('R', 0.53), morph: { smile: 0.45 } },
-      { t: 0.75, pose: passing('R', 0.56), morph: { smile: 0.45 } },
-      { t: 1, pose: stride('L', 0.53), morph: { smile: 0.45 } },
+      { t: 0, pose: stride('L', 0.58), morph: { smile: 0.45 } },
+      { t: 0.25, pose: passing('L', 0.61), morph: { smile: 0.45 } },
+      { t: 0.5, pose: stride('R', 0.58), morph: { smile: 0.45 } },
+      { t: 0.75, pose: passing('R', 0.61), morph: { smile: 0.45 } },
+      { t: 1, pose: stride('L', 0.58), morph: { smile: 0.45 } },
     ],
   },
   // ── gestures (layered over any idle by the site) ──
@@ -305,8 +305,8 @@ const CLIPS: { name: string; duration: number; loop: boolean; keys: Key[]; lag?:
     keys: [
       { t: 0, pose: STAND, morph: { smile: 0.45 } },
       { t: 0.25, pose: ARMS_UP, morph: { grin: 1, squint: 0.6, browsUp: 0.5 }, ease: 'out' },
-      { t: 0.5, pose: merge(ARMS_UP, { hips: { p: [0, 0.55, 0] } }), morph: { grin: 1, squint: 0.6, browsUp: 0.4 } },
-      { t: 0.8, pose: merge(ARMS_UP, { hips: { p: [0, 0.575, 0] } }), morph: { grin: 0.9, squint: 0.5 } },
+      { t: 0.5, pose: merge(ARMS_UP, { hips: { p: [0, 0.6, 0] } }), morph: { grin: 1, squint: 0.6, browsUp: 0.4 } },
+      { t: 0.8, pose: merge(ARMS_UP, { hips: { p: [0, 0.625, 0] } }), morph: { grin: 0.9, squint: 0.5 } },
       { t: 1.3, pose: STAND, morph: { smile: 0.6 } },
     ],
   },

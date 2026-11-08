@@ -89,6 +89,25 @@ def world(bone):
     return p
 
 
+def ty(y):
+    """Torso heights were drawn for the first, shorter skeleton (hips 0.6, neck 1.0); stretch them to the current one."""
+    top = world("neck").y
+    return y if y <= 0.6 else 0.6 + (y - 0.6) * (top - 0.6) / 0.4
+
+
+# The painting's head is small on a big body: everything on the head is built at
+# face-sculpting size, then scaled about the head joint by HEAD_SCALE.
+HEAD_SCALE = 0.83
+HEAD_WIDTH = 0.84   # and narrower than tall: the painted face is closer-set than the sculpt
+HEAD_PARTS = {"head", "eye_L", "eye_R", "beanie"}
+
+
+def head_scale(p):
+    d = (V(p) - world("head")) * HEAD_SCALE
+    d.x *= HEAD_WIDTH
+    return world("head") + d
+
+
 def euler(x, y, z):
     """three.js Euler XYZ (radians) as a rotation matrix."""
     return (Matrix.Rotation(x, 3, "X") @ Matrix.Rotation(y, 3, "Y") @ Matrix.Rotation(z, 3, "Z"))
@@ -618,13 +637,14 @@ def build_head(B):
     # ears: big peach cups with a shaded bowl and gold hoops
     for s in (1, -1):
         rot = euler(0, s * 0.55, s * -0.12)
-        ec = H + V((s * 0.315, 0.07, -0.01))
-        vs, fs, us = ellipsoid(ec, (0.04, 0.1, 0.082), 24, 16, rot=rot)
+        ec = H + V((s * 0.37, 0.0, -0.01))  # big, at mouth level, standing out of the mane
+        vs, fs, us = ellipsoid(ec, (0.05, 0.125, 0.1), 24, 16, rot=rot)
         B.add(vs, fs, us, "skin", head)
-        vs, fs, us = ellipsoid(ec + rot @ V((s * 0.02, -0.006, 0.006)), (0.022, 0.07, 0.054), 20, 12, rot=rot)
+        vs, fs, us = ellipsoid(ec + rot @ V((s * 0.02, -0.006, 0.006)), (0.028, 0.088, 0.068), 20, 12, rot=rot)
         B.add(vs, fs, us, "skin_shade", head)
         hoops = ([((-0.318, 0.0, 0.03), 0.017), ((-0.322, 0.02, 0.04), 0.016), ((-0.325, 0.04, 0.045), 0.015), ((-0.31, 0.15, 0.045), 0.015)]
                  if s < 0 else [((0.318, -0.01, 0.03), 0.028), ((0.325, 0.04, 0.045), 0.015), ((0.315, 0.145, 0.045), 0.014)])
+        hoops = [((p[0] + s * 0.06, p[1] - 0.075, p[2]), r * 1.15) for p, r in hoops]
         for p, r in hoops:
             vs, fs, us = torus(H + V(p), r * 1.3, 0.0055, euler(0, math.pi / 2 + s * 0.3, 0) @ Matrix.Rotation(math.pi / 2, 3, "X"), 24, 6)
             B.add(vs, fs, us, "gold_jewellery", head)
@@ -749,6 +769,7 @@ def build_body(B):
     # torso: a lathe around Y, fur above, dungarees below, with the bib in front
     prof = [(0.48, 0.1, 0.09), (0.52, 0.18, 0.16), (0.58, 0.21, 0.18), (0.66, 0.225, 0.19), (0.75, 0.23, 0.19),
             (0.84, 0.25, 0.19), (0.92, 0.27, 0.19), (0.99, 0.25, 0.17), (1.04, 0.16, 0.13), (1.09, 0.1, 0.09)]
+    prof = [(ty(y), rx * 1.1, rz * 1.05) for y, rx, rz in prof]
 
     def torso(u, v):
         k = v * (len(prof) - 1)
@@ -765,21 +786,21 @@ def build_body(B):
     per = []
     for f in fs:
         c = sum((vs[i] for i in f), V()) / len(f)
-        bib = c.z > 0.07 and abs(c.x) < 0.13 and 0.6 < c.y < 0.935
+        bib = c.z > 0.07 and abs(c.x) < 0.13 and 0.6 < c.y < ty(0.935)
         per.append("dungarees" if (c.y < 0.6 or bib) else "fur")
     B.add(vs, fs, us, per, torso_weight)
 
     # straps, bib buttons, pendant on its chain
     for s in (1, -1):
-        pts = [V((s * 0.1, 0.925, 0.205)), V((s * 0.12, 1.0, 0.17)), V((s * 0.15, 1.05, 0.0)), V((s * 0.13, 1.0, -0.17)), V((s * 0.1, 0.86, -0.2))]
+        pts = [V((s * 0.1, ty(0.925), 0.215)), V((s * 0.13, ty(1.0), 0.18)), V((s * 0.17, ty(1.05), 0.0)), V((s * 0.14, ty(1.0), -0.18)), V((s * 0.1, ty(0.86), -0.21))]
         vs, fs, us = tube(pts, [0.016] * 5, nu=8, squash=0.45)
         B.add(vs, fs, us, "dungarees", torso_weight)
-        vs, fs, us = ellipsoid(V((s * 0.1, 0.915, 0.21)), (0.012, 0.012, 0.006), 12, 8)
+        vs, fs, us = ellipsoid(V((s * 0.1, ty(0.915), 0.22)), (0.012, 0.012, 0.006), 12, 8)
         B.add(vs, fs, us, "gold_jewellery", torso_weight)
-    chain = [V((0.09 * math.cos(a), 1.03 - 0.06 * math.sin(a) ** 2, 0.13 + 0.07 * math.sin(a))) for a in [math.pi * i / 12 for i in range(13)]]
+    chain = [V((0.09 * math.cos(a), ty(1.03) - 0.06 * math.sin(a) ** 2, 0.13 + 0.07 * math.sin(a))) for a in [math.pi * i / 12 for i in range(13)]]
     vs, fs, us = tube(chain, [0.0025] * 13, nu=5, caps=False, nv=36)
     B.add(vs, fs, us, "gold_jewellery", {"chest": 1.0})
-    vs, fs, us = ellipsoid(V((0, 0.975, 0.215)), (0.022, 0.022, 0.006), 20, 8, rot=euler(0.3, 0, 0))
+    vs, fs, us = ellipsoid(V((0, ty(0.975), 0.225)), (0.022, 0.022, 0.006), 20, 8, rot=euler(0.3, 0, 0))
     B.add(vs, fs, us, "gold_jewellery", {"chest": 1.0})
 
     # arms: thick and shaggy, long-fingered peach hands (palms face in, thumbs forward)
@@ -872,9 +893,9 @@ def build_beanie(B):
         up = max(0.0, n.y)
         a = math.atan2(n.x, n.z)
         fold = 0.05 * math.sin(a * 3 + up * 4) * up ** 1.5
-        return (-0.6 * up ** 1.6 + fold, 0.05 * up - 0.5 * max(0.0, -n.x) * up ** 2, 0.06 * up + fold * 0.4)
+        return (-0.6 * up ** 1.6 + fold, -0.45 * max(0.0, -n.x) * up ** 2, 0.06 * up + fold * 0.4)
 
-    vs, fs, us = ellipsoid(V((0, half - 0.01, 0)), (rx - 0.004, 0.17, rz - 0.004), 40, 16, deform=crown_def, v0=0.5)
+    vs, fs, us = ellipsoid(V((0, half - 0.01, 0)), (rx - 0.004, 0.09, rz - 0.004), 40, 16, deform=crown_def, v0=0.5)
     B.add([at(v) for v in vs], fs, [[(u * 3, v) for u, v in uv] for uv in us], "hat", hat_w)
     # the folded-over tip, flopping down on his right
     vs, fs, us = ellipsoid(V((-0.25, 0.1, -0.02)), (0.09, 0.1, 0.14), 20, 14, rot=euler(0.1, 0, 0.6),
@@ -968,7 +989,7 @@ def blades(B, parts, seed):
 def build_fur(F):
     head = {"head": 1.0}
     face_zone = lambda p: ((p.x - FACE_C.x) / 0.24) ** 2 + ((p.y - FACE_C.y) / 0.235) ** 2 < 1 and p.z > FACE_C.z - 0.05
-    ears = lambda p: abs(abs(p.x) - 0.315) < 0.05 and abs(p.y - (H.y + 0.07)) < 0.1 and p.z > -0.05
+    ears = lambda p: abs(abs(p.x) - 0.37) < 0.06 and abs(p.y - H.y) < 0.13 and p.z > -0.05
     third_eye_y = on_face(0, 0.47)[0].y
     under_hat = lambda p: p.y > third_eye_y + 0.04
     mane_flow = lambda p, n: V((p.x - FACE_C.x, (p.y - FACE_C.y) - 0.12, (p.z - FACE_C.z) * 0.3))
@@ -987,9 +1008,9 @@ def build_fur(F):
     blades(F, parts, 11)
 
     # torso fur, skipping the dungarees
-    tv, tf, _ = surface(lambda u, v: V((0.26 * math.sin(2 * math.pi * u - math.pi) * (0.85 + 0.15 * v), lerp(0.6, 1.06, v), 0.19 * math.cos(2 * math.pi * u - math.pi))), 32, 12)
-    bib = lambda p: p.z > 0.06 and abs(p.x) < 0.145 and 0.6 < p.y < 0.94
-    straps = lambda p: abs(abs(p.x) - 0.13) < 0.03 and p.y > 0.94
+    tv, tf, _ = surface(lambda u, v: V((0.29 * math.sin(2 * math.pi * u - math.pi) * (0.85 + 0.15 * v), lerp(0.6, ty(1.06), v), 0.2 * math.cos(2 * math.pi * u - math.pi))), 32, 12)
+    bib = lambda p: p.z > 0.06 and abs(p.x) < 0.145 and 0.6 < p.y < ty(0.94)
+    straps = lambda p: abs(abs(p.x) - 0.13) < 0.03 and p.y > ty(0.94)
     blades(F, [dict(surf=(tv, tf), count=760, length=(0.045, 0.09), width=0.026, lift=0.25, outward=V((0, 0.9, 0)),
                     keep=lambda p, n: not bib(p) and not straps(p), flow=lambda p, n: V((p.x * 0.6, -1, 0)), weight=torso_weight)], 21)
 
@@ -1008,6 +1029,13 @@ def build_fur(F):
 
 
 def finish(B, coll, rig, mats):
+    for i, w in enumerate(B.weights):
+        if set(w) <= HEAD_PARTS:
+            B.verts[i] = head_scale(B.verts[i])
+    for k in B.keys.values():
+        for i in k:
+            if set(B.weights[i]) <= HEAD_PARTS:
+                k[i] = head_scale(k[i])
     me = bpy.data.meshes.new(B.name)
     me.from_pydata([to_blender(p) for p in B.verts], [], B.faces)
     me.update()
@@ -1055,7 +1083,7 @@ def build_rig(coll):
     bpy.ops.object.mode_set(mode="EDIT")
     for b in BONES:
         eb = arm.edit_bones.new(b)
-        p = to_blender(world(b) if not b.startswith("eye_") else EYE[b[-1]])
+        p = to_blender(world(b) if not b.startswith("eye_") else head_scale(EYE[b[-1]]))
         eb.head = p
         eb.tail = p + V((0, 0, 0.06))  # pointing up with roll 0: bone axes = the character's own axes
         eb.roll = 0

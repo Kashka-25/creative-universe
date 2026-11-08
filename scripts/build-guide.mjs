@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // The whole guide pipeline in one go:
-//   bake clips -> build the character in Blender -> export GLB -> optimise -> check and register.
+//   bake clips -> cut the chimp out of the painting -> build the character in Blender ->
+//   line him up with the painting -> paint him with it -> export GLB -> optimise -> check and register.
 //
 //   npm run guide:build
 //
@@ -27,7 +28,10 @@ if (!blender) {
 
 const run = (cmd, args) => execFileSync(cmd, args, { cwd: ROOT, stdio: 'inherit', shell: process.platform === 'win32' && cmd === 'npm' });
 run('npm', ['run', 'guide:clips']);
+run(blender, ['--background', '--factory-startup', '--python', 'blender/scripts/reference_masks.py']);
 run(blender, ['--background', '--factory-startup', '--python', 'blender/scripts/build_guide.py']);
+run(blender, ['blender/guide.blend', '--background', '--python', 'blender/scripts/fit_reference.py']);
+run(blender, ['blender/guide.blend', '--background', '--python', 'blender/scripts/paint_from_reference.py']);
 run(blender, ['blender/guide.blend', '--background', '--python', 'blender/scripts/export_guide.py']);
 run('npm', ['run', 'optimize:guide']);
 run('npm', ['run', 'check:guide', '--', '--register']);
