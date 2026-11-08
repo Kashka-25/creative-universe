@@ -9,7 +9,7 @@
     "build": "npm run content && tsc --noEmit -p tsconfig.json && vite build",
     "preview": "vite preview --port 5289",
     "content": "node scripts/build-content.mjs",
-    "content:import": "node scripts/build-content.mjs --import C:/Users/cassi/YOUrigin/starters/cassidy-ventures.json",
+    "content:import": "node scripts/build-content.mjs --import ../YOUrigin/starters/cassidy-ventures.json",
     "check:guide": "node scripts/check-guide.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",

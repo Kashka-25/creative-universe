@@ -1,5 +1,7 @@
 # Cassidy's Creative Universe
 
+**The central project:** the front door to everything Cassidy makes. Every venture is its own world with its own repo; this site connects them and lets visitors discover and enter them. Lives at `C:\Users\cassi\Projects\CreativeUniverse`, next to the other projects. Plan: [docs/ROADMAP.md](docs/ROADMAP.md).
+
 An artist portfolio introduced by Cassidy's guide, the meditating chimp from the Atlantean Gardens emblem. He wakes on his cloud, looks at you, beckons, flies past the camera, and lands in the portfolio, where he stays and watches you explore.
 
 Built with Vite, React 19, Three.js (React Three Fiber) and a Blender → glTF pipeline.
@@ -36,5 +38,6 @@ Open http://localhost:5288. Useful switches: `?intro=full`, `?intro=lite`, `?int
 ## Status
 
 - The 3D guide on the site today is a **stand-in** built from primitives in your painting's colours. It's rigged and animated to the same contract as the Blender model, so exporting the real one is a drop-in swap.
-- Blender wasn't installed on the machine this was built on, so the Blender scripts haven't been run yet. The web side of the GLB path has been verified with a generated test model.
-- Music & Sound, Books & Literature and Art & Experiments are empty until works are added. Contact links aren't set yet.
+- Blender is being installed (8 Nov 2026); the Blender scripts haven't been run yet. The web side of the GLB path has been verified with a generated test model.
+- Music & Sound, Books & Literature and Art & Experiments are empty until works are added. Contact: email and Instagram are set in `content/about.json`.
+- `npm run content:import` reads the starter pack from the sibling folder `../YOUrigin`.
