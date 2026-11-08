@@ -1181,7 +1181,7 @@ def main():
     build_actions(rig, face_obj)
     scene.frame_start, scene.frame_end = 1, 121
     out = os.path.join(ROOT, "blender", "guide.blend")
-    bpy.ops.wm.save_as_mainfile(filepath=out)
+    bpy.ops.wm.save_as_mainfile(filepath=out, compress=True)
     print(f"Saved {out}")
 
 
