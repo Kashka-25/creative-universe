@@ -10,3 +10,5 @@ public/models/test-guide.glb
 # build outputs of the Blender pipeline (PR #3); never commit them here
 blender/guide.blend
 blender/reference/guide-reference-chimp.png
+# Cassidy's sculpted source models (large; kept locally, the web copy is in public/models)
+blender/sculpt/
