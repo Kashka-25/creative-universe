@@ -7,6 +7,7 @@ import './styles/tokens.css';
 import './styles/base.css';
 import './styles/intro.css';
 import './styles/portfolio.css';
+import './styles/interest.css';
 import { Layout } from './portfolio/Layout';
 import { AboutPage, NotFound, RealmPage, WorkPage, WorldPage } from './portfolio/pages';
 

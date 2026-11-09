@@ -28,5 +28,5 @@ What it does:
 `kronk/index.html` is a self-contained guided tour of Kronk and the Booth, built by the Kronk Booth session (9 Nov 2026) from Cassidy's work on Kronk, with Tal's platform shared by permission (see `projects/kronk-booth/README.md`). It is not a copy of Kronk's code.
 
 - Nine steps: Welcome, Home, Mates and reach, the Hub, the Booth, a set, Live, Wachuneed, Join Kronk. `#N` opens step N.
-- All members, sets, posts and listings are made up. Everything lives in memory in the page: no storage, no network requests, no audio.
-- The Join step has an "Ask Cassidy for an invite" form: it opens the visitor's own email app with a note to yourownuniverse.life@gmail.com (Cassidy asked for this address to be shown). The page sends nothing itself. "Read about Kronk" opens https://kronk.info/kronk/about (new tab). Kronk is invite-only (registrations off), so nothing says "sign up".
+- All members, sets, posts and listings are made up. Everything lives in memory in the page: no storage and no audio; the invite form's POST is its only network request.
+- The Join step has an "Ask Cassidy for an invite" form that posts to Cassidy's Formspree form (https://formspree.io/f/moeeoorq) with project "Kronk": the shared interest form's fields and privacy line (see docs/INTEREST.md). That POST is the tour's only network call (Cassidy chose it). "Read about Kronk" opens https://kronk.info/kronk/about (new tab). Kronk is invite-only (registrations off), so nothing says "sign up".

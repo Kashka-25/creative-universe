@@ -1,0 +1,4 @@
+{
+  "$comment": "The shared \"I'm interested\" form on every work page. Paste Cassidy's Formspree form endpoint here (https://formspree.io/f/<id>); until then no form is shown. Every submission goes to that one form, which emails YourOwnUniverse.life@gmail.com with the subject \"[<Project>] Interest from <name>\". See docs/INTEREST.md.",
+  "endpoint": "https://formspree.io/f/moeeoorq"
+}

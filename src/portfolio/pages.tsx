@@ -4,6 +4,7 @@ import {
   about, asset, neighbours, owner, pageAction, realmById, realms, workBySlug, works, worksIn, type RealmId,
 } from '../content';
 import { ActionButton, InviteLine, LiveLink, PreviewGallery } from './actions';
+import { InterestForm } from './InterestForm';
 import { Cover, HeroStage, RealmMedallion, StatusPill, WorkCard, realmCount, realmHref } from './components';
 import { CloudScroll, LeafDivider, Vine } from './ornaments';
 import { useDocumentTitle } from './useDocumentTitle';
@@ -205,6 +206,7 @@ export function WorkPage() {
           <p><ActionButton work={work} action={pageAction(work)} variant="page" /></p>
         )}
         <LiveLink work={work} />
+        <InterestForm project={work.title} />
       </div>
 
       <LeafDivider className="divider" />
