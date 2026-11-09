@@ -8,7 +8,7 @@ Each folder here, `public/demos/<project>/`, holds a **built copy** of a project
 
 ## FreeTheDream
 
-`freethedream/index.html` is `dist/demo.html` from free-the-dream-map, branch `demo-richer-seed`, commit `0120a2c` (its PR #4, copied before that PR was merged).
+`freethedream/index.html` is `dist/demo.html` from free-the-dream-map, `main`, commit `4d62fb3` (its PR #5).
 
 To refresh it:
 
