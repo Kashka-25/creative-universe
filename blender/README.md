@@ -109,3 +109,16 @@ npm run check:guide -- --register
 `optimize:guide` compresses the file (meshopt, which three.js decodes natively). `check:guide` compares it with the contract and lists any problems. With `--register` it switches the site from the stand-in to your model. Reload the site and he's there. To go back to the stand-in: `npm run check:guide -- --unregister`.
 
 > **Pipeline self-test without Blender:** `npm run test:guide-pipeline` builds a crude contract-complete GLB, optimises it and checks it. It was used to verify this whole path end to end.
+
+## Coco's Awakening: the invitation take
+
+The invitation page (`#/invitation`) is hosted by **Adult Coco** (`coco-sage`). Run these from the project folder, after `build_coco_sage.py` has made `blender/characters/coco-sage.blend`:
+
+```bash
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python blender/scripts/build_coco_invite.py
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b blender/characters/invitation.blend --python blender/scripts/check_cloud_cover.py
+```
+
+- `build_coco_invite.py` copies `coco-sage.blend` to `invitation.blend` (the original is never written), keys his ride in from stage left (the visitor's left) as the clip `invite` on his own rig (60 fps; it ends on `breathe` frame 0, pose and velocity), and exports only his skeleton and that clip to `public/models/invitation/coco-invite.glb`. The site plays it on `coco-sage.glb` and then hands over to that model's own `breathe` and `float`. It writes the markers `floatIn`, `arrive`, `welcome` (the heading) and `glow` to `timeline.json`, then builds the magic cloud with `build_magic_cloud.py` (`magic-cloud.glb`, the markers after the glow, `coverFrame` and the `cloud` block) and the ride cloud with `build_ride_cloud.py` (`public/models/clouds/ride-cloud.glb`, `clips.ride` in `timeline.json`).
+- `build_ride_cloud.py` builds the swirl cloud he rides on from the magic cloud's own curls, wisp and colours. Its clips: `ride` (the welcome, on the master timeline: it trails and streams while he travels, idles, then from `glow` swells into the base of the magic cloud and thins away inside it before he is hidden), `rest` (a seamless 20 s idle loop under him on pages) and `flyin` (2 s: the path of his flight to a new space on a page, as `ctl_progress` / `ctl_lift` / `ctl_bank`, and a soft shimmer as he lands; its last frame is `rest` frame 0). The site makes it follow his root bone, so his own motion carries it.
+- `check_cloud_cover.py` renders coverage masks with the site's camera and prints the frames on which no pixel of him shows. `HIDDEN` in `build_magic_cloud.py` records that span.

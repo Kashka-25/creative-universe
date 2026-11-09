@@ -42,7 +42,9 @@ What it does, in order:
      The third eye has its own material, 'third_eye' (same texture, a small emission the site can raise).
   4. Clips at 30 fps, each its own glTF animation: breathe (5 s loop), settle (into breathe frame 0,
      pose and velocity matched), and additive drift_a/b/c, flutter, react_left/right/smile (zero at
-     both ends; the site layers them on breathe). Curves come from smooth (C2) functions of the
+     both ends; the site layers them on breathe), and float (an additive 7 s loop:
+     his whole self, sun, bolt and swirls included, rises and settles a few cm with a slight sway about a
+     pivot in his middle; it moves the root bone, and the sun and bolt are skinned rigidly to the root). Curves come from smooth (C2) functions of the
      settings below, keyed on every frame with Bezier keys, so loops and joins are seamless. The arms
      are solved every frame so his hands never leave the cloud; the swirl beside his hat follows his
      head so the two never touch.
@@ -939,6 +941,21 @@ def breathe_channels(f):
     return out
 
 
+def float_channels(f):
+    """float: an additive loop (CFG float). His whole self rises and settles, sways and tips back a touch; every
+    channel is 0 with zero velocity at frame 0 and periodic, so it layers over breathe (or any clip) seamlessly."""
+    F = CFG["float"]
+    phi = 2 * np.pi * np.asarray(f, np.float64) / F["frames"]
+    up = (1 - np.cos(phi)) / 2                                # 0 -> 1 -> 0, at rest at both ends
+    side = np.sin(phi) * up / (np.sqrt(27.0) / 8)              # leads the rise; peaks at +-1 (phi = 120 / 240 deg)
+    return {
+        "root.lift": F["liftMM"] * up,
+        "root.sway": F["swayMM"] * side,
+        "root.roll": F["rollDeg"] * side,
+        "root.pitch": -F["pitchDeg"] * up,
+    }
+
+
 SETTLE_FROM = {"spine.pitch": (1.5, 0), "chest.pitch": (2.0, 2), "shoulder_L.raise": (-1.5, 3), "shoulder_R.raise": (-1.5, 3),
                "neck.pitch": (2.5, 5), "head.pitch": (3.0, 8), "belly.fwd": (-2.0, 1)}
 
@@ -1019,6 +1036,7 @@ CLIPS = [
     ("react_left", 45, clip_react("left"), 2, False),
     ("react_right", 45, clip_react("right"), 2, False),
     ("react_smile", 45, clip_react_smile, 2, False),
+    ("float", CFG["float"]["frames"], float_channels, 0, True),
 ]
 
 
@@ -1027,6 +1045,12 @@ def pose_at(P, chans):
     def c(k):
         return float(chans.get(k, 0.0))
     basis = {}
+    if any(k.startswith("root.") for k in chans):
+        # the float: his whole self moves about a pivot in his middle (world axes: +X his left, -Y towards you, +Z up)
+        piv = Vector(CFG["float"]["pivot"])
+        R = Euler((math.radians(c("root.pitch")), math.radians(c("root.roll")), 0.0), "XYZ").to_matrix().to_4x4()
+        M = Matrix.Translation((c("root.sway") / 1000.0, 0, c("root.lift") / 1000.0)) @ Matrix.Translation(piv) @ R             @ Matrix.Translation(-piv)
+        basis["root"] = P.rest["root"].inverted() @ M @ P.rest["root"]
     for n in ("spine", "chest", "neck", "head"):
         basis[n] = rot(c(f"{n}.pitch"), c(f"{n}.yaw"), c(f"{n}.roll"))
     for s in ("L", "R"):
@@ -1044,11 +1068,12 @@ def solve_arm(P, basis, W, s):
     the elbow stays in the plane it rests in."""
     ua, fa, hd = f"upperarm_{s}", f"forearm_{s}", f"hand_{s}"
     rest = P.rest
+    C = W["cloud"] @ rest["cloud"].inverted()          # where the held cloud has gone (it moves only with the float)
     S = W[ua].to_translation()
-    T = rest[hd].to_translation()
+    T = (C @ rest[hd]).to_translation()
     L1 = (rest[fa].to_translation() - rest[ua].to_translation()).length
     L2 = (rest[hd].to_translation() - rest[fa].to_translation()).length
-    E_rest = rest[fa].to_translation()                 # the elbow stays as close to where it rests as it can
+    E_rest = (C @ rest[fa]).to_translation()           # the elbow stays as close to where it rests as it can
     d = max(min((T - S).length, L1 + L2 - 1e-6), abs(L1 - L2) + 1e-6)
     u = (T - S).normalized()
     a = (L1 * L1 - L2 * L2 + d * d) / (2 * d)
@@ -1069,7 +1094,7 @@ def solve_arm(P, basis, W, s):
     basis[fa] = rot_only(P.basis_for_world(basis, fa, tgt, W))
     W = P.world(basis)
     # the hand keeps its rest orientation on the cloud (the solve has put the wrist back where it rests)
-    basis[hd] = rot_only(P.basis_for_world(basis, hd, rest[hd], W))
+    basis[hd] = rot_only(P.basis_for_world(basis, hd, C @ rest[hd], W))
 
 
 def rot_only(M):
@@ -1080,7 +1105,8 @@ def rot_only(M):
 def swirl_basis(P, W_now, chans):
     """The swirl follows the head's motion (as if carried with it) plus its own small float."""
     rest = P.rest
-    D = W_now["head"] @ rest["head"].inverted()
+    # the head's motion relative to the root (the swirl hangs from the root, so it already rides any root motion)
+    D = (W_now["root"] @ rest["root"].inverted()).inverted() @ W_now["head"] @ rest["head"].inverted()
     lift = float(chans.get("swirl.mm", 0.0)) / 1000.0
     sway = math.radians(float(chans.get("swirl.deg", 0.0)))
     own = Matrix.Translation((0, lift, 0)) @ Matrix.Rotation(sway, 4, "X")   # in its own axes: up its length, lean
@@ -1127,7 +1153,7 @@ def bake_clip(P, rig, face, name, N, fn, swirl_lag, loop):
         path = f'pose.bones["{n}"]'
         for idx in range(4):
             put_curve(cb, f"{path}.rotation_quaternion", idx, n, [q[idx] for q in qs])
-        if n in ("belly", "swirl_head"):
+        if n in ("belly", "swirl_head") or (n == "root" and any(k.startswith("root.") for k in chans[0])):
             for idx in range(3):
                 put_curve(cb, f"{path}.location", idx, n, [l[idx] for l in ls])
     cb2 = strip.channelbag(s_key, ensure=True)
@@ -1198,6 +1224,10 @@ def main():
     swirl.vertex_groups.clear()
     swirl.vertex_groups.new(name="swirl_head").add(list(range(len(swirl.data.vertices))), 1.0, "REPLACE")
     skin_to(swirl, rig)
+    # the sun and bolt ride the root (rigidly), so they float with him and never part from him
+    sun.vertex_groups.clear()
+    sun.vertex_groups.new(name="root").add(list(range(len(sun.data.vertices))), 1.0, "REPLACE")
+    skin_to(sun, rig)
     # the sun and bolt: static, its own softly glowing material (same image, so nothing extra to download)
     mat = sun.data.materials[0].copy()
     mat.name = "sun_bolt"

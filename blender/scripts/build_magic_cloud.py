@@ -10,10 +10,10 @@
     --out-dir <dir>      write magic-cloud.glb and timeline.json there instead (for trials; the timeline starts
                          from the project's copy)
 
-Run from the repository root, after blender/scripts/build_invitation.py has made invitation.blend (that script
+Run from the repository root, after blender/scripts/build_coco_invite.py has made invitation.blend (that script
 also calls this one as its last stage, so one run rebuilds the whole scene). Re-runnable: everything this script
-made before (the "magic_cloud" collection and the "transform" action) is removed first; Young Coco is never
-touched, and nothing outside the files listed below is written.
+made before (the "magic_cloud" collection and the "transform" action) is removed first; Adult Coco and his take
+are never touched, and nothing outside the files listed below is written.
 
 Writes
   blender/characters/invitation.blend             + collection "magic_cloud" on the same 60 fps master timeline
@@ -21,7 +21,7 @@ Writes
                                                     "luminous_hold" (a seamless loop at luminous, see build_hold; its
                                                     exact per-frame samples put back by scripts/restore-clip-samples.mjs)
   public/models/invitation/timeline.json          + markers expand, engulf, luminous, dissipate, complete,
-                                                    swapFrame, adultBox and the clip "transform"
+                                                    coverFrame, adultBox, cloud and the clip "transform"
 
 The look comes from his OWN cloud: the carved spiral curls ("ruyi") of the cloud in his hands, in its colours
 (sampled from his texture: deep #1abcda in the grooves, #96ebfb in the body, #efffff on the crests).
@@ -30,23 +30,26 @@ The look comes from his OWN cloud: the carved spiral curls ("ruyi") of the cloud
                       Shared by every puff (one mesh, many nodes: a small file); half of them are mirrored (a
                       negative X scale) so the spirals turn both ways.
   wisp                a tapered ribbon that ends in a curl, like the tail of his cloud.
-  core                a soft, lumpy inner body that glows from within; it also guarantees the swap is hidden.
+  core                a soft, lumpy inner body that glows from within; it also makes sure he is fully hidden at
+                      the peak (while the veil covers the screen).
 Colours are a 1-D ramp texture (UV u = lightness) used as base colour AND emissive map, so when the site raises
 the glow (ctl_glow) the crests and rims glow most: luminous edges, soft white highlights.
 
-Beats (master frames, from the young take's 'glow' marker; the transform is 4.0 s):
-  glow        the held cloud glows (the seed); the magic cloud's own glow rises
+Beats (master frames, from his take's 'glow' marker; the transform is 4.0 s). He is Adult Coco throughout: the
+cloud wraps him and opens on him again, nothing is swapped.
+  glow        the magic cloud's glow rises from the cloud in his hands (the seed)
   expand      curls bubble out of the cloud in his hands and grow
   engulf      the curls, spiralling around him, close in; the inner glow grows from his hands
   luminous    the cloud at its largest, the swirl easing down, glowing from within (the veil starts here)
-  swapFrame   Young Coco and Adult Coco swap, fully hidden (checked with coverage masks)
+  coverFrame  the veil has covered the screen (the site goes home underneath); he is fully hidden around it
+              (checked with coverage masks, see the 'cloud' block this writes into timeline.json)
   dissipate   the curls shrink and thin from the front outwards, the inner glow draws back into his held cloud
-  complete    Adult Coco revealed; a few wisps settle around him and fade (ctl_fade)
+  complete    he is revealed (under the veil, on the invitation page); a few wisps settle around him and fade
 Every movement is a smooth function of time (C2 eases, no linear segments), keyed as Bezier keys on every frame
 with the function's own slopes; the swirl slows smoothly and never stops dead.
 
 Glow and opacity travel as the X scale of the empties ctl_glow and ctl_fade (three r187 cannot play material
-animation). Axes: Blender -Y faces the visitor (+Z in glTF), metres, the same origin as Young Coco and Adult Coco.
+animation). Axes: Blender -Y faces the visitor (+Z in glTF), metres, the same origin as Adult Coco at rest.
 """
 
 import json
@@ -68,7 +71,7 @@ ADULT_GLB = os.path.join(ROOT, "public", "models", "characters", "coco-sage.glb"
 FPS = 60
 COLL = "magic_cloud"
 ACTION = "transform"
-YOUNG = "little-coco"
+RIG = "coco-sage_rig"         # Adult Coco's rig in invitation.blend (build_coco_invite.py)
 FLOOR = 2.0 ** -10          # resting value of the control empties: never 0, exact after meshopt's filter
 
 ARGV = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
@@ -80,8 +83,8 @@ if "--out-dir" in ARGV:                               # trials: leave the projec
         shutil.copyfile(TIMELINE, os.path.join(_trial, "timeline.json"))
     GLB, TIMELINE = os.path.join(_trial, "magic-cloud.glb"), os.path.join(_trial, "timeline.json")
 
-# Beats, in frames after the young take's 'glow' marker (60 fps).
-OFFSETS = {"glow": 0, "expand": 28, "engulf": 66, "luminous": 102, "swap": 138, "dissipate": 156,
+# Beats, in frames after his take's 'glow' marker (60 fps). cover: the veil has covered the screen.
+OFFSETS = {"glow": 0, "expand": 28, "engulf": 66, "luminous": 102, "cover": 138, "dissipate": 156,
            "complete": 210, "end": 240}
 
 # His cloud's colours (sRGB), sampled from the held cloud's texture (percentiles of lightness): grooves and rims
@@ -89,14 +92,19 @@ OFFSETS = {"glow": 0, "expand": 28, "engulf": 66, "luminous": 102, "swap": 138, 
 RAMP = [(0.00, "#1abcda"), (0.20, "#22c2dc"), (0.34, "#2cd4e7"), (0.52, "#96ebfb"), (0.70, "#b6f3fe"),
         (0.85, "#d3feff"), (1.00, "#efffff")]
 
-# The shape of the cloud at its largest (Blender axes, metres). Centre between Young Coco's pose at the swap and
-# Adult Coco (whose bounding box, sun and bolt included, is about x -0.69..0.68, y -0.48..0.48, z -0.95..0.95).
+# The shape of the cloud at its largest (Blender axes, metres), round Adult Coco (whose bounding box, sun and bolt
+# included, is about x -0.69..0.68, y -0.48..0.48, z -0.95..0.95). Unchanged since the veil's matte
+# (veil-matte.webp) was rendered from it at luminous.
 CENTRE = Vector((-0.035, -0.06, -0.07))
 SHELL = (0.80, 0.78, 1.06)          # half-axes of the surface the curl centres settle on (round in plan)
 SHELL_P = 3.4                        # superellipsoid exponent (2 = ellipsoid; higher = fuller shoulders)
 CORE = (0.76, 0.74, 1.00)            # half-axes of the inner glow at full size (inside the curls)
 CORE_P = 2.8
 N_SLOTS = 70                         # Fibonacci points before the far back is thinned out
+# Frames after luminous between which Adult Coco is fully hidden by the cloud (it is opaque there), measured with
+# coverage masks rendered with the site's camera by blender/scripts/check_cloud_cover.py; written into
+# timeline.json as cloud.hiddenFrom / hiddenTo. The veil covers the screen at OFFSETS cover, inside this span.
+HIDDEN = (-9, 65)
 
 
 def log(*a):
@@ -393,7 +401,7 @@ def swirl_angle(B, f):
     fine = np.arange(B["glow"] - 2, B["end"] + 3, 0.25)
     peak = 0.95                                                     # rad/s
     w = peak * (ss(B["expand"], B["expand"] + 40, fine)
-                - 0.90 * ss(B["luminous"] - 4, B["swap"] - 6, fine)
+                - 0.90 * ss(B["luminous"] - 4, B["cover"] - 6, fine)
                 - 0.05 * ss(B["dissipate"], B["complete"], fine))
     ang = np.r_[0.0, np.cumsum((w[1:] + w[:-1]) / 2 * 0.25 / FPS)]
     return np.interp(f, fine, ang)
@@ -413,7 +421,7 @@ def look_quat(fwd, roll):
 
 def held_seed(sc):
     """Where the seed is: the middle of the cloud in his hands (its bone), and the clump's spread there."""
-    rig = bpy.data.objects[f"{YOUNG}_rig"]
+    rig = bpy.data.objects[RIG]
     f0 = sc.frame_current
     sc.frame_set(sc.timeline_markers["glow"].frame + OFFSETS["expand"])
     p = rig.matrix_world @ rig.pose.bones["cloud"].head
@@ -439,12 +447,12 @@ def curl_tracks(B, seed, f):
     middle of the cloud while its front swells outwards, and each curl appears on that front, small, on the side
     of its place, then grows as it travels there, winding a little further round than the swirl (D) as it goes.
     The nearest places fill first and the top last, so his head is the last thing hidden. Everything rides the
-    swirl (the frame turned by Phi), whose layout is exact at the swap."""
+    swirl (the frame turned by Phi), whose layout is exact at the cover."""
     pos_s, size, dirs = slots()
     n = len(size)
     rng = np.random.default_rng(11)
     Phi = swirl_angle(B, f)
-    Phi = Phi - np.interp(B["swap"], f, Phi)
+    Phi = Phi - np.interp(B["cover"], f, Phi)
     seed = np.array(seed)
     C = np.array(CENTRE)
     # birth order: the nearest places first, the top last
@@ -598,8 +606,8 @@ def glow_curve(B, f):
     clears."""
     g = (FLOOR + (0.30 - FLOOR) * ss(B["glow"] + 8, B["expand"] + 6, f)
          + 0.14 * ss(B["expand"] + 6, B["luminous"], f)
-         + 0.08 * ss(B["luminous"], B["swap"], f)
-         - 0.20 * ss(B["swap"] + 4, B["complete"], f))
+         + 0.08 * ss(B["luminous"], B["cover"], f)
+         - 0.20 * ss(B["cover"] + 4, B["complete"], f))
     return g
 
 
@@ -617,7 +625,7 @@ def fade_curve(B, f):
 #   return   and in its last HOLD_RETURN seconds turns and runs forward again, reaching luminous at full speed
 #            (it passes a few frames before luminous only for a moment, never lingering there).
 # So frame 0 and the last frame equal the transform at luminous in pose and velocity, and every pose in between is
-# one the transform itself passes through (Young Coco stays fully hidden; a crossfade back into the transform never
+# one the transform itself passes through (he stays fully hidden; a crossfade back into the transform never
 # cuts across the cloud). The wisps, tucked inside the curls, return over a shorter HOLD_RETURN_WISPS so their tails
 # never peek out. Glow and opacity stay at their luminous values (both are at rest there).
 HOLD = "luminous_hold"
@@ -775,8 +783,6 @@ def build():
     sc.render.fps_base = 1.0
     clear_previous()
     B = beats(sc)
-    if not (420 <= B["swap"] <= 540):
-        log("WARNING: swap frame", B["swap"], "outside 420..540")
     seed = held_seed(sc)
     log("beats", B, "seed", tuple(round(x, 3) for x in seed))
     coll = bpy.data.collections.new(COLL)
@@ -822,8 +828,11 @@ def build():
     for name in ("expand", "engulf", "luminous", "dissipate", "complete"):
         mk = sc.timeline_markers.get(name) or sc.timeline_markers.new(name, frame=0)
         mk.frame = B[name]
-    mk = sc.timeline_markers.get("swap") or sc.timeline_markers.new("swap", frame=0)
-    mk.frame = B["swap"]
+    old = sc.timeline_markers.get("swap")
+    if old:
+        sc.timeline_markers.remove(old)
+    mk = sc.timeline_markers.get("cover") or sc.timeline_markers.new("cover", frame=0)
+    mk.frame = B["cover"]
     sc["magic_cloud_beats"] = json.dumps(B)
     sc.frame_end = max(sc.frame_end, B["end"])
     build_hold(B)
@@ -839,13 +848,8 @@ def export(B):
     os.makedirs(OUT_DIR, exist_ok=True)
     sc = bpy.context.scene
     coll = bpy.data.collections[COLL]
-    young_glow = bpy.data.objects.get("ctl_glow")
-    renamed = []
     try:
-        if young_glow is not None:                     # the exported names must be ctl_glow / ctl_fade
-            young_glow.name = "ctl_glow__young"
-            renamed.append(young_glow)
-        bpy.data.objects["magic_ctl_glow"].name = "ctl_glow"
+        bpy.data.objects["magic_ctl_glow"].name = "ctl_glow"     # the exported names must be ctl_glow / ctl_fade
         bpy.data.objects["magic_ctl_fade"].name = "ctl_fade"
         bpy.ops.object.select_all(action="DESELECT")
         for ob in coll.all_objects:
@@ -862,8 +866,6 @@ def export(B):
     finally:
         bpy.data.objects["ctl_glow"].name = "magic_ctl_glow"
         bpy.data.objects["ctl_fade"].name = "magic_ctl_fade"
-        for ob in renamed:
-            ob.name = "ctl_glow"
     log("exported", raw, round(os.path.getsize(raw) / 1e3, 1), "KB")
     if "--cloud-raw-copy" in ARGV:
         import shutil
@@ -904,18 +906,19 @@ def write_timeline(B):
     tl.setdefault("clips", {})["transform"] = {
         "file": rel, "startFrame": int(B["glow"]), "endFrame": int(B["end"]),
         "note": "the magic cloud (blender/scripts/build_magic_cloud.py); its own time 0 is master frame startFrame"}
-    tl["swapFrame"] = int(B["swap"])
+    tl.pop("swapFrame", None)
+    tl["coverFrame"] = int(B["cover"])
     lo, hi = adult_box(bpy.context.scene)
     # Blender (x, y, z) -> glTF (x, z, -y)
     gmin = [round(float(lo[0]), 4), round(float(lo[2]), 4), round(float(-hi[1]), 4)]
     gmax = [round(float(hi[0]), 4), round(float(hi[2]), 4), round(float(-lo[1]), 4)]
     tl["adultBox"] = [gmin, gmax]
     tl["cloud"] = {
-        "$comment": "The magic cloud (blender/scripts/build_magic_cloud.py), in the same frame as Young Coco (glTF "
-                    "axes, metres). Young Coco and Adult Coco are fully hidden from swapFrame-8 to swapFrame+6 "
-                    "(coverage masks with the site's camera). ctl_glow and ctl_fade carry glow and opacity as "
-                    "scale.x. adultBox: Adult Coco seated at the same origin, sun and bolt included.",
-        "hiddenFrom": int(B["swap"]) - 8, "hiddenTo": int(B["swap"]) + 6,
+        "$comment": "The magic cloud (blender/scripts/build_magic_cloud.py), in the same frame as Adult Coco (glTF "
+                    "axes, metres). He is fully hidden from hiddenFrom to hiddenTo, coverFrame included (coverage "
+                    "masks with the site's camera, blender/scripts/check_cloud_cover.py). ctl_glow and ctl_fade carry "
+                    "glow and opacity as scale.x. adultBox: Adult Coco seated at his place, sun and bolt included.",
+        "hiddenFrom": int(B["luminous"]) + HIDDEN[0], "hiddenTo": int(B["luminous"]) + HIDDEN[1],
         "centre": [round(CENTRE.x, 4), round(CENTRE.z, 4), round(-CENTRE.y, 4)],
     }
     with open(TIMELINE, "w", encoding="utf-8") as fh:
@@ -926,7 +929,7 @@ def write_timeline(B):
 # ───────────────────────────── main ─────────────────────────────
 
 def run_in_scene(save_to=None, do_export=True):
-    """Builds the cloud in the open scene (invitation.blend), saves it, exports. build_invitation.py calls this."""
+    """Builds the cloud in the open scene (invitation.blend), saves it, exports. build_coco_invite.py calls this."""
     B = build()
     path = save_to or BLEND
     bpy.ops.wm.save_as_mainfile(filepath=path, compress=True)
