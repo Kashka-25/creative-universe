@@ -160,6 +160,26 @@
       "description": "A botanical brand and imaginative world with characters, realms, strain collections and an interactive Atlas.",
       "portfolioDescription": "A botanical brand that is also a world. Atlantean Gardens pairs its strain collections with the characters and realms they come from, all mapped in an interactive Atlas, so every product opens a door into a larger story.",
       "link": "https://kashka-25.github.io/Atlantean-Gardens/",
+      "action": {
+        "kind": "visit",
+        "url": "https://kashka-25.github.io/Atlantean-Gardens/"
+      },
+      "preview": {
+        "images": [
+          {
+            "src": "content/previews/atlantean-gardens-home.webp",
+            "alt": "Home page: \"Welcome to the Gardens\" in teal over a soft cream-to-green gradient, with Explore Botanicals and Members Portal buttons."
+          },
+          {
+            "src": "content/previews/atlantean-gardens-about.webp",
+            "alt": "About page: a teal banner reading \"The Legend of Atlantean Gardens\", above a section titled \"From the Depths\"."
+          },
+          {
+            "src": "content/previews/atlantean-gardens-members.webp",
+            "alt": "Members Portal: a cream card titled \"Enter the Inner Gardens\" with a password field and an Enter button, on a teal background."
+          }
+        ]
+      },
       "realm": "ventures",
       "cover": {
         "src": "content/covers/atlantean-gardens.b5831fef.webp",
@@ -195,6 +215,26 @@
       "description": "A human-centred wellbeing and therapy concept: a warm home for growth.",
       "portfolioDescription": "A warm home for growth. Hopeium is a human-centred wellbeing and therapy concept, designed to feel welcoming from the first moment, with simplicity and kindness put ahead of clinical distance.",
       "link": "https://kashka-25.github.io/HOPEIUM/",
+      "action": {
+        "kind": "visit",
+        "url": "https://kashka-25.github.io/IntoTheLighthouse/"
+      },
+      "preview": {
+        "images": [
+          {
+            "src": "content/previews/hopeium-home.webp",
+            "alt": "Home page: the HOPEIUM name with a lighthouse for the letter I, over dusky mountains and a low sun, with a \"Get support now\" button."
+          },
+          {
+            "src": "content/previews/hopeium-support.webp",
+            "alt": "Support page: \"How would you like to reach out?\", with two cream cards, \"Book a session\" and \"Request the next available time\"."
+          },
+          {
+            "src": "content/previews/hopeium-request.webp",
+            "alt": "Request page: \"You don't need the perfect words.\", above a short form asking for a name and how to be contacted."
+          }
+        ]
+      },
       "realm": "ventures",
       "cover": {
         "src": "content/covers/hopeium.868c7c0a.webp",
@@ -254,6 +294,33 @@
         "src": "content/covers/refocus-counselling.cd98805d.webp",
         "width": 1600,
         "height": 900
+      }
+    },
+    {
+      "slug": "freethedream",
+      "realm": "digital",
+      "source": "works/freethedream.json",
+      "title": "FreeTheDream",
+      "description": "A shared map of the community's projects. Suggest an idea, approve it as the admin, and watch it join the web.",
+      "action": {
+        "kind": "demo",
+        "url": "demos/freethedream/"
+      },
+      "preview": {
+        "images": [
+          {
+            "src": "content/previews/freethedream-map.webp",
+            "alt": "The FreeTheDream demo: a round map of community projects in a yin-yang of sea and night sky, each project a labelled circle, with a project list beside it and a strip saying the data is made up."
+          },
+          {
+            "src": "content/previews/freethedream-suggestions.webp",
+            "alt": "The Suggestions panel beside the map, listing two made-up project ideas, Rooftop Garden and Repair Café, each waiting for review with a Follow button."
+          },
+          {
+            "src": "content/previews/freethedream-review.webp",
+            "alt": "The admin Review panel beside the map, with Add to the map and Not this time buttons for each suggested project."
+          }
+        ]
       }
     }
   ]
