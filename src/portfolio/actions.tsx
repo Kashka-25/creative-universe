@@ -35,6 +35,9 @@ export function ActionButton({ work, action, variant }: { work: Work; action?: W
   );
 }
 
+/** "tall" for portrait files (phone screenshots), so they keep a fixed height instead of shrinking into a wide box. */
+const shape = (s: { width?: number; height?: number }) => (s.width && s.height && s.height > s.width ? 'tall' : 'wide');
+
 /** Screenshots in a calm sideways strip (scrollable by keyboard once focused), and an optional clip. */
 export function PreviewGallery({ work, preview }: { work: Work; preview?: Preview }) {
   if (!preview || (preview.images.length === 0 && !preview.clip)) return null;
@@ -51,6 +54,9 @@ export function PreviewGallery({ work, preview }: { work: Work; preview?: Previe
           preload="none"
           poster={previewAsset(preview.clip.poster)}
           src={previewAsset(preview.clip.src)}
+          width={preview.clip.width}
+          height={preview.clip.height}
+          data-shape={shape(preview.clip)}
           aria-label={`${work.title}: preview clip`}
         />
       )}
@@ -58,8 +64,16 @@ export function PreviewGallery({ work, preview }: { work: Work; preview?: Previe
         <div className="preview__strip" tabIndex={0} role="region" aria-label={`${work.title}: preview images. Scroll sideways to see more.`}>
           <ul>
             {preview.images.map((img) => (
-              <li key={img.src} className="preview__item">
-                <img src={previewAsset(img.src)} alt={img.alt} loading="lazy" decoding="async" />
+              <li key={img.src} className="preview__item" data-shape={shape(img)}>
+                <img
+                  src={previewAsset(img.src)}
+                  alt={img.alt}
+                  width={img.width}
+                  height={img.height}
+                  style={shape(img) === 'tall' ? { aspectRatio: `${img.width} / ${img.height}` } : undefined}
+                  loading="lazy"
+                  decoding="async"
+                />
               </li>
             ))}
           </ul>

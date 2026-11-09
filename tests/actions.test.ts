@@ -81,6 +81,15 @@ describe('preview gallery', () => {
     expect(video).not.toMatch(/autoplay/i);
   });
 
+  it('marks portrait screenshots and clips as tall, and reserves their size', () => {
+    const tall = { src: 'content/previews/fake-phone.webp', alt: 'Fake phone screen', width: 720, height: 1560 };
+    const clip = { src: 'content/previews/fake.mp4', poster: 'content/previews/fake-poster.webp', width: 720, height: 1560 };
+    const out = html(createElement(PreviewGallery, { work: base, preview: { images: [tall, images[0]], clip } }));
+    expect(out).toMatch(/<li class="preview__item" data-shape="tall"><img[^>]*width="720" height="1560"/);
+    expect(out).toContain('<li class="preview__item" data-shape="wide">');
+    expect(out.match(/<video[^>]*>/)?.[0]).toContain('data-shape="tall"');
+  });
+
   it('shows nothing without preview data', () => {
     expect(html(createElement(PreviewGallery, { work: base, preview: undefined }))).toBe('');
     expect(html(createElement(PreviewGallery, { work: base, preview: { images: [] } }))).toBe('');

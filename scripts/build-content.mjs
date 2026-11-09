@@ -97,8 +97,15 @@ for (const w of works) {
     console.warn(`  ! ${w.title}: preview clip or poster not found in public/, skipped`);
     clip = undefined;
   }
-  if (images.length || clip) w.preview = clip ? { images, clip } : { images };
-  else delete w.preview;
+  // Pixel sizes of local files, so the page reserves their space and can lay out tall screenshots.
+  const sized = (item, file) => {
+    const size = isWebUrl(file) ? null : imageSize(readFileSync(P('public', file)));
+    return size ? { ...item, width: size.width, height: size.height } : item;
+  };
+  if (images.length || clip) {
+    w.preview = { images: images.map((img) => sized(img, img.src)) };
+    if (clip) w.preview.clip = sized(clip, clip.poster);
+  } else delete w.preview;
 }
 
 // 3. Covers: write image files, keep only paths + sizes in the JSON

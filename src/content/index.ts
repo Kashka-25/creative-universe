@@ -30,7 +30,12 @@ export interface ChangeNote { date: string; text: string }
  */
 export interface WorkAction { kind: 'visit' | 'demo' | 'vision'; url: string }
 /** Screenshots and an optional short clip. Local files are paths inside public/. */
-export interface Preview { images: GalleryImage[]; clip?: { src: string; poster: string } }
+export interface Preview {
+  /** width and height are filled in at build time for local files. */
+  images: (GalleryImage & { width?: number; height?: number })[];
+  /** The clip's width and height are its poster's. */
+  clip?: { src: string; poster: string; width?: number; height?: number };
+}
 
 export interface Work {
   slug: string;
