@@ -353,7 +353,7 @@
       "realm": "digital",
       "source": "works/freethedream.json",
       "title": "FreeTheDream",
-      "description": "A shared map of the community's projects. Suggest an idea, approve it as the admin, and watch it join the web.",
+      "description": "A shared map of the community's projects. Explore sixteen projects, approve new ideas as the admin, and watch a project space come to life.",
       "action": {
         "kind": "demo",
         "url": "demos/freethedream/"
@@ -362,21 +362,33 @@
         "images": [
           {
             "src": "content/previews/freethedream-map.webp",
-            "alt": "The FreeTheDream demo: a round map of community projects in a yin-yang of sea and night sky, each project a labelled circle, with a project list beside it and a strip saying the data is made up.",
+            "alt": "The FreeTheDream demo: a round map of sixteen community projects in a yin-yang of sea and night sky, each project a labelled circle, with a project list beside it and a strip saying the data is made up.",
             "width": 1440,
             "height": 1300
           },
           {
             "src": "content/previews/freethedream-suggestions.webp",
-            "alt": "The Suggestions panel beside the map, listing two made-up project ideas, Rooftop Garden and Repair Café, each waiting for review with a Follow button.",
+            "alt": "The Suggestions panel beside the map, with five made-up project ideas waiting for review, starting with Rooftop Garden and Repair Café, each with a Follow button.",
             "width": 1440,
             "height": 900
           },
           {
             "src": "content/previews/freethedream-review.webp",
-            "alt": "The admin Review panel beside the map, with Add to the map and Not this time buttons for each suggested project.",
+            "alt": "The admin Review panel beside the map, with Add to the map and Not this time buttons for suggested projects such as Repair Café and Sound Bath in the Park.",
             "width": 1440,
             "height": 900
+          },
+          {
+            "src": "content/previews/freethedream-project.webp",
+            "alt": "A project page for the made-up Seed Library: a sprout logo, \"On the map\" and \"Run by Sam, Lena\" labels, and editable tagline and about sections.",
+            "width": 800,
+            "height": 537
+          },
+          {
+            "src": "content/previews/freethedream-project-space.webp",
+            "alt": "The project space preview: the map zoomed in on Mayhem beside a panel titled \"How a project space would run\", at step 4 of 14, where Ari posts a task that every member sees.",
+            "width": 799,
+            "height": 544
           }
         ]
       }
