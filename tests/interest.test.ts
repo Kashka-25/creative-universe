@@ -10,8 +10,8 @@ describe('the shared interest form', () => {
     }
   });
 
-  it('is off until an endpoint is configured', () => {
-    expect(interestEndpoint()).toBeNull();
+  it("uses Cassidy's configured Formspree form", () => {
+    expect(interestEndpoint()).toMatch(/^https:\/\/formspree\.io\/f\/[A-Za-z0-9]+$/);
   });
 
   it('puts the project in the subject, for Gmail labels', () => {
