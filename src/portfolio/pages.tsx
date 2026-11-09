@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import {
   about, asset, neighbours, owner, pageAction, realmById, realms, workBySlug, works, worksIn, type RealmId,
 } from '../content';
-import { ActionButton, InviteLine, PreviewGallery } from './actions';
+import { ActionButton, InviteLine, LiveLink, PreviewGallery } from './actions';
 import { Cover, HeroStage, RealmMedallion, StatusPill, WorkCard, realmCount, realmHref } from './components';
 import { CloudScroll, LeafDivider, Vine } from './ornaments';
 import { useDocumentTitle } from './useDocumentTitle';
@@ -204,6 +204,7 @@ export function WorkPage() {
         {pageAction(work) && (
           <p><ActionButton work={work} action={pageAction(work)} variant="page" /></p>
         )}
+        <LiveLink work={work} />
       </div>
 
       <LeafDivider className="divider" />
