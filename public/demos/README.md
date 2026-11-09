@@ -22,3 +22,11 @@ What it does:
 - The people and ideas are made up. "Watch a project space" plays a step-by-step preview with example people; nothing in it is saved.
 - It makes no network requests. Its links to YOU and Kronk open only when the visitor clicks them.
 - "← Back to Creative Universe" goes to `../../#/`, so the action url keeps its trailing slash: `demos/freethedream/`.
+
+## Kronk
+
+`kronk/index.html` is a self-contained guided tour of Kronk and the Booth, built by the Kronk Booth session (9 Nov 2026) from Cassidy's work on Kronk, with Tal's platform shared by permission (see `projects/kronk-booth/README.md`). It is not a copy of Kronk's code.
+
+- Nine steps: Welcome, Home, Mates and reach, the Hub, the Booth, a set, Live, Wachuneed, Join Kronk. `#N` opens step N.
+- All members, sets, posts and listings are made up. Everything lives in memory in the page: no storage, no network requests, no audio.
+- Its only outbound link is "Join Kronk" → https://kronk.info/kronk/about (new tab). Kronk is invite-only (registrations off), so nothing on the card or in the tour says "sign up".

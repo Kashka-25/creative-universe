@@ -1,8 +1,10 @@
 {
-  "$comment": "A collaboration: Kronk is Tal's platform, and Cassidy has helped build it. Facts from projects/kronk-booth/README.md and the Kronk Booth session (checked against the repo and the live site, 9 Nov 2026); Cassidy to review. Sharing permission confirmed by Cassidy, 9 Nov 2026.",
+  "$comment": "A collaboration: Kronk is Tal's platform, and Cassidy has helped build it. Facts from projects/kronk-booth/README.md and the Kronk Booth session (checked against the repo and the live site, 9 Nov 2026); Cassidy to review. Sharing permission confirmed by Cassidy, 9 Nov 2026. The action is a guided tour with example data (demos/kronk/), because Kronk is invite-only: the tour ends at Kronk's public About page, never a sign-up.",
   "title": "Kronk",
   "realm": "digital",
-  "alsoIn": ["music"],
+  "alsoIn": [
+    "music"
+  ],
   "collection": "Collaborations",
   "category": "Collaboration",
   "description": "A community-owned social platform run by Tal. Cassidy has helped build the Booth, Kronk's stage for music.",
@@ -13,11 +15,32 @@
   ],
   "role": "Contributor. Cassidy built the Booth tidy (#2127, merged 13 Oct 2026); live sets and listening tools (#2339, merged 23 Oct 2026: My sets, saves, kinds, sort, play next, Remind me, Shoutouts, First listens and a live banner); and the FreeTheDream korner, the map inside Kronk (#1988 and #2010, merged Oct 2026). More Booth work is in progress.",
   "credits": "Kronk is run by Tal.",
-  "action": { "kind": "visit", "url": "https://kronk.info/kronk/about" },
+  "action": {
+    "kind": "tour",
+    "url": "demos/kronk/"
+  },
   "preview": {
     "images": [
-      { "src": "content/previews/kronk-about.webp", "alt": "Kronk's About page: a ring of round icons for About, How-it-works, Contributors, Governance, Rules, Privacy and Terms around the Kronk emblem, on a dark background." },
-      { "src": "content/previews/kronk-booth-musik.webp", "alt": "The Booth's Musik page: a grid of sets and mixes with cover art, including My Living YOUlogy and Lavender Skies by Cassidy Rae, and Waiting For A Ride by Cassidy Rae ft Taylah Mayne." }
+      {
+        "src": "content/previews/kronk-tour-booth.webp",
+        "alt": "The Kronk tour at step 5, the Booth: a live banner for a made-up member's set above the Musik grid of example sets with play and save buttons, beside a short explanation of the Booth."
+      },
+      {
+        "src": "content/previews/kronk-tour-set.webp",
+        "alt": "The Kronk tour's set page for an example set, with credits, a track list, Play next and Shoutouts."
+      },
+      {
+        "src": "content/previews/kronk-tour-home.webp",
+        "alt": "The Kronk tour's Home step: a feed of made-up members' posts in time order."
+      },
+      {
+        "src": "content/previews/kronk-about.webp",
+        "alt": "Kronk's About page: a ring of round icons for About, How-it-works, Contributors, Governance, Rules, Privacy and Terms around the Kronk emblem, on a dark background."
+      },
+      {
+        "src": "content/previews/kronk-booth-musik.webp",
+        "alt": "The Booth's Musik page: a grid of sets and mixes with cover art, including My Living YOUlogy and Lavender Skies by Cassidy Rae, and Waiting For A Ride by Cassidy Rae ft Taylah Mayne."
+      }
     ]
   }
 }
