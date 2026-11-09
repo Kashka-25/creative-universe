@@ -29,4 +29,4 @@ What it does:
 
 - Nine steps: Welcome, Home, Mates and reach, the Hub, the Booth, a set, Live, Wachuneed, Join Kronk. `#N` opens step N.
 - All members, sets, posts and listings are made up. Everything lives in memory in the page: no storage, no network requests, no audio.
-- Its only outbound link is "Join Kronk" → https://kronk.info/kronk/about (new tab). Kronk is invite-only (registrations off), so nothing on the card or in the tour says "sign up".
+- The Join step has an "Ask Cassidy for an invite" form: it opens the visitor's own email app with a note to yourownuniverse.life@gmail.com (Cassidy asked for this address to be shown). The page sends nothing itself. "Read about Kronk" opens https://kronk.info/kronk/about (new tab). Kronk is invite-only (registrations off), so nothing says "sign up".
