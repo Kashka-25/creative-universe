@@ -229,6 +229,45 @@ describe('content pipeline', () => {
       expect(worksFromStarter(exported([{ action: { kind: 'demo', url: 'demos/fake-demo/' } }, {}]), quiet)[0]).not.toHaveProperty('action');
     });
 
+    it('takes the tour and idea kinds, including site-hosted pages', () => {
+      const exists = (rel: string) => rel === 'demos/fake-tour/index.html';
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([
+        { action: { kind: 'tour', url: 'demos/fake-tour/' } },
+        { action: { kind: 'idea', url: 'https://example.test/idea/' } },
+      ]), warn, exists);
+      expect(works.map((w: { action: unknown }) => w.action)).toEqual([
+        { kind: 'tour', url: 'demos/fake-tour/' },
+        { kind: 'idea', url: 'https://example.test/idea/' },
+      ]);
+      expect(msgs).toEqual([]);
+    });
+
+    it('takes a short status label as written, and refuses long or multi-line ones', () => {
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([{ status: 'In construction' }, { status: 'building' }]), warn);
+      expect(works.map((w: { status: string }) => w.status)).toEqual(['In construction', 'building']);
+      expect(msgs).toEqual([]);
+      for (const status of ['x'.repeat(33), 'Two\nlines', 42, '   ']) {
+        const c = collect();
+        const [w] = worksFromStarter(exported([{ status }, {}]), c.warn);
+        expect(w).not.toHaveProperty('status');
+        expect(c.msgs).toHaveLength(1);
+      }
+    });
+
+    it('takes an invite only as mailto: to Cassidy\'s public address', () => {
+      const ok = worksFromStarter(exported([{ invite: 'mailto:YourOwnUniverse.life@gmail.com' }, {}]), quiet);
+      expect(ok[0].invite).toBe('mailto:YourOwnUniverse.life@gmail.com');
+      expect(ok[1]).not.toHaveProperty('invite');
+      for (const invite of ['mailto:someone@example.test', 'https://example.test/', 'YourOwnUniverse.life@gmail.com', 'mailto:YourOwnUniverse.life@gmail.com?bcc=x@example.test', true]) {
+        const c = collect();
+        const [w] = worksFromStarter(exported([{ invite }, {}]), c.warn);
+        expect(w, String(invite)).not.toHaveProperty('invite');
+        expect(c.msgs).toHaveLength(1);
+      }
+    });
+
     it('takes a preview gallery with and without a clip', () => {
       const images = [
         { src: 'content/previews/fake-1.webp', alt: 'Fake home screen' },

@@ -8,7 +8,9 @@ import { RealmEmblem } from './ornaments';
 
 export function StatusPill({ status }: { status?: string }) {
   if (!status) return null;
-  return <span className={`status status--${status}`}>{statusLabel(status)}</span>;
+  // Free-text labels ("In construction") get a class-safe modifier; only idea, building and complete are coloured.
+  const key = status.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return <span className={`status status--${key}`}>{statusLabel(status)}</span>;
 }
 
 /** Cover image, or a drawn stand-in when a work has none (nothing is invented: it shows the title). */

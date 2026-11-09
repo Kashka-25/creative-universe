@@ -1,8 +1,18 @@
 {
-  "$comment": "Card words written by the FreeTheDream project session; Cassidy to review (9 Nov 2026). The demo is a built copy in public/demos/freethedream/ (see public/demos/README.md).",
+  "$comment": "Card words and page text written by the FreeTheDream project session from Cassidy's words on the map and the repo's README and KRONK.md; Cassidy to review (9 Nov 2026). The demo is a built copy in public/demos/freethedream/ (see public/demos/README.md).",
   "title": "FreeTheDream",
   "realm": "digital",
   "description": "A shared map of the community's projects. Explore sixteen projects, approve new ideas as the admin, and watch a project space come to life.",
+  "portfolioDescription": "FreeTheDream is a community where we support each other in following our passions and be rewarded for making the world a better place, through heART. We all deserve to free our dreams, and together we can live that dream reality.",
+  "body": [
+    "The FreeTheDream map is a map of the projects people in the community are running, with FreeTheDream, the idea behind them all, at the centre. Each circle is a project someone runs: YOU, Kronk, Anthemos, Mayhem, SoulRise, Empatherapy, CommYOUnity, the Space, the Organisation and The $2 Push, alongside new ideas from the group. Find one you'd like to help with, or suggest your own.",
+    "Anyone can suggest a project the community could help with. A project must involve the community: personal goals belong in YOU, and posts belong on the Kronk feed. An admin reviews each suggestion, and once approved it appears on the map, run by the person who shared it. Whoever runs a project fills in its details in place on the live map: a tagline, what it is, its part in the dream, how to get involved, open questions, reflections and its own logo. Others can follow the suggestions they like and ask to run a project with them.",
+    "The map is the \"O\" from the YOU logo. The ocean side is each person's inner life; the cosmos side, in Kronk's purples, is the shared life of the community. It opens on The Great Web, every project on one ring with every link drawn, and a golden spiral winds inward to FreeTheDream at the centre.",
+    "\"Bringing a dream into waking reality is the key to setting it free. Once the door is open, together we can walk through into the great unknown of our dream reality.\"",
+    "None of it is a ladder. Healing feeds art, art feeds community, community feeds healing, and the web shows how it all flows. One example of heART: release a song, and everyone gives $2 to back the artist pushing the edge. 100 people × $2 = $200 for that release. It's a space for all dreams to make the web, so there's a strong foundation for all our dreams to be set free.",
+    "The map is also shown inside Kronk, the community's social platform.",
+    "About this demo: the people, projects and ideas in it are made up. You are the admin, so you can approve ideas, decide who runs what, and watch how a project space would run. Nothing you do leaves your browser, and Reset starts it again."
+  ],
   "action": { "kind": "demo", "url": "demos/freethedream/" },
   "preview": {
     "images": [

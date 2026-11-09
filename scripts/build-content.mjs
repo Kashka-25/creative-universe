@@ -17,7 +17,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, copyFi
 import { createHash } from 'node:crypto';
 import { join, basename, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { worksFromStarter, placeWorks, parseDataUri, imageSize, checkWork, readAction, readPreview, isWebUrl, EXTRA_FIELDS, STARTER_FIELDS, slugify } from './lib/content-core.mjs';
+import { worksFromStarter, placeWorks, parseDataUri, imageSize, checkWork, readAction, readPreview, readStatus, readInvite, isWebUrl, EXTRA_FIELDS, STARTER_FIELDS, slugify } from './lib/content-core.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const P = (...s) => join(ROOT, ...s);
@@ -72,6 +72,10 @@ if (existsSync(worksDir)) {
     if (action) work.action = action;
     const preview = readPreview(w.preview, `content/works/${f}`, warn);
     if (preview) work.preview = preview;
+    const status = readStatus(w.status, `content/works/${f}`, warn);
+    if (status) work.status = status; else delete work.status;
+    const invite = readInvite(w.invite, `content/works/${f}`, warn);
+    if (invite) work.invite = invite;
     if (w.cover) work.coverRaw = w.cover.startsWith('data:') ? w.cover : { file: join(worksDir, w.cover) };
     works.push(work);
   });

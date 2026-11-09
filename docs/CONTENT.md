@@ -21,12 +21,14 @@ Each project in the pack may also carry these. All are optional; a bad value is 
 | `realm` | `"digital"`, `"ventures"`, `"music"`, `"books"` or `"art"` | Places the work, ahead of `content/placement.json`. |
 | `slug` | `"lowercase-words"` | The work's address (`/work/<slug>`), if it must differ from the title's. |
 | `changes` | `[{ "date": "YYYY-MM-DD", "text": "..." }]` | The "What's new" list on the work's page, newest first. |
-| `action` | `{ "kind": "visit" \| "demo" \| "vision", "url": "https://..." }` | The work's one button, on its card and its page: **Visit** (a live site), **Try the demo** (a demo mode inside the real app) or **See the vision** (work in progress). The url must be `http://` or `https://`, or a demo hosted here, `demos/<project>/` (see [public/demos/README.md](../public/demos/README.md)), whose file must exist in `public/`. It opens in a new tab. |
+| `action` | `{ "kind": "visit" \| "demo" \| "vision" \| "tour" \| "idea", "url": "https://..." }` | The work's one button, on its card and its page: **Visit** (a live site), **Try the demo** (a demo mode inside the real app), **See the vision** (work in progress), **Take the tour** (a guided tour) or **See the idea** (an idea page). The url must be `http://` or `https://`, or a page hosted here, `demos/<project>/` (see [public/demos/README.md](../public/demos/README.md)), whose file must exist in `public/`. It opens in a new tab. |
 | `preview` | `{ "images": [{ "src", "alt" }], "clip": { "src", "poster" } }` | A quiet preview gallery on the work's page: screenshots (lazy-loaded, each needs `alt` text) and an optional short clip (needs a `poster`; it is muted, plays inline and never starts by itself). `clip` is optional. |
+| `status` | short text, e.g. `"In construction"` | A small, calm tag on the card and page, shown as written (first letter capitalised). At most 32 characters on one line; anything else is skipped with a warning. `idea`, `building` and `complete` keep their colours; other labels use the plain tag. |
+| `invite` | `"mailto:YourOwnUniverse.life@gmail.com"` | A line on the work's page: "Want to join the beta, or hear when it's published? Email YourOwnUniverse.life@gmail.com". Only that exact address (Cassidy's public contact) is accepted. Not switched on for any work yet. |
 
 Preview files are either `https://` addresses or paths inside `public/`, written relative to it, e.g. `content/previews/you-home.webp` for `public/content/previews/you-home.webp`. Paths that leave `public/` are refused, and a local file that does not exist is skipped.
 
-Without an `action`, a work's card shows no button, and its page keeps showing the pack's plain `link` as "Visit", as it always has. With neither, there is no button at all. Hand-written works (`content/works/*.json`) may use `action` and `preview` too.
+Without an `action`, a work's card shows no button, and its page keeps showing the pack's plain `link` as "Visit", as it always has. With neither, there is no button at all. Hand-written works (`content/works/*.json`) may use `action`, `preview`, `status` and `invite` too, and may also list another realm with `"alsoIn": ["music"]`.
 
 ```json
 {

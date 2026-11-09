@@ -275,6 +275,7 @@ main > * { max-width: var(--page); margin-inline: auto; }
 .status--building { background: #fde9b0; border-color: #e9c25a; }
 .status--idea { background: #e6defa; border-color: #c4b4ea; }
 .status--complete { background: #d4f1e4; border-color: #9fd6bd; }
+.work-page__invite { color: var(--ink-soft); overflow-wrap: anywhere; }
 
 /* drawn cover for works without an image */
 .cover--drawn {
@@ -335,7 +336,7 @@ main > * { max-width: var(--page); margin-inline: auto; }
 .preview__clip[data-shape='tall'] { width: auto; max-width: 100%; height: var(--preview-tall); object-fit: contain; }
 .preview__strip { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; border-radius: var(--radius-sm); padding-bottom: 0.4rem; }
 .preview__strip:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
-.preview__strip ul { display: flex; gap: 0.75rem; list-style: none; margin: 0; padding: 0; }
+.preview__strip ul { display: flex; align-items: center; gap: 0.75rem; list-style: none; margin: 0; padding: 0; }
 .preview__item { flex: 0 0 min(80%, 420px); scroll-snap-align: start; }
 .preview__item img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: contain; background: var(--parchment-2); border: 1px solid var(--rule); border-radius: var(--radius-sm); }
 /* Tall (portrait) screenshots: a fixed height, each as wide as its own shape. */

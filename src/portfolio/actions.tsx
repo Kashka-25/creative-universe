@@ -35,6 +35,17 @@ export function ActionButton({ work, action, variant }: { work: Work; action?: W
   );
 }
 
+/** The invite line. Its address is fixed: the build only accepts Cassidy's public contact. */
+export function InviteLine({ invite }: { invite?: string }) {
+  if (!invite) return null;
+  const email = invite.replace(/^mailto:/i, '');
+  return (
+    <p className="work-page__invite">
+      Want to join the beta, or hear when it’s published? <a href={invite}>Email {email}</a>
+    </p>
+  );
+}
+
 /** "tall" for portrait files (phone screenshots), so they keep a fixed height instead of shrinking into a wide box. */
 const shape = (s: { width?: number; height?: number }) => (s.width && s.height && s.height > s.width ? 'tall' : 'wide');
 
