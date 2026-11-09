@@ -34,13 +34,15 @@ export interface LivingPaintingProps {
   className?: string;
   /** Fade in over this many ms when it first draws (0: at once). */
   fadeIn?: number;
+  /** Always the still painting (no WebGL, no motion). */
+  still?: boolean;
 }
 
-export function LivingPainting({ className = '', fadeIn = 700 }: LivingPaintingProps) {
+export function LivingPainting({ className = '', fadeIn = 700, still: forceStill = false }: LivingPaintingProps) {
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const offerRequest = useRef(false);
-  const [still, setStill] = useState(prefersStill);
+  const [still, setStill] = useState(() => forceStill || prefersStill());
 
   useEffect(() => {
     if (still) return;
@@ -55,7 +57,7 @@ export function LivingPainting({ className = '', fadeIn = 700 }: LivingPaintingP
 
     const fit = () => {
       if (!renderer) return;
-      // Layout size, not the on-screen box: transforms (the emergence, the glide home) must not resize the canvas.
+      // Layout size, not the on-screen box: CSS transforms on a parent must not resize the canvas.
       const r = { width: el.clientWidth, height: el.clientHeight };
       const a = LAYOUT.aspect;
       const w = Math.min(r.width, r.height * a);
@@ -105,6 +107,16 @@ export function LivingPainting({ className = '', fadeIn = 700 }: LivingPaintingP
       renderer?.dispose();
     };
   }, [still, fadeIn]);
+
+  // Reduced motion turned on while it is moving: it holds still at once, not only on the next visit.
+  useEffect(() => {
+    if (still) return;
+    const mq = typeof window !== 'undefined' ? window.matchMedia?.('(prefers-reduced-motion: reduce)') : undefined;
+    if (!mq?.addEventListener) return;
+    const onChange = () => { if (mq.matches) setStill(true); };
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, [still]);
 
   const offer = () => { offerRequest.current = true; };
 

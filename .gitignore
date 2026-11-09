@@ -12,3 +12,9 @@ blender/guide.blend
 blender/reference/guide-reference-chimp.png
 # Cassidy's sculpted source models (large; kept locally, the web copy is in public/models)
 blender/sculpt/
+# Blender working files made by the scripts (large; rebuild with the scripts in blender/scripts)
+blender/*.blend
+blender/characters/*.blend
+# TypeScript build info and Git Bash crash dumps (local junk)
+*.tsbuildinfo
+*.stackdump

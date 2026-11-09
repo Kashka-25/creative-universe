@@ -35,8 +35,8 @@ export default defineConfig({
   build: {
     target: 'es2022',
     chunkSizeWarningLimit: 1200,
-    // No manual chunks: the lazy import() of GuideStage already puts three.js
-    // and R3F in their own async chunk, so the portfolio never waits for 3D.
+    // No manual chunks: the lazy import()s of HomeStage and InvitationStage already put
+    // three.js and R3F in their own async chunks, so the portfolio never waits for 3D.
   },
   test: {
     include: ['tests/**/*.test.ts'],
