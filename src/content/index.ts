@@ -24,7 +24,10 @@ export interface Cover { src: string; width: number | null; height: number | nul
 export interface Media { kind: 'audio' | 'video' | 'embed'; src: string; title?: string }
 export interface GalleryImage { src: string; alt: string }
 export interface ChangeNote { date: string; text: string }
-/** A work's one primary action. The url is always an http(s) address (checked at build time). */
+/**
+ * A work's one primary action. The url is an http(s) address, or a demo hosted
+ * on this site ("demos/<project>/"); both are checked at build time.
+ */
 export interface WorkAction { kind: 'visit' | 'demo' | 'vision'; url: string }
 /** Screenshots and an optional short clip. Local files are paths inside public/. */
 export interface Preview { images: GalleryImage[]; clip?: { src: string; poster: string } }
@@ -89,6 +92,12 @@ export const asset = (p: string) => `${import.meta.env.BASE_URL}${p.replace(/^\/
 
 /** A preview file: web addresses as they are, public/ paths through asset(). */
 export const previewAsset = (src: string) => (/^https?:\/\//i.test(src) ? src : asset(src));
+
+/** True for a demo hosted on this site, under public/demos/ (checked at build time). */
+export const isSiteDemo = (url: string) => url.startsWith('demos/');
+
+/** Where an action's button points: site demos resolve against the site's base. */
+export const actionHref = (url: string) => (isSiteDemo(url) ? asset(url) : url);
 
 /** Button words for each kind of action. */
 export const actionLabel: Record<WorkAction['kind'], string> = {

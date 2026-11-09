@@ -21,7 +21,7 @@ Each project in the pack may also carry these. All are optional; a bad value is 
 | `realm` | `"digital"`, `"ventures"`, `"music"`, `"books"` or `"art"` | Places the work, ahead of `content/placement.json`. |
 | `slug` | `"lowercase-words"` | The work's address (`/work/<slug>`), if it must differ from the title's. |
 | `changes` | `[{ "date": "YYYY-MM-DD", "text": "..." }]` | The "What's new" list on the work's page, newest first. |
-| `action` | `{ "kind": "visit" \| "demo" \| "vision", "url": "https://..." }` | The work's one button, on its card and its page: **Visit** (a live site), **Try the demo** (a demo mode inside the real app) or **See the vision** (work in progress). The url must be `http://` or `https://`. It opens in a new tab. |
+| `action` | `{ "kind": "visit" \| "demo" \| "vision", "url": "https://..." }` | The work's one button, on its card and its page: **Visit** (a live site), **Try the demo** (a demo mode inside the real app) or **See the vision** (work in progress). The url must be `http://` or `https://`, or a demo hosted here, `demos/<project>/` (see [public/demos/README.md](../public/demos/README.md)), whose file must exist in `public/`. It opens in a new tab. |
 | `preview` | `{ "images": [{ "src", "alt" }], "clip": { "src", "poster" } }` | A quiet preview gallery on the work's page: screenshots (lazy-loaded, each needs `alt` text) and an optional short clip (needs a `poster`; it is muted, plays inline and never starts by itself). `clip` is optional. |
 
 Preview files are either `https://` addresses or paths inside `public/`, written relative to it, e.g. `content/previews/you-home.webp` for `public/content/previews/you-home.webp`. Paths that leave `public/` are refused, and a local file that does not exist is skipped.

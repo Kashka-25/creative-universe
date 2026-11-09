@@ -22,6 +22,7 @@ import { worksFromStarter, placeWorks, parseDataUri, imageSize, checkWork, readA
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const P = (...s) => join(ROOT, ...s);
 const readJson = (f) => JSON.parse(readFileSync(f, 'utf8'));
+const inPublicDir = (rel) => existsSync(P('public', rel));
 
 const args = process.argv.slice(2);
 const importIdx = args.indexOf('--import');
@@ -52,7 +53,7 @@ let owner = null;
 const works = [];
 for (const f of packs) {
   const pack = readJson(join(starterDir, f));
-  works.push(...worksFromStarter(pack));
+  works.push(...worksFromStarter(pack, undefined, inPublicDir));
   owner ??= { name: pack.ownerName, line: pack.ownerLine, intro: pack.intro, packTitle: pack.title, packKey: pack.key };
 }
 
@@ -67,7 +68,7 @@ if (existsSync(worksDir)) {
     const work = { slug: w.slug || slugify(w.title), realm: w.realm, collection: w.collection, source: `works/${f}`, order: 10000 + (w.order ?? i) };
     for (const k of [...STARTER_FIELDS, ...EXTRA_FIELDS]) if (w[k] !== undefined) work[k] = w[k];
     const warn = (msg) => console.warn(`  ! ${msg}`);
-    const action = readAction(w.action, `content/works/${f}`, warn);
+    const action = readAction(w.action, `content/works/${f}`, warn, inPublicDir);
     if (action) work.action = action;
     const preview = readPreview(w.preview, `content/works/${f}`, warn);
     if (preview) work.preview = preview;
@@ -83,7 +84,7 @@ if (problems.length) {
 }
 
 // Preview files given as public/ paths must exist, or they are left out.
-const inPublic = (src) => isWebUrl(src) || existsSync(P('public', src));
+const inPublic = (src) => isWebUrl(src) || inPublicDir(src);
 for (const w of works) {
   if (!w.preview) continue;
   const images = w.preview.images.filter((img) => {

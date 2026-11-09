@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 // @ts-expect-error plain JS module shared with the build script
-import { slugify, parseDataUri, imageSize, worksFromStarter, placeWorks } from '../scripts/lib/content-core.mjs';
+import { slugify, parseDataUri, imageSize, worksFromStarter, placeWorks, siteDemoFile } from '../scripts/lib/content-core.mjs';
 // @ts-expect-error plain JS module shared with the CLI
 import { validateGuide, sanitizeName } from '../scripts/lib/guide-validate.mjs';
 
@@ -151,7 +151,7 @@ describe('content pipeline', () => {
     });
 
     it('a work with no action gets no button data', () => {
-      const plain = worksFromStarter(pack, quiet);
+      const plain = worksFromStarter(exported([{ link: 'https://example.test/' }, {}]), quiet);
       for (const w of plain) {
         expect(w).not.toHaveProperty('action');
         expect(w).not.toHaveProperty('preview');
@@ -175,6 +175,39 @@ describe('content pipeline', () => {
         expect(works[0]).not.toHaveProperty('action');
         expect(msgs).toHaveLength(1);
       }
+    });
+
+    it('takes a site-hosted demo under demos/ only when its file is in public/', () => {
+      const files = new Set(['demos/fake-demo/index.html', 'demos/fake-demo/other.html']);
+      const exists = (rel: string) => files.has(rel);
+      expect(siteDemoFile('demos/fake-demo/')).toBe('demos/fake-demo/index.html');
+      expect(siteDemoFile('demos/fake-demo/other.html')).toBe('demos/fake-demo/other.html');
+      for (const url of ['demos/fake-demo/', 'demos/fake-demo/other.html']) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ action: { kind: 'demo', url } }, {}]), warn, exists);
+        expect(works[0].action).toEqual({ kind: 'demo', url });
+        expect(msgs).toEqual([]);
+      }
+      const refused = [
+        'demos/missing-demo/', // no file in public/
+        'demos/fake-demo', // a directory needs its trailing slash
+        '/demos/fake-demo/',
+        './demos/fake-demo/',
+        'demos/../secrets/',
+        'demos/fake-demo/../../x.html',
+        'demos/fake-demo/.hidden',
+        'demos/Fake Demo/',
+        'demos/fake-demo/?q=1',
+        'content/previews/fake.webp',
+      ];
+      for (const url of refused) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ action: { kind: 'demo', url } }, {}]), warn, exists);
+        expect(works[0], url).not.toHaveProperty('action');
+        expect(msgs).toHaveLength(1);
+      }
+      // Without a way to check public/, a site demo is refused rather than trusted.
+      expect(worksFromStarter(exported([{ action: { kind: 'demo', url: 'demos/fake-demo/' } }, {}]), quiet)[0]).not.toHaveProperty('action');
     });
 
     it('takes a preview gallery with and without a clip', () => {
@@ -228,7 +261,8 @@ describe('content pipeline', () => {
   it('the generated site content matches the starter pack', () => {
     expect(generated.owner.name).toBe(pack.ownerName);
     expect(generated.owner.intro).toBe(pack.intro);
-    expect(generated.works.map((w: { title: string }) => w.title)).toEqual(
+    const fromPack = generated.works.filter((w: { source: string }) => w.source.startsWith('starter:'));
+    expect(fromPack.map((w: { title: string }) => w.title)).toEqual(
       pack.sections.flatMap((s: { projects: { title: string }[] }) => s.projects.map((p) => p.title)),
     );
     expect(generated.realms.map((r: { id: string }) => r.id)).toEqual(['digital', 'ventures', 'music', 'books', 'art', 'about']);

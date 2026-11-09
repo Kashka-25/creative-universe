@@ -25,6 +25,15 @@ describe('work action button', () => {
     expect(out).toContain('Fake Work');
   });
 
+  it('a site-hosted demo resolves against the site base and still opens in a new tab', () => {
+    const work = { ...base, action: { kind: 'demo' as const, url: 'demos/fake-demo/' } };
+    const out = html(createElement(ActionButton, { work, action: work.action, variant: 'page' }));
+    expect(out).toContain(`href="${import.meta.env.BASE_URL}demos/fake-demo/"`);
+    expect(out).toContain('target="_blank"');
+    expect(out).toContain('rel="noopener noreferrer"');
+    expect(out).toContain('(opens in a new tab)');
+  });
+
   it('shows nothing without a link', () => {
     expect(html(createElement(ActionButton, { work: base, action: undefined, variant: 'card' }))).toBe('');
     expect(pageAction(base)).toBeUndefined();

@@ -36,7 +36,7 @@ The ecosystem audit and architecture proposal are done.
 - [ ] Routes: `/explore` (map of the universe), `/world/:id` (project destination with an "Enter" link), `/journey` (creative timeline), `/contact`
 - [ ] Companion behaviours: travel between spots, realm gestures, one line per place, click reactions
 - [ ] Blender: install it, sculpt the guide from `blender/README.md`, export, then `npm run check:guide -- --register`
-- [ ] Entry key and demo access to YOU and YOUrigin (blank or example user, never real data); needs its own design pass first
+- [ ] Open demos of YOU and YOUrigin, with no entry key (decided 9 Nov 2026): example data in the visitor's browser, never real user data. Add each one's "Try the demo" action once its demo is live.
 
 ## Phase 6 — Testing
 

@@ -1,7 +1,7 @@
 // A work's one primary action ("Visit", "Try the demo", "See the vision") and
 // its optional preview gallery. Both come only from content data: no link, no button.
 
-import { actionLabel, previewAsset, type Preview, type Work, type WorkAction } from '../content';
+import { actionHref, actionLabel, isSiteDemo, previewAsset, type Preview, type Work, type WorkAction } from '../content';
 
 /** True when the url goes to another site (always, when rendered outside a browser). */
 export function leavesSite(url: string) {
@@ -18,12 +18,13 @@ export function leavesSite(url: string) {
  */
 export function ActionButton({ work, action, variant }: { work: Work; action?: WorkAction; variant: 'card' | 'page' }) {
   if (!action) return null;
-  const away = leavesSite(action.url);
+  // A site-hosted demo is a separate app, so it opens in a new tab too.
+  const away = isSiteDemo(action.url) || leavesSite(action.url);
   const longVisit = variant === 'page' && action.kind === 'visit';
   return (
     <a
       className={`button ${variant === 'page' ? 'button--primary' : 'button--ghost button--small'}`}
-      href={action.url}
+      href={actionHref(action.url)}
       data-action={action.kind}
       {...(away ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
     >

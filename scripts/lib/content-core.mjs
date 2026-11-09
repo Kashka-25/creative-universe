@@ -127,10 +127,25 @@ export function previewSrc(s) {
 }
 
 /**
+ * A site-hosted demo: a path inside public/demos/<project>/, written relative to
+ * the site ("demos/freethedream/" or "demos/freethedream/index.html").
+ * Returns the public/ file that must exist for it (a directory means its
+ * index.html), or null when the url is not such a path.
+ */
+export function siteDemoFile(url) {
+  if (typeof url !== 'string') return null;
+  const m = /^demos\/[a-z0-9][a-z0-9-]*\/((?:[A-Za-z0-9_-][A-Za-z0-9._-]*\/)*(?:[A-Za-z0-9_-][A-Za-z0-9._-]*)?)$/.exec(url);
+  if (!m) return null;
+  return url.endsWith('/') ? `${url}index.html` : url;
+}
+
+/**
  * Reads a work's primary action: { kind: "visit" | "demo" | "vision", url }.
+ * The url is an http(s) address, or a site-hosted demo under demos/ whose file
+ * exists in public/ (checked with publicFileExists, given by the build script).
  * Returns the action, or undefined (with a warning) when it is missing or invalid.
  */
-export function readAction(value, name, warn) {
+export function readAction(value, name, warn, publicFileExists) {
   if (value === undefined || value === null) return undefined;
   if (typeof value !== 'object' || Array.isArray(value)) {
     warn(`${name}: action must be an object like { "kind": "visit", "url": "https://..." }; showing no button.`);
@@ -140,8 +155,14 @@ export function readAction(value, name, warn) {
     warn(`${name}: action kind ${JSON.stringify(value.kind)} is not one of ${ACTION_KINDS.join(', ')}; showing no button.`);
     return undefined;
   }
-  if (!isWebUrl(value.url)) {
-    warn(`${name}: action url ${JSON.stringify(value.url)} is not an http(s) address; showing no button.`);
+  const demoFile = siteDemoFile(value.url);
+  if (demoFile) {
+    if (!publicFileExists || !publicFileExists(demoFile)) {
+      warn(`${name}: action url "${value.url}" needs public/${demoFile}, which is not there; showing no button.`);
+      return undefined;
+    }
+  } else if (!isWebUrl(value.url)) {
+    warn(`${name}: action url ${JSON.stringify(value.url)} is not an http(s) address or a demo under demos/; showing no button.`);
     return undefined;
   }
   return { kind: value.kind, url: value.url };
@@ -192,7 +213,7 @@ export function readPreview(value, name, warn) {
  * so the work falls back to how it would be read without them. The pack's
  * top-level "source" and "exportedAt" are accepted and not used.
  */
-export function worksFromStarter(pack, warn = (msg) => console.warn(`  ! ${msg}`)) {
+export function worksFromStarter(pack, warn = (msg) => console.warn(`  ! ${msg}`), publicFileExists) {
   if (!pack || pack.format !== 'yourigin-starter-portfolio' || !Array.isArray(pack.sections)) {
     throw new Error('Not a YOUrigin starter portfolio (expected format "yourigin-starter-portfolio").');
   }
@@ -235,7 +256,7 @@ export function worksFromStarter(pack, warn = (msg) => console.warn(`  ! ${msg}`
       if (kept.length) work.changes = kept;
     }
 
-    const action = readAction(p.action, name, warn);
+    const action = readAction(p.action, name, warn, publicFileExists);
     if (action) work.action = action;
     const preview = readPreview(p.preview, name, warn);
     if (preview) work.preview = preview;
