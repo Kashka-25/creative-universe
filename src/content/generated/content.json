@@ -242,11 +242,15 @@
       "description": "A botanical brand and imaginative world with characters, realms, strain collections and an interactive Atlas.",
       "portfolioDescription": "The idea, in development: the story of Atlantean Gardens, bringing love, creativity and joy back to the world of plant medicine, especially cannabis. A plant guide with a real folklore story woven through it, told through painted strain cards, the Atlas and its realms, and the five Keepers. The full immersive experience is being rebuilt.",
       "link": "https://kashka-25.github.io/Atlantean-Gardens/",
+      "action": {
+        "kind": "idea",
+        "url": "https://kashka-25.github.io/Atlantean-Gardens/idea/"
+      },
       "preview": {
         "images": [
           {
             "src": "content/previews/atlantean-gardens-idea-top.webp",
-            "alt": "The Atlantean Gardens idea page opens over a painted map of a forested island city: the guide emblem of a meditating chimp on his cloud, the title \"Atlantean Gardens\", \"Atlantis Rising · Myth Made Medicine\", and \"Bringing love, creativity and joy back to the world of plant medicine, especially cannabis.\"",
+            "alt": "The Atlantean Gardens idea page opens over a painted map of a forested island city: a gold-ringed green tree emblem, the pale sea-foam trident wordmark \"Atlantean Gardens\", \"Atlantis Rising · Myth Made Medicine\", and \"Bringing love, creativity and joy back to the world of plant medicine, especially cannabis.\"",
             "width": 1440,
             "height": 900
           },
@@ -266,7 +270,7 @@
       },
       "realm": "ventures",
       "cover": {
-        "src": "content/covers/atlantean-gardens.b5831fef.webp",
+        "src": "content/covers/atlantean-gardens.5005dbc9.webp",
         "width": 1600,
         "height": 900
       }
