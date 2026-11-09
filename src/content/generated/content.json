@@ -94,7 +94,7 @@
       "status": "building",
       "description": "A human development and community ecosystem: personal growth, community, guided journeys, events, a marketplace and gamification.",
       "portfolioDescription": "A home for growing, together. YOU brings personal development and community into one place: guided journeys to follow at your own pace, events to meet in person, a marketplace for people who help others grow, and a playful layer that notices progress and makes it feel worth celebrating.",
-      "link": "https://kashka-25.github.io/you-app-build/",
+      "link": "https://yourownuniverse.life/",
       "realm": "digital",
       "cover": {
         "src": "content/covers/you.e5d96b75.webp",
@@ -180,6 +180,10 @@
       "status": "Not yet released",
       "description": "A modern explorer's atlas for documenting adventures, planning journeys, preserving memories and discovering where friends are.",
       "portfolioDescription": "A modern explorer's atlas. Wandering keeps a private map of where you've been, where you dream of going and the journeys you're planning, alongside a separate map of friends who choose to share where they are, so it's easier to meet in real life.",
+      "action": {
+        "kind": "demo",
+        "url": "demos/wandering/"
+      },
       "preview": {
         "images": [
           {
@@ -220,7 +224,12 @@
           "height": 1170
         }
       },
-      "realm": "digital"
+      "realm": "digital",
+      "cover": {
+        "src": "content/covers/wandering.a67e0455.webp",
+        "width": 1600,
+        "height": 900
+      }
     },
     {
       "slug": "atlantean-gardens",
@@ -280,16 +289,16 @@
       }
     },
     {
-      "slug": "hopeium",
+      "slug": "intothelighthouse",
       "collection": "Healing & Wellbeing",
       "source": "starter:cassidy-ventures-v1",
-      "title": "Hopeium",
+      "title": "IntoTheLighthouse",
       "category": "Wellbeing",
       "colour": "lavender",
       "status": "In construction",
       "description": "A human-centred wellbeing and therapy concept: a warm home for growth.",
-      "portfolioDescription": "A warm home for growth. Hopeium is a human-centred wellbeing and therapy concept, designed to feel welcoming from the first moment, with simplicity and kindness put ahead of clinical distance.",
-      "link": "https://kashka-25.github.io/HOPEIUM/",
+      "portfolioDescription": "A warm home for growth. IntoTheLighthouse is a human-centred wellbeing and therapy concept, designed to feel welcoming from the first moment, with simplicity and kindness put ahead of clinical distance.",
+      "link": "https://kashka-25.github.io/IntoTheLighthouse/",
       "action": {
         "kind": "visit",
         "url": "https://kashka-25.github.io/IntoTheLighthouse/"
@@ -318,7 +327,7 @@
       },
       "realm": "ventures",
       "cover": {
-        "src": "content/covers/hopeium.868c7c0a.webp",
+        "src": "content/covers/intothelighthouse.868c7c0a.webp",
         "width": 1600,
         "height": 900
       }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 // @ts-expect-error plain JS module shared with the build script
 import { slugify, parseDataUri, imageSize, worksFromStarter, placeWorks, siteDemoFile } from '../scripts/lib/content-core.mjs';
 // @ts-expect-error plain JS module shared with the CLI
@@ -73,7 +73,8 @@ describe('content pipeline', () => {
 
     it('a pack without them imports exactly as before, with no warnings', () => {
       const { msgs, warn } = collect();
-      const plain = worksFromStarter(pack, warn);
+      const inPublic = (rel: string) => existsSync(new URL(`../public/${rel}`, import.meta.url));
+      const plain = worksFromStarter(pack, warn, inPublic);
       expect(msgs).toEqual([]);
       for (const w of plain) {
         expect(w).not.toHaveProperty('realm');
@@ -81,7 +82,7 @@ describe('content pipeline', () => {
         expect(w.slug).toBe(slugify(w.title));
       }
       // Adding the top-level export markers changes nothing.
-      expect(worksFromStarter({ ...pack, source: 'yourigin', exportedAt: '2026-11-09T10:00:00.000Z' }, warn)).toEqual(plain);
+      expect(worksFromStarter({ ...pack, source: 'yourigin', exportedAt: '2026-11-09T10:00:00.000Z' }, warn, inPublic)).toEqual(plain);
       expect(msgs).toEqual([]);
     });
 

@@ -52,7 +52,7 @@ In Gmail, go to Settings, then Filters and blocked addresses, then Create a new 
 | `[CommYOUnity]` | Interest/CommYOUnity |
 | `[Wandering]` | Interest/Wandering |
 | `[Atlantean Gardens]` | Interest/Atlantean Gardens |
-| `[Hopeium]` | Interest/IntoTheLighthouse |
+| `[IntoTheLighthouse]` | Interest/IntoTheLighthouse |
 | `[Empatherapy]` | Interest/Empatherapy |
 | `[FreeTheDream]` | Interest/FreeTheDream |
 | `[Kronk]` | Interest/Kronk |
@@ -64,4 +64,4 @@ In Gmail, go to Settings, then Filters and blocked addresses, then Create a new 
 
 A filter with only `Interest from` in the Subject and the label **Interest** catches all of them.
 
-The subject uses the work's title as it appears on the site. If a title changes, for example Hopeium becoming IntoTheLighthouse, update its filter.
+The subject uses the work's title as it appears on the site. If a title changes, update its filter.
