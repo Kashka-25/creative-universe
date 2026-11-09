@@ -180,6 +180,10 @@
       "status": "Not yet released",
       "description": "A modern explorer's atlas for documenting adventures, planning journeys, preserving memories and discovering where friends are.",
       "portfolioDescription": "A modern explorer's atlas. Wandering keeps a private map of where you've been, where you dream of going and the journeys you're planning, alongside a separate map of friends who choose to share where they are, so it's easier to meet in real life.",
+      "action": {
+        "kind": "demo",
+        "url": "demos/wandering/"
+      },
       "preview": {
         "images": [
           {

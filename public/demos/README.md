@@ -30,3 +30,11 @@ What it does:
 - Nine steps: Welcome, Home, Mates and reach, the Hub, the Booth, a set, Live, Wachuneed, Join Kronk. `#N` opens step N.
 - All members, sets, posts and listings are made up. Everything lives in memory in the page: no storage and no audio; the invite form's POST is its only network request.
 - The Join step has an "Ask Cassidy for an invite" form that posts to Cassidy's Formspree form (https://formspree.io/f/moeeoorq) with project "Kronk": the shared interest form's fields and privacy line (see docs/INTEREST.md). That POST is the tour's only network call (Cassidy chose it). "Read about Kronk" opens https://kronk.info/kronk/about (new tab). Kronk is invite-only (registrations off), so nothing says "sign up".
+
+## Wandering
+
+`wandering/` is the real Wandering web app with the made-up traveller Rowan Avery's data, built from Kashka-25/Wandering#5 for **`/creative-universe/demos/wandering/`** (the GitHub Pages project site). When Creative Universe moves to its own domain, rebuild it for that path (the rebuild notes are in Wandering#5) and copy the folder over again.
+
+- There's no backend. A stand-in answers in the browser, with an in-memory database per tab. Reset clears it. Only map tiles load, from tiles.openfreemap.org.
+- Every screen says "Not yet released · example data". The welcome page ends with "Wandering is yet to be released" and "Back to Creative Universe".
+- Refreshing a page with an id in its address (…/place/<id>, …/route/<id>) shows the site's own 404 on GitHub Pages, because Pages uses only the root `404.html`. Every other page refreshes fine.

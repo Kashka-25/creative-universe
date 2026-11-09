@@ -99,6 +99,10 @@
               "src": "content/previews/wandering-kyoto-route.mp4",
               "poster": "content/previews/wandering2-route-great-circle.webp"
             }
+          },
+          "action": {
+            "kind": "demo",
+            "url": "demos/wandering/"
           }
         }
       ]
