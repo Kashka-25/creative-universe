@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { asset, statusLabel, worksIn, type Realm, type Work } from '../content';
 import { useIntro } from '../intro/IntroProvider';
 import { stage } from '../scene/stage';
+import { ActionButton } from './actions';
 import { RealmEmblem } from './ornaments';
 
 export function StatusPill({ status }: { status?: string }) {
@@ -35,7 +36,7 @@ export function Cover({ work, eager = false, alt = '' }: { work: Work; eager?: b
 export function WorkCard({ work, headingLevel = 3 }: { work: Work; headingLevel?: 2 | 3 }) {
   const H = `h${headingLevel}` as 'h2' | 'h3';
   return (
-    <article className="work-card" data-colour={work.colour}>
+    <article className={work.action ? 'work-card work-card--action' : 'work-card'} data-colour={work.colour}>
       <Link to={`/work/${work.slug}`} className="work-card__link" viewTransition>
         <div className="work-card__media"><Cover work={work} /></div>
         <div className="work-card__body">
@@ -47,6 +48,9 @@ export function WorkCard({ work, headingLevel = 3 }: { work: Work; headingLevel?
           {work.description && <p className="work-card__desc">{work.description}</p>}
         </div>
       </Link>
+      {work.action && (
+        <p className="work-card__action"><ActionButton work={work} action={work.action} variant="card" /></p>
+      )}
     </article>
   );
 }

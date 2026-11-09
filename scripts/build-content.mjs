@@ -17,11 +17,12 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, copyFi
 import { createHash } from 'node:crypto';
 import { join, basename, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { worksFromStarter, placeWorks, parseDataUri, imageSize, checkWork, EXTRA_FIELDS, STARTER_FIELDS, slugify } from './lib/content-core.mjs';
+import { worksFromStarter, placeWorks, parseDataUri, imageSize, checkWork, readAction, readPreview, isWebUrl, EXTRA_FIELDS, STARTER_FIELDS, slugify } from './lib/content-core.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const P = (...s) => join(ROOT, ...s);
 const readJson = (f) => JSON.parse(readFileSync(f, 'utf8'));
+const inPublicDir = (rel) => existsSync(P('public', rel));
 
 const args = process.argv.slice(2);
 const importIdx = args.indexOf('--import');
@@ -52,7 +53,7 @@ let owner = null;
 const works = [];
 for (const f of packs) {
   const pack = readJson(join(starterDir, f));
-  works.push(...worksFromStarter(pack));
+  works.push(...worksFromStarter(pack, undefined, inPublicDir));
   owner ??= { name: pack.ownerName, line: pack.ownerLine, intro: pack.intro, packTitle: pack.title, packKey: pack.key };
 }
 
@@ -66,6 +67,11 @@ if (existsSync(worksDir)) {
     problems.push(...checkWork(w, `content/works/${f}`));
     const work = { slug: w.slug || slugify(w.title), realm: w.realm, collection: w.collection, source: `works/${f}`, order: 10000 + (w.order ?? i) };
     for (const k of [...STARTER_FIELDS, ...EXTRA_FIELDS]) if (w[k] !== undefined) work[k] = w[k];
+    const warn = (msg) => console.warn(`  ! ${msg}`);
+    const action = readAction(w.action, `content/works/${f}`, warn, inPublicDir);
+    if (action) work.action = action;
+    const preview = readPreview(w.preview, `content/works/${f}`, warn);
+    if (preview) work.preview = preview;
     if (w.cover) work.coverRaw = w.cover.startsWith('data:') ? w.cover : { file: join(worksDir, w.cover) };
     works.push(work);
   });
@@ -75,6 +81,31 @@ problems.push(...placeWorks(works, placement, realmIds));
 if (problems.length) {
   console.error('Content build stopped:\n  - ' + problems.join('\n  - '));
   process.exit(1);
+}
+
+// Preview files given as public/ paths must exist, or they are left out.
+const inPublic = (src) => isWebUrl(src) || inPublicDir(src);
+for (const w of works) {
+  if (!w.preview) continue;
+  const images = w.preview.images.filter((img) => {
+    if (inPublic(img.src)) return true;
+    console.warn(`  ! ${w.title}: preview image public/${img.src} not found, skipped`);
+    return false;
+  });
+  let clip = w.preview.clip;
+  if (clip && !(inPublic(clip.src) && inPublic(clip.poster))) {
+    console.warn(`  ! ${w.title}: preview clip or poster not found in public/, skipped`);
+    clip = undefined;
+  }
+  // Pixel sizes of local files, so the page reserves their space and can lay out tall screenshots.
+  const sized = (item, file) => {
+    const size = isWebUrl(file) ? null : imageSize(readFileSync(P('public', file)));
+    return size ? { ...item, width: size.width, height: size.height } : item;
+  };
+  if (images.length || clip) {
+    w.preview = { images: images.map((img) => sized(img, img.src)) };
+    if (clip) w.preview.clip = sized(clip, clip.poster);
+  } else delete w.preview;
 }
 
 // 3. Covers: write image files, keep only paths + sizes in the JSON

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 // @ts-expect-error plain JS module shared with the build script
-import { slugify, parseDataUri, imageSize, worksFromStarter, placeWorks } from '../scripts/lib/content-core.mjs';
+import { slugify, parseDataUri, imageSize, worksFromStarter, placeWorks, siteDemoFile } from '../scripts/lib/content-core.mjs';
 // @ts-expect-error plain JS module shared with the CLI
 import { validateGuide, sanitizeName } from '../scripts/lib/guide-validate.mjs';
 
@@ -138,6 +138,117 @@ describe('content pipeline', () => {
       const notList = worksFromStarter(exported([{ changes: 'yesterday' }, {}]), warn);
       expect(notList[0]).not.toHaveProperty('changes');
     });
+
+    // Clearly fake addresses only: real project links are supplied by each project.
+    it('takes each kind of action', () => {
+      for (const kind of ['visit', 'demo', 'vision']) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ action: { kind, url: 'https://example.test/app/', extra: 'dropped' } }, {}]), warn);
+        expect(works[0].action).toEqual({ kind, url: 'https://example.test/app/' });
+        expect(works[1]).not.toHaveProperty('action');
+        expect(msgs).toEqual([]);
+      }
+    });
+
+    it('a work with no action gets no button data', () => {
+      const plain = worksFromStarter(exported([{ link: 'https://example.test/' }, {}]), quiet);
+      for (const w of plain) {
+        expect(w).not.toHaveProperty('action');
+        expect(w).not.toHaveProperty('preview');
+      }
+    });
+
+    it('rejects unknown kinds and non-http(s) URLs with a warning', () => {
+      const bad = [
+        { kind: 'buy', url: 'https://example.test/' },
+        { kind: 'Visit', url: 'https://example.test/' },
+        { kind: 'visit', url: 'javascript:alert(1)' },
+        { kind: 'demo', url: 'ftp://example.test/file' },
+        { kind: 'vision', url: '/work/local-page' },
+        { kind: 'visit', url: 'https://' },
+        { kind: 'visit' },
+        'https://example.test/',
+      ];
+      for (const action of bad) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ action }, {}]), warn);
+        expect(works[0]).not.toHaveProperty('action');
+        expect(msgs).toHaveLength(1);
+      }
+    });
+
+    it('takes a site-hosted demo under demos/ only when its file is in public/', () => {
+      const files = new Set(['demos/fake-demo/index.html', 'demos/fake-demo/other.html']);
+      const exists = (rel: string) => files.has(rel);
+      expect(siteDemoFile('demos/fake-demo/')).toBe('demos/fake-demo/index.html');
+      expect(siteDemoFile('demos/fake-demo/other.html')).toBe('demos/fake-demo/other.html');
+      for (const url of ['demos/fake-demo/', 'demos/fake-demo/other.html']) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ action: { kind: 'demo', url } }, {}]), warn, exists);
+        expect(works[0].action).toEqual({ kind: 'demo', url });
+        expect(msgs).toEqual([]);
+      }
+      const refused = [
+        'demos/missing-demo/', // no file in public/
+        'demos/fake-demo', // a directory needs its trailing slash
+        '/demos/fake-demo/',
+        './demos/fake-demo/',
+        'demos/../secrets/',
+        'demos/fake-demo/../../x.html',
+        'demos/fake-demo/.hidden',
+        'demos/Fake Demo/',
+        'demos/fake-demo/?q=1',
+        'content/previews/fake.webp',
+      ];
+      for (const url of refused) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ action: { kind: 'demo', url } }, {}]), warn, exists);
+        expect(works[0], url).not.toHaveProperty('action');
+        expect(msgs).toHaveLength(1);
+      }
+      // Without a way to check public/, a site demo is refused rather than trusted.
+      expect(worksFromStarter(exported([{ action: { kind: 'demo', url: 'demos/fake-demo/' } }, {}]), quiet)[0]).not.toHaveProperty('action');
+    });
+
+    it('takes a preview gallery with and without a clip', () => {
+      const images = [
+        { src: 'content/previews/fake-1.webp', alt: 'Fake home screen' },
+        { src: '/content/previews/fake-2.webp', alt: 'Fake settings' },
+        { src: 'https://example.test/shot.png', alt: 'Fake web shot' },
+      ];
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([
+        { preview: { images } },
+        { preview: { images: images.slice(0, 1), clip: { src: 'content/previews/fake.mp4', poster: 'content/previews/fake-poster.webp' } } },
+      ]), warn);
+      expect(msgs).toEqual([]);
+      expect(works[0].preview).toEqual({ images: [
+        { src: 'content/previews/fake-1.webp', alt: 'Fake home screen' },
+        { src: 'content/previews/fake-2.webp', alt: 'Fake settings' },
+        { src: 'https://example.test/shot.png', alt: 'Fake web shot' },
+      ] });
+      expect(works[0].preview).not.toHaveProperty('clip');
+      expect(works[1].preview.clip).toEqual({ src: 'content/previews/fake.mp4', poster: 'content/previews/fake-poster.webp' });
+    });
+
+    it('keeps preview files under public/ and needs alt text and a poster', () => {
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([
+        { preview: { images: [
+          { src: '../secrets/shot.webp', alt: 'Escapes public/' },
+          { src: 'C:\\shots\\a.webp', alt: 'Windows path' },
+          { src: 'file:///shots/a.webp', alt: 'File URL' },
+          { src: '//example.test/a.webp', alt: 'Protocol-relative' },
+          { src: 'content/previews/no-alt.webp' },
+          { src: 'content/previews/ok.webp', alt: 'Kept' },
+        ], clip: { src: 'content/previews/fake.mp4' } } },
+        { preview: { images: [{ src: '../x.webp', alt: 'x' }], clip: { src: 'javascript:x', poster: 'p.webp' } } },
+      ]), warn);
+      expect(works[0].preview).toEqual({ images: [{ src: 'content/previews/ok.webp', alt: 'Kept' }] });
+      expect(works[1]).not.toHaveProperty('preview');
+      expect(msgs.some((m) => /ignored 5 preview image/.test(m))).toBe(true);
+      expect(msgs.some((m) => /clip needs/.test(m))).toBe(true);
+    });
   });
 
   it('decodes cover images and reads their size', () => {
@@ -150,7 +261,8 @@ describe('content pipeline', () => {
   it('the generated site content matches the starter pack', () => {
     expect(generated.owner.name).toBe(pack.ownerName);
     expect(generated.owner.intro).toBe(pack.intro);
-    expect(generated.works.map((w: { title: string }) => w.title)).toEqual(
+    const fromPack = generated.works.filter((w: { source: string }) => w.source.startsWith('starter:'));
+    expect(fromPack.map((w: { title: string }) => w.title)).toEqual(
       pack.sections.flatMap((s: { projects: { title: string }[] }) => s.projects.map((p) => p.title)),
     );
     expect(generated.realms.map((r: { id: string }) => r.id)).toEqual(['digital', 'ventures', 'music', 'books', 'art', 'about']);

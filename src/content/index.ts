@@ -24,6 +24,18 @@ export interface Cover { src: string; width: number | null; height: number | nul
 export interface Media { kind: 'audio' | 'video' | 'embed'; src: string; title?: string }
 export interface GalleryImage { src: string; alt: string }
 export interface ChangeNote { date: string; text: string }
+/**
+ * A work's one primary action. The url is an http(s) address, or a demo hosted
+ * on this site ("demos/<project>/"); both are checked at build time.
+ */
+export interface WorkAction { kind: 'visit' | 'demo' | 'vision'; url: string }
+/** Screenshots and an optional short clip. Local files are paths inside public/. */
+export interface Preview {
+  /** width and height are filled in at build time for local files. */
+  images: (GalleryImage & { width?: number; height?: number })[];
+  /** The clip's width and height are its poster's. */
+  clip?: { src: string; poster: string; width?: number; height?: number };
+}
 
 export interface Work {
   slug: string;
@@ -41,6 +53,10 @@ export interface Work {
   cover?: Cover;
   /** Change notes from YOUrigin's export, newest first, in Cassidy's words. */
   changes?: ChangeNote[];
+  /** The one button on the card and page ("Visit", "Try the demo", "See the vision"). */
+  action?: WorkAction;
+  /** Preview gallery shown on the work's page. */
+  preview?: Preview;
   // Optional fields for hand-written works (content/works/*.json)
   year?: string;
   role?: string;
@@ -78,3 +94,26 @@ export const statusLabel = (s?: string) => (s ? s.charAt(0).toUpperCase() + s.sl
 
 /** Public asset path that respects Vite's base. */
 export const asset = (p: string) => `${import.meta.env.BASE_URL}${p.replace(/^\//, '')}`;
+
+/** A preview file: web addresses as they are, public/ paths through asset(). */
+export const previewAsset = (src: string) => (/^https?:\/\//i.test(src) ? src : asset(src));
+
+/** True for a demo hosted on this site, under public/demos/ (checked at build time). */
+export const isSiteDemo = (url: string) => url.startsWith('demos/');
+
+/** Where an action's button points: site demos resolve against the site's base. */
+export const actionHref = (url: string) => (isSiteDemo(url) ? asset(url) : url);
+
+/** Button words for each kind of action. */
+export const actionLabel: Record<WorkAction['kind'], string> = {
+  visit: 'Visit',
+  demo: 'Try the demo',
+  vision: 'See the vision',
+};
+
+/**
+ * The action a work's page shows: its own action, or else its plain starter-pack
+ * link as "Visit" (how pages have always looked). Cards show only work.action.
+ */
+export const pageAction = (work: Work): WorkAction | undefined =>
+  work.action ?? (work.link ? { kind: 'visit', url: work.link } : undefined);

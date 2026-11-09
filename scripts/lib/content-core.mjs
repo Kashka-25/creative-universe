@@ -98,16 +98,122 @@ export function cleanChanges(changes) {
   return { kept, dropped: changes.length - kept.length };
 }
 
+/** The kinds of primary action a work may offer, and the words its button uses. */
+export const ACTION_KINDS = ['visit', 'demo', 'vision'];
+
+/** True for an absolute http(s) URL with a host. */
+export function isWebUrl(s) {
+  if (typeof s !== 'string' || !/^https?:\/\//i.test(s)) return false;
+  try {
+    const u = new URL(s);
+    return (u.protocol === 'http:' || u.protocol === 'https:') && u.hostname !== '';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * A preview file: either an http(s) URL, or a path inside public/ written
+ * relative to it ("content/previews/you-1.webp", a leading "/" is allowed).
+ * Returns the cleaned path, or null if it is neither.
+ */
+export function previewSrc(s) {
+  if (typeof s !== 'string' || s.trim() === '') return null;
+  if (isWebUrl(s)) return s;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(s) || s.startsWith('//') || s.includes('\\')) return null;
+  const path = s.replace(/^\/+/, '').replace(/^public\//, '');
+  if (path === '' || path.split('/').some((part) => part === '' || part === '.' || part === '..')) return null;
+  return path;
+}
+
+/**
+ * A site-hosted demo: a path inside public/demos/<project>/, written relative to
+ * the site ("demos/freethedream/" or "demos/freethedream/index.html").
+ * Returns the public/ file that must exist for it (a directory means its
+ * index.html), or null when the url is not such a path.
+ */
+export function siteDemoFile(url) {
+  if (typeof url !== 'string') return null;
+  const m = /^demos\/[a-z0-9][a-z0-9-]*\/((?:[A-Za-z0-9_-][A-Za-z0-9._-]*\/)*(?:[A-Za-z0-9_-][A-Za-z0-9._-]*)?)$/.exec(url);
+  if (!m) return null;
+  return url.endsWith('/') ? `${url}index.html` : url;
+}
+
+/**
+ * Reads a work's primary action: { kind: "visit" | "demo" | "vision", url }.
+ * The url is an http(s) address, or a site-hosted demo under demos/ whose file
+ * exists in public/ (checked with publicFileExists, given by the build script).
+ * Returns the action, or undefined (with a warning) when it is missing or invalid.
+ */
+export function readAction(value, name, warn, publicFileExists) {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== 'object' || Array.isArray(value)) {
+    warn(`${name}: action must be an object like { "kind": "visit", "url": "https://..." }; showing no button.`);
+    return undefined;
+  }
+  if (!ACTION_KINDS.includes(value.kind)) {
+    warn(`${name}: action kind ${JSON.stringify(value.kind)} is not one of ${ACTION_KINDS.join(', ')}; showing no button.`);
+    return undefined;
+  }
+  const demoFile = siteDemoFile(value.url);
+  if (demoFile) {
+    if (!publicFileExists || !publicFileExists(demoFile)) {
+      warn(`${name}: action url "${value.url}" needs public/${demoFile}, which is not there; showing no button.`);
+      return undefined;
+    }
+  } else if (!isWebUrl(value.url)) {
+    warn(`${name}: action url ${JSON.stringify(value.url)} is not an http(s) address or a demo under demos/; showing no button.`);
+    return undefined;
+  }
+  return { kind: value.kind, url: value.url };
+}
+
+/**
+ * Reads a work's preview gallery: { images: [{ src, alt }], clip?: { src, poster } }.
+ * Images need a valid src and alt text. A clip needs both a src and a poster.
+ * Invalid parts are dropped with a warning. Returns undefined when nothing is left.
+ */
+export function readPreview(value, name, warn) {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== 'object' || Array.isArray(value)) {
+    warn(`${name}: preview must be an object like { "images": [{ "src": "...", "alt": "..." }] }; showing no gallery.`);
+    return undefined;
+  }
+  const images = [];
+  const rawImages = value.images === undefined ? [] : value.images;
+  if (!Array.isArray(rawImages)) {
+    warn(`${name}: preview images must be a list; ignoring them.`);
+  } else {
+    let dropped = 0;
+    for (const img of rawImages) {
+      const src = img && previewSrc(img.src);
+      if (src && typeof img.alt === 'string' && img.alt.trim() !== '') images.push({ src, alt: img.alt });
+      else dropped++;
+    }
+    if (dropped) warn(`${name}: ignored ${dropped} preview image(s) without an http(s) or public/ src and alt text.`);
+  }
+  let clip;
+  if (value.clip !== undefined) {
+    const src = value.clip && previewSrc(value.clip.src);
+    const poster = value.clip && previewSrc(value.clip.poster);
+    if (src && poster) clip = { src, poster };
+    else warn(`${name}: preview clip needs an http(s) or public/ src and poster; ignoring it.`);
+  }
+  if (!images.length && !clip) return undefined;
+  return clip ? { images, clip } : { images };
+}
+
 /**
  * Turns a parsed starter pack into a flat list of works, each remembering the
  * section it came from. Values are copied verbatim: nothing is rewritten or invented.
  *
  * Packs exported by YOUrigin may also give each project an optional "realm",
- * "slug" and "changes" (change notes). Invalid values are ignored with a warning,
+ * "slug", "changes" (change notes), "action" (its one button) and "preview"
+ * (screenshots and a short clip). See docs/CONTENT.md. Invalid values are ignored with a warning,
  * so the work falls back to how it would be read without them. The pack's
  * top-level "source" and "exportedAt" are accepted and not used.
  */
-export function worksFromStarter(pack, warn = (msg) => console.warn(`  ! ${msg}`)) {
+export function worksFromStarter(pack, warn = (msg) => console.warn(`  ! ${msg}`), publicFileExists) {
   if (!pack || pack.format !== 'yourigin-starter-portfolio' || !Array.isArray(pack.sections)) {
     throw new Error('Not a YOUrigin starter portfolio (expected format "yourigin-starter-portfolio").');
   }
@@ -149,6 +255,11 @@ export function worksFromStarter(pack, warn = (msg) => console.warn(`  ! ${msg}`
       if (dropped) warn(`${name}: ignored ${dropped} change note(s) without a YYYY-MM-DD date and text.`);
       if (kept.length) work.changes = kept;
     }
+
+    const action = readAction(p.action, name, warn, publicFileExists);
+    if (action) work.action = action;
+    const preview = readPreview(p.preview, name, warn);
+    if (preview) work.preview = preview;
   });
   return works;
 }
