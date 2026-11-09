@@ -250,7 +250,7 @@
         "images": [
           {
             "src": "content/previews/atlantean-gardens-idea-top.webp",
-            "alt": "The Atlantean Gardens idea page opens over a painted map of a forested island city: a gold-ringed green tree emblem, the trident wordmark \"Atlantean Gardens\", \"Atlantis Rising · Myth Made Medicine\", and \"Bringing love, creativity and joy back to the world of plant medicine, especially cannabis.\"",
+            "alt": "The Atlantean Gardens idea page opens over a painted map of a forested island city: a gold-ringed green tree emblem, the pale sea-foam trident wordmark \"Atlantean Gardens\", \"Atlantis Rising · Myth Made Medicine\", and \"Bringing love, creativity and joy back to the world of plant medicine, especially cannabis.\"",
             "width": 1440,
             "height": 900
           },
@@ -270,7 +270,7 @@
       },
       "realm": "ventures",
       "cover": {
-        "src": "content/covers/atlantean-gardens.ab1c4963.webp",
+        "src": "content/covers/atlantean-gardens.5005dbc9.webp",
         "width": 1600,
         "height": 900
       }
