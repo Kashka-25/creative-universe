@@ -23,6 +23,7 @@ export interface Realm {
 export interface Cover { src: string; width: number | null; height: number | null }
 export interface Media { kind: 'audio' | 'video' | 'embed'; src: string; title?: string }
 export interface GalleryImage { src: string; alt: string }
+export interface ChangeNote { date: string; text: string }
 
 export interface Work {
   slug: string;
@@ -38,6 +39,8 @@ export interface Work {
   portfolioDescription?: string;
   link?: string;
   cover?: Cover;
+  /** Change notes from YOUrigin's export, newest first, in Cassidy's words. */
+  changes?: ChangeNote[];
   // Optional fields for hand-written works (content/works/*.json)
   year?: string;
   role?: string;

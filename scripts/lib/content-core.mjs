@@ -70,22 +70,85 @@ export const STARTER_FIELDS = ['title', 'category', 'colour', 'status', 'descrip
 /** Extra optional fields a hand-written work (content/works/*.json) may add. */
 export const EXTRA_FIELDS = ['year', 'role', 'tags', 'media', 'gallery', 'credits', 'body'];
 
+/** Realms a starter-pack project may name with its optional "realm" field (YOUrigin's export). */
+export const STARTER_REALMS = ['digital', 'ventures', 'music', 'books', 'art'];
+
+/** A slug as slugify() makes it: lowercase letters and digits joined by single hyphens. */
+const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+function isRealDay(s) {
+  if (typeof s !== 'string' || !DAY.test(s)) return false;
+  const d = new Date(`${s}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
+}
+
+/**
+ * Keeps only well-formed change notes ({ date: "YYYY-MM-DD", text }), newest first.
+ * Text is copied exactly as written. Returns the kept notes and how many were dropped.
+ */
+export function cleanChanges(changes) {
+  if (!Array.isArray(changes)) return { kept: [], dropped: changes === undefined ? 0 : 1 };
+  const kept = [];
+  for (const c of changes) {
+    if (c && isRealDay(c.date) && typeof c.text === 'string' && c.text.trim() !== '') kept.push({ date: c.date, text: c.text });
+  }
+  // Stable sort, so notes on the same day keep the pack's order.
+  kept.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  return { kept, dropped: changes.length - kept.length };
+}
+
 /**
  * Turns a parsed starter pack into a flat list of works, each remembering the
  * section it came from. Values are copied verbatim: nothing is rewritten or invented.
+ *
+ * Packs exported by YOUrigin may also give each project an optional "realm",
+ * "slug" and "changes" (change notes). Invalid values are ignored with a warning,
+ * so the work falls back to how it would be read without them. The pack's
+ * top-level "source" and "exportedAt" are accepted and not used.
  */
-export function worksFromStarter(pack) {
+export function worksFromStarter(pack, warn = (msg) => console.warn(`  ! ${msg}`)) {
   if (!pack || pack.format !== 'yourigin-starter-portfolio' || !Array.isArray(pack.sections)) {
     throw new Error('Not a YOUrigin starter portfolio (expected format "yourigin-starter-portfolio").');
   }
   const works = [];
+  const projects = [];
   pack.sections.forEach((section, si) => {
     (section.projects || []).forEach((p, pi) => {
       const work = { slug: slugify(p.title), collection: section.heading, source: `starter:${pack.key}`, order: si * 100 + pi };
       for (const f of STARTER_FIELDS) if (p[f] !== undefined && p[f] !== '') work[f] = p[f];
       if (p.cover) work.coverRaw = p.cover;
       works.push(work);
+      projects.push(p);
     });
+  });
+
+  // Optional fields from YOUrigin's export.
+  works.forEach((work, i) => {
+    const p = projects[i];
+    const name = `"${p.title}"`;
+
+    if (p.realm !== undefined) {
+      if (STARTER_REALMS.includes(p.realm)) work.realm = p.realm;
+      else warn(`${name}: realm ${JSON.stringify(p.realm)} is not one of ${STARTER_REALMS.join(', ')}; placing it by section instead.`);
+    }
+
+    if (p.slug !== undefined && p.slug !== work.slug) {
+      const takenBy = works.find((other, j) => j !== i && other.slug === p.slug);
+      if (typeof p.slug !== 'string' || !SLUG.test(p.slug)) {
+        warn(`${name}: slug ${JSON.stringify(p.slug)} is not a valid slug; using "${work.slug}".`);
+      } else if (takenBy) {
+        warn(`${name}: slug "${p.slug}" is already used by "${takenBy.title}"; using "${work.slug}".`);
+      } else {
+        work.slug = p.slug;
+      }
+    }
+
+    if (p.changes !== undefined) {
+      const { kept, dropped } = cleanChanges(p.changes);
+      if (dropped) warn(`${name}: ignored ${dropped} change note(s) without a YYYY-MM-DD date and text.`);
+      if (kept.length) work.changes = kept;
+    }
   });
   return works;
 }

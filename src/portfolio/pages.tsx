@@ -133,6 +133,12 @@ function groupByCollection<T extends { collection?: string }>(list: T[]): [strin
   return [...map.entries()];
 }
 
+/** "2026-11-09" -> "9 Nov 2026", read as a calendar day (no time zone shift). */
+function formatDay(day: string) {
+  const d = new Date(`${day}T00:00:00Z`);
+  return Number.isNaN(d.getTime()) ? day : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+
 // ── A single work ──────────────────────────────────────────
 export function WorkPage() {
   const { slug = '' } = useParams();
@@ -181,6 +187,16 @@ export function WorkPage() {
           <div className="gallery">
             {work.gallery.map((g) => <img key={g.src} src={asset(g.src)} alt={g.alt} loading="lazy" />)}
           </div>
+        )}
+        {work.changes && work.changes.length > 0 && (
+          <section className="work-page__changes" aria-labelledby="whats-new">
+            <h2 id="whats-new" className="work-page__label">What's new</h2>
+            <ul>
+              {work.changes.map((c, i) => (
+                <li key={`${c.date}-${i}`}><time dateTime={c.date}>{formatDay(c.date)}</time> {c.text}</li>
+              ))}
+            </ul>
+          </section>
         )}
         {work.link && (
           <p>
