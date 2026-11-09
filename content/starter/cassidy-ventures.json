@@ -50,29 +50,29 @@
           "preview": {
             "images": [
               {
-                "src": "content/previews/wandering-atlas.webp",
-                "alt": "The Atlas screen on a phone: a map of Portugal with two blue flags joined by a route near Coimbra, a dashed flight line heading out to sea, and an \"Add a place\" button."
+                "src": "content/previews/wandering2-atlas.webp",
+                "alt": "The Atlas on a phone for the made-up traveller Rowan Avery: a map of Europe and North Africa with ticked, diamond and star place markers, a dashed route, a search box and an \"Add a place\" button."
               },
               {
-                "src": "content/previews/wandering-plan.webp",
-                "alt": "The Plan screen: an expedition card, \"Portugal by train\", 1 to 14 May 2027, and two routes, \"The long way to Kyoto\" and \"Up the coast by rail\"."
+                "src": "content/previews/wandering2-plan.webp",
+                "alt": "The Plan screen: three expeditions, \"Portugal by train\" (planning, May 2027), \"Cape Town and the Garden Route\" (completed, 3 of 3 stops) and \"The W Trek\" (set aside)."
               },
               {
-                "src": "content/previews/wandering-route.webp",
-                "alt": "A route called \"The long way to Kyoto\": a dashed arc over a world map joining three numbered waypoints, 11,767 km by air."
+                "src": "content/previews/wandering2-route-great-circle.webp",
+                "alt": "A route called \"The long way to Kyoto\": a dashed great-circle arc over a world map joining three numbered waypoints, 11,767 km by air, with \"Show the whole route\" and \"Draw it again\"."
               },
               {
-                "src": "content/previews/wandering-expedition.webp",
-                "alt": "The \"Portugal by train\" expedition: an itinerary of Lisbon (ticked), Coimbra and Porto, with Up, Down and Remove for each stop."
+                "src": "content/previews/wandering2-journal.webp",
+                "alt": "The Journal: dated Moments in Vienna, such as standing room at the opera and Café Central on a rainy morning, with places and tags, and an \"Arrived at Vienna\" check-in."
               },
               {
-                "src": "content/previews/wandering-journal.webp",
-                "alt": "The Journal screen: New Moment and Check in buttons, tag chips such as #mountains and #palaces, and a Moment from Sintra on Saturday 4 April 2026."
+                "src": "content/previews/wandering2-place-history.webp",
+                "alt": "A place card: Visits and Moments with Check in and New Moment buttons, and a History of the place moving from Wishlist to Planned to In progress."
               }
             ],
             "clip": {
-              "src": "content/previews/wandering-route-ink-in.mp4",
-              "poster": "content/previews/wandering-route-ink-in-poster.webp"
+              "src": "content/previews/wandering-kyoto-route.mp4",
+              "poster": "content/previews/wandering2-route-great-circle.webp"
             }
           }
         }
