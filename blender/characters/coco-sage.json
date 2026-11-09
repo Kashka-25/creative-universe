@@ -154,5 +154,92 @@
     "swayMM": 6.0,
     "pitchDeg": 0.3,
     "pivot": [-0.035, 0.05, -0.35]
+  },
+  "life": {
+    "$comment": "Living details (blender/scripts/coco_sage_life.py, 9 Nov 2026, Cassidy: bring the sun and lightning to life, blink his third eye on every page, and on the welcome let him open his eyes, look at the visitor, close them and bow). Seconds unless named otherwise; clips at 'fps', additive (zero at frame 0), stored as cubic keys within 'cubic' of every frame.",
+    "cubic": 1e-5,
+    "sun": {
+      "$comment": "the sun's middle (x, z; refined from its disc), the disc's radius (a little past its rim, so each ray's base is on it), how far the rays reach, and the blend from the sun bone to the root along the bolt's arms (metres)",
+      "centre": [0.111, 0.585],
+      "disc": 0.21,
+      "rays": 0.4,
+      "blend": 0.09
+    },
+    "radiance": {
+      "$comment": "'radiance': a seamless 40 s loop. The sun turns +-turnDeg (turnPeriods per loop) and breathes in scale (+breathe, breathePeriods), its glow swells by up to 'glow' of its own (glowPeriods); the bolt shimmers softly at 'shimmers' ([second, pulses]): each pulse rises over shimmerRise and fades over shimmerFall, pulses shimmerGap apart (well under 3 a second), the second one secondPeak as bright. Glow values are ctl_sun / ctl_bolt scale.x - 1: the site multiplies the soft emission by 1 + value.",
+      "frames": 1200,
+      "turnDeg": 2.0,
+      "turnPeriods": 2,
+      "breathe": 0.03,
+      "breathePeriods": 5,
+      "glow": 0.8,
+      "glowPeriods": 4,
+      "shimmers": [[7.0, 1], [18.5, 2], [31.0, 1]],
+      "shimmerGap": 0.55,
+      "shimmerPeak": 2.2,
+      "secondPeak": 0.6,
+      "shimmerRise": 0.45,
+      "shimmerFall": 1.1
+    },
+    "thirdEye": {
+      "$comment": "'thirdeye': a seamless 32 s loop with four blinks at irregular moments (gaps 7.4, 9.2, 6.6 and 8.8 s). Each closes the painted eye onto its lid line (pivotDown of its half-height below its middle, along the forehead) by 'squash', over closeS, holds, opens over openS; it dims a little while closed and glows softly after (ctl_eye: dim, then glow, over glowS). Vertices inside 'inner' of the gem ellipse blink fully, fading out by 'outer' (above its middle by innerUp / outerUp, blended in over its upper half: the fur of his brow comes down to it and should follow the lid as little as possible).",
+      "frames": 960,
+      "blinks": [3.0, 10.4, 19.6, 26.2],
+      "closeS": 0.11,
+      "holdS": 0.06,
+      "openS": 0.2,
+      "squash": 0.85,
+      "dim": -0.5,
+      "glow": 2.2,
+      "glowS": 1.6,
+      "pivotDown": 0.0,
+      "inner": 1.1,
+      "outer": 1.8,
+      "innerUp": 1.0,
+      "outerUp": 1.6
+    },
+    "eyes": {
+      "$comment": "the open-eye cards (prep_coco_eyes.py): a grid (cells across, up) per eye, each vertex 'offset' metres in front of the frontmost point of his face round it (enough that the skin under it never comes through as he lowers and bows his head; seen from the front it does not show); at rest its cutoff hides it",
+      "grid": [40, 24],
+      "offset": 0.0025,
+      "restCutoff": 0.99
+    },
+    "awaken": {
+      "$comment": "'awaken', the welcome's beat after he arrives (6 s, one shot). Eyes (ctl_eyes): open to 'first' from 'start' over firstS, dip to dipTo over dipS (a flutter), open fully over fullS; close from closeAt over closeS. Envelopes are [rise from, full at, hold until, gone by]. look: his head and neck lower a little so he looks at the visitor; bow: he bows his head in honour after closing his eyes, then rises back to rest; inhale: the waking breath (chest lifts, shoulders rise); tilt: a small warm tilt while he looks; brows and smile: the face's own browSoft and microSmile shapes. Markers on the master timeline (build_coco_invite.py): wake (0), gaze (eyes fully open), eyesClose (closeAt), bow (bow[0]).",
+      "seconds": 6.0,
+      "open": {
+        "start": 0.35,
+        "first": 0.4,
+        "firstS": 0.6,
+        "dipTo": 0.22,
+        "dipS": 0.3,
+        "fullS": 0.8
+      },
+      "closeAt": 3.45,
+      "closeS": 0.75,
+      "look": [0.15, 1.7, 4.3, 5.95],
+      "lookDeg": {
+        "head": 4.0,
+        "neck": 2.0,
+        "chest": 0.6
+      },
+      "bow": [4.0, 4.95, 5.25, 5.95],
+      "bowDeg": {
+        "head": 7.0,
+        "neck": 4.0,
+        "chest": 2.5,
+        "spine": 1.0
+      },
+      "inhale": [0.0, 0.9, 1.3, 2.6],
+      "inhaleDeg": 0.8,
+      "shoulderDeg": 0.8,
+      "shoulderBow": 0.6,
+      "tilt": [1.6, 2.4, 3.3, 4.2],
+      "tiltDeg": 1.5,
+      "brows": [0.3, 1.6, 3.2, 4.2],
+      "browSoft": 0.55,
+      "smile": [1.8, 2.6, 3.4, 4.3],
+      "microSmile": 0.6
+    }
   }
 }

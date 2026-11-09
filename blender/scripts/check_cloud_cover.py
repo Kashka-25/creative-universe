@@ -30,7 +30,7 @@ from mathutils import Vector
 
 ARGV = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 RIG = "coco-sage_rig"
-HIM = ("coco-sage_body", "coco-sage_face", "sun_bolt", "swirl_head_mesh")
+HIM = ("coco-sage_body", "coco-sage_face", "sun_bolt", "swirl_head_mesh", "coco-sage_eyes")
 CENTRE = Vector((-0.004, 0.0, 0.0))        # his box's middle (Blender axes), where the site frames him
 FOV_DEG = 30.0
 VIEWS = [

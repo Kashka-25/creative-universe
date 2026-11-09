@@ -1,0 +1,61 @@
+{
+  "$comment": "Made by blender/scripts/prep_coco_eyes.py from blender/sculpt/coco-open.glb (Cassidy's open-eyed Adult Coco). Cards in Blender metres on his face (x across, z up); atlas uv of each card; lidLine: his closed lid line z(x) as a quadratic (numpy polyval order).",
+  "scale": 1.05183,
+  "eyesUp": 0.0095,
+  "alphaMax": 0.98,
+  "alphaMin": 0.05,
+  "atlas": [
+    771,
+    226
+  ],
+  "cards": [
+    {
+      "side": "A",
+      "x0": -0.197222,
+      "x1": -0.074982,
+      "z0": 0.378986,
+      "z1": 0.451306,
+      "w": 382,
+      "h": 226,
+      "lidLine": [
+        -0.869635,
+        -0.126232,
+        0.402054
+      ],
+      "lidSpan": [
+        -0.1825,
+        -0.0831
+      ],
+      "eyeWidth": 0.114,
+      "lidWidth": 0.0994,
+      "u0": 0.0,
+      "u1": 0.49546044098573283,
+      "v0": 0.0,
+      "v1": 1.0
+    },
+    {
+      "side": "B",
+      "x0": 0.005361,
+      "x1": 0.129201,
+      "z0": 0.378624,
+      "z1": 0.449344,
+      "w": 387,
+      "h": 221,
+      "lidLine": [
+        -0.764092,
+        0.004922,
+        0.404806
+      ],
+      "lidSpan": [
+        0.00966,
+        0.1173
+      ],
+      "eyeWidth": 0.1157,
+      "lidWidth": 0.1076,
+      "u0": 0.4980544747081712,
+      "u1": 1.0,
+      "v0": 0.02212389380530977,
+      "v1": 1.0
+    }
+  ]
+}

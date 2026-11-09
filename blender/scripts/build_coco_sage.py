@@ -48,6 +48,11 @@ What it does, in order:
      settings below, keyed on every frame with Bezier keys, so loops and joins are seamless. The arms
      are solved every frame so his hands never leave the cloud; the swirl beside his hat follows his
      head so the two never touch.
+  4b. Living details (coco_sage_life.py, 9 Nov 2026): the sun and bolt come to life on a 'sun' bone and their own
+     materials ('radiance', a 40 s loop), the third eye blinks on a 'third_eye' bone ('thirdeye', a 32 s loop), and
+     for the welcome his open eyes are two cards made from Cassidy's open-eyed sculpt (prep_coco_eyes.py), revealed
+     as his lids part ('awaken'). Glow and the eyes' opening travel as the X scale of control bones ctl_sun,
+     ctl_bolt, ctl_eye and ctl_eyes (value = scale.x - 1), which the site turns into material settings.
   5. Export (skins, shape keys, every action), optimise with scripts/optimize-guide.mjs, then put the
      exact per-frame samples back with scripts/restore-clip-samples.mjs: the optimiser's resample()
      straightens slow curves (a 4 mm breath became a triangle wave with a kink at every kept key) and
@@ -72,6 +77,9 @@ import bpy
 import bmesh
 import numpy as np
 from mathutils import Euler, Matrix, Vector
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import coco_sage_life as life  # noqa: E402  (the sun and bolt, the third eye, the open eyes, their clips)
 
 print = functools.partial(builtins.print, flush=True)  # noqa: A001  (progress shows up while Blender works)
 
@@ -1040,6 +1048,16 @@ CLIPS = [
 ]
 
 
+def life_clips():
+    """The living details' clips (coco_sage_life.py): the sun and bolt, the third eye's blinks, the welcome's beat."""
+    out = []
+    for name, maker, lag, loop in (("radiance", life.radiance_channels, 0, True), ("thirdeye", life.thirdeye_channels, 0, True),
+                                   ("awaken", life.awaken_channels, 2, False)):
+        N, fn = maker(CFG)
+        out.append((name, N, fn, lag, loop))
+    return out
+
+
 def pose_at(P, chans):
     """Pose bases for one frame from channel values (arms solved so the hands stay on the cloud)."""
     def c(k):
@@ -1056,6 +1074,7 @@ def pose_at(P, chans):
     for s in ("L", "R"):
         basis[f"shoulder_{s}"] = Euler((math.radians(c(f"shoulder_{s}.raise")), 0, 0), "XYZ").to_matrix().to_4x4()
     basis["belly"] = Matrix.Translation((0, c("belly.fwd") / 1000.0, 0))
+    life.extra_basis(P, chans, basis)               # the sun, the third eye's blink and the control bones
     W = P.world(basis)
     for s in ("L", "R"):
         solve_arm(P, basis, W, s)
@@ -1156,6 +1175,10 @@ def bake_clip(P, rig, face, name, N, fn, swirl_lag, loop):
         if n in ("belly", "swirl_head") or (n == "root" and any(k.startswith("root.") for k in chans[0])):
             for idx in range(3):
                 put_curve(cb, f"{path}.location", idx, n, [l[idx] for l in ls])
+        scs = [p.get(n, Matrix.Identity(4)).to_scale() for p in poses]
+        if n in life.SCALED and any(abs(v - 1.0) > 1e-6 for sc_ in scs for v in sc_):   # sun breath, blink, control values
+            for idx in range(3):
+                put_curve(cb, f"{path}.scale", idx, n, [sc_[idx] for sc_ in scs])
     cb2 = strip.channelbag(s_key, ensure=True)
     for kb in face.data.shape_keys.key_blocks[1:]:
         vals = [c.get(kb.name, 0.0) for c in chans]
@@ -1219,16 +1242,14 @@ def main():
     third_eye_material(face)
     shapes = add_face_shapes(cp, face)
     rig = build_rig(bones)
+    lay = life.add_bones(rig, CFG, sun, face)
     skin_to(body, rig)
     skin_to(face, rig)
+    life_report = {"third_eye_verts": life.weight_third_eye(face, lay)}
     swirl.vertex_groups.clear()
     swirl.vertex_groups.new(name="swirl_head").add(list(range(len(swirl.data.vertices))), 1.0, "REPLACE")
     skin_to(swirl, rig)
-    # the sun and bolt ride the root (rigidly), so they float with him and never part from him
-    sun.vertex_groups.clear()
-    sun.vertex_groups.new(name="root").add(list(range(len(sun.data.vertices))), 1.0, "REPLACE")
-    skin_to(sun, rig)
-    # the sun and bolt: static, its own softly glowing material (same image, so nothing extra to download)
+    # the sun and bolt: a softly glowing material of their own (same image, so nothing extra to download)
     mat = sun.data.materials[0].copy()
     mat.name = "sun_bolt"
     nt = mat.node_tree
@@ -1236,10 +1257,18 @@ def main():
     nt.links.new(bsdf.inputs["Base Color"].links[0].from_node.outputs["Color"], bsdf.inputs["Emission Color"])
     bsdf.inputs["Emission Strength"].default_value = CFG["sun"]["emission"]
     sun.data.materials[0] = mat
+    # they ride the root, so they float with him and never part from him; the sun (disc and rays) on its own bone,
+    # which turns and breathes it ('radiance'); the sun and the bolt on their own copies of that material
+    life_report.update(life.weight_sun(sun, lay))
+    skin_to(sun, rig)
+    cards = life.build_eye_cards(CFG, face, rig)
+    if cards:
+        life_report["eyes"] = cards[1]
+    log("life", life_report)
     body.data.materials[0].name = f"{NAME}_body"
     P = Poser(rig)
     clips = {}
-    for name, N, fn, lag, loop in CLIPS:
+    for name, N, fn, lag, loop in CLIPS + life_clips():
         clips[name] = bake_clip(P, rig, face, name, N, fn, lag, loop)
         log("clip", name, clips[name]["frames"], "frames")
     for pb in rig.pose.bones:
@@ -1264,6 +1293,18 @@ def main():
         # filters round the samples: put the exact per-frame samples back (scripts/restore-clip-samples.mjs)
         r = subprocess.run(["node", os.path.join(ROOT, "scripts", "restore-clip-samples.mjs"), raw, OUT_GLB], cwd=ROOT,
                            capture_output=True, text=True, shell=(os.name == "nt"))
+        print(r.stdout, r.stderr)
+        # the living details' long loops and the beat: smooth cubic keys instead of one per frame (their rest is at
+        # frame 0, so they stay exact as additive clips); the older clips are left exactly as they were
+        for name, *_ in life_clips():
+            r = subprocess.run(["node", os.path.join(ROOT, "scripts", "restore-clip-samples.mjs"), raw, OUT_GLB, "--only", name,
+                                "--cubic", str(CFG["life"]["cubic"])], cwd=ROOT, capture_output=True, text=True, shell=(os.name == "nt"))
+            print(r.stdout, r.stderr)
+        # every clip carries every joint, held still where it does not move it: those of the living-detail bones (only
+        # their own clips move them) and every still one in the new additive clips go (scripts/prune-still-channels.mjs)
+        r = subprocess.run(["node", os.path.join(ROOT, "scripts", "prune-still-channels.mjs"), OUT_GLB,
+                            "--clips", ",".join(n for n, *_ in life_clips()), "--nodes", ",".join(life.SCALED)],
+                           cwd=ROOT, capture_output=True, text=True, shell=(os.name == "nt"))
         print(r.stdout, r.stderr)
         log("web copy", OUT_GLB, round(os.path.getsize(OUT_GLB) / 1e6, 2), "MB")
     json.dump({"clips": clips, "shapes": shapes}, open(os.path.join(tempfile.gettempdir(), f"{NAME}-build.json"), "w"), indent=1)

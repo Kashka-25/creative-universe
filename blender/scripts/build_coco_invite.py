@@ -20,7 +20,8 @@ Writes
                                                 public/models/characters/coco-sage.glb (the same rig, so the clip
                                                 binds by bone name), then hands over to that model's own 'breathe'
                                                 loop at its first frame, with 'float' layered on it, as at home.
-  public/models/invitation/timeline.json       fps, markers floatIn / arrive / welcome / glow and the clip "invite"
+  public/models/invitation/timeline.json       fps, markers floatIn / arrive / welcome / wake / gaze / eyesClose / bow /
+                                                glow and the clip "invite"
                                                 (the cloud build adds its own keys)
   + the magic cloud (stage 2, blender/scripts/build_magic_cloud.py): its collection in invitation.blend,
     public/models/invitation/magic-cloud.glb and its keys in timeline.json
@@ -28,7 +29,10 @@ Writes
 The take: he rides in on his swirl cloud (build_ride_cloud.py) from stage left (the visitor's left), seated in
 meditation with his eyes closed (they are sculpted closed), gliding a little down as he comes, leaning softly into
 the ride; the ride slows all the way into rest (no overshoot: he never passes his place) and he settles at his
-place under the heading, then breathes and floats there.
+place under the heading, then breathes and floats there. A moment after the heading he wakes ('wake'): coco-sage.glb's
+own 'awaken' (coco_sage_life.py), layered by the site on his breathing: he slowly opens his eyes, looks at the visitor
+('gaze'), closes them again ('eyesClose') and bows his head in honour ('bow'); the glow comes the beat's length later
+than it did before.
   - The ride and the glide are smooth functions of time (zero velocity, acceleration and jerk at both ends: he
     starts from rest well off screen and comes to rest exactly at his place). The lean follows his speed and the
     small tip back follows his glide down, so both fade out with the motion.
@@ -80,7 +84,9 @@ TAIL = 2.5              # the speed fades as (1 - u) ** TAIL: a long, soft slowi
 LEAN_DEG = 2.0          # lean into the ride at its fastest
 TIP_DEG = 0.6           # tip back while he glides down, at his fastest (it fades with his speed)
 WELCOME_AFTER = 43      # frames after he arrives: the heading's cue (the same cue as the earlier take)
-GLOW_AFTER = 157        # frames after he arrives: the magic cloud's glow, unless "Come on in" comes first
+WAKE_AFTER = 68         # frames after he arrives: his awakening ('awaken' on coco-sage.glb), a moment after the heading
+GLOW_AFTER = 157        # frames after he arrives: the magic cloud's glow, unless "Come on in" comes first (before the
+                        # awakening was added); the glow now comes this long after he arrives PLUS the beat's length
 
 
 def log(*a):
@@ -177,6 +183,19 @@ def open_source():
     sc.render.fps_base = 1.0
 
 
+def beat_marks(N):
+    """His awakening on the master timeline (coco-sage.json life.awaken, seconds): it starts WAKE_AFTER frames after
+    he arrives; 'gaze' when his eyes are fully open, 'eyesClose' as they start to close, 'bow' as he bows. Returns the
+    markers and the beat's length in master frames (the glow and everything after it move later by that much)."""
+    A = sage.CFG["life"]["awaken"]
+    o = A["open"]
+    wake = N + WAKE_AFTER
+    at = lambda s: wake + int(round(s * FPS))                                      # noqa: E731
+    marks = {"wake": wake, "gaze": at(o["start"] + o["firstS"] + o["dipS"] + o["fullS"]),
+             "eyesClose": at(A["closeAt"]), "bow": at(A["bow"][0])}
+    return marks, int(round(A["seconds"] * FPS))
+
+
 def build_take():
     rig = bpy.data.objects[RIG]
     face = bpy.data.objects[FACE]
@@ -186,12 +205,13 @@ def build_take():
     for pb in rig.pose.bones:
         pb.matrix_basis = sage.Matrix.Identity(4)
     sc = bpy.context.scene
-    marks = {"floatIn": 0, "arrive": N, "welcome": N + WELCOME_AFTER, "glow": N + GLOW_AFTER}
+    beat, beat_len = beat_marks(N)
+    marks = {"floatIn": 0, "arrive": N, "welcome": N + WELCOME_AFTER, **beat, "glow": N + GLOW_AFTER + beat_len}
     for m in list(sc.timeline_markers):
         sc.timeline_markers.remove(m)
     for k, v in marks.items():
         sc.timeline_markers.new(k, frame=v)
-    sc.frame_start, sc.frame_end = 0, N + GLOW_AFTER
+    sc.frame_start, sc.frame_end = 0, marks["glow"]
     log("take", CLIP, info["frames"], "frames;", "markers", marks)
     return N, marks
 
@@ -225,7 +245,9 @@ def export_take():
     for cmd in (["node", os.path.join(ROOT, "scripts", "optimize-guide.mjs"), raw, GLB],
                 # the exact per-frame samples back (resample() would straighten the slow end of the descent and
                 # the breath), stored as smooth cubic keys that pass within 2e-6 of every frame
-                ["node", os.path.join(ROOT, "scripts", "restore-clip-samples.mjs"), raw, GLB, "--cubic", "2e-6"]):
+                ["node", os.path.join(ROOT, "scripts", "restore-clip-samples.mjs"), raw, GLB, "--cubic", "2e-6"],
+                # the living-detail bones are held at rest throughout: their channels go (only home's clips move them)
+                ["node", os.path.join(ROOT, "scripts", "prune-still-channels.mjs"), GLB, "--nodes", ",".join(sage.life.SCALED)]):
         r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, shell=(os.name == "nt"))
         log(r.stdout.strip())
         if r.returncode != 0:
@@ -239,7 +261,9 @@ def write_timeline(N, marks):
         "$comment": "Coco's Awakening, invitation page. Frames are on one 60 fps master timeline (frame / fps = seconds "
                     "into the take). Adult Coco's take: blender/scripts/build_coco_invite.py (the clip 'invite', played "
                     "on models/characters/coco-sage.glb; from its last frame, 'arrive', he breathes and floats with "
-                    "that model's own 'breathe' and 'float'). The magic cloud: blender/scripts/build_magic_cloud.py.",
+                    "that model's own 'breathe' and 'float'; at 'wake' the site layers that model's 'awaken' on it: he opens "
+                    "his eyes, looks at the visitor ('gaze'), closes them ('eyesClose') and bows ('bow')). The magic "
+                    "cloud: blender/scripts/build_magic_cloud.py.",
         "fps": FPS,
         "markers": dict(marks),
         "clips": {
