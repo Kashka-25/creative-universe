@@ -37,6 +37,109 @@ describe('content pipeline', () => {
     expect(placeWorks(orphan, placement, ['digital'])[0]).toMatch(/no realm/);
   });
 
+  describe("YOUrigin's export: optional realm, slug and change notes", () => {
+    const quiet = () => {};
+    const exported = (extra: Record<string, unknown>[], top: Record<string, unknown> = {}) => ({
+      format: 'yourigin-starter-portfolio',
+      key: 'test-v1',
+      source: 'yourigin',
+      exportedAt: '2026-11-09T10:00:00.000Z',
+      ...top,
+      sections: [{ heading: 'Apps', projects: [
+        { title: 'First One', description: 'One.', ...extra[0] },
+        { title: 'Second One', description: 'Two.', ...extra[1] },
+      ] }],
+    });
+    const collect = () => { const msgs: string[] = []; return { msgs, warn: (m: string) => msgs.push(m) }; };
+
+    it('a pack without them imports exactly as before, with no warnings', () => {
+      const { msgs, warn } = collect();
+      const plain = worksFromStarter(pack, warn);
+      expect(msgs).toEqual([]);
+      for (const w of plain) {
+        expect(w).not.toHaveProperty('realm');
+        expect(w).not.toHaveProperty('changes');
+        expect(w.slug).toBe(slugify(w.title));
+      }
+      // Adding the top-level export markers changes nothing.
+      expect(worksFromStarter({ ...pack, source: 'yourigin', exportedAt: '2026-11-09T10:00:00.000Z' }, warn)).toEqual(plain);
+      expect(msgs).toEqual([]);
+    });
+
+    it('takes a valid realm, and placeWorks prefers it over the section', () => {
+      const works = worksFromStarter(exported([{ realm: 'music' }, {}]), quiet);
+      expect(works[0].realm).toBe('music');
+      expect(works[1]).not.toHaveProperty('realm');
+      expect(placeWorks(works, { bySection: { Apps: 'digital' } }, ['digital', 'music'])).toEqual([]);
+      expect(works.map((w: { realm: string }) => w.realm)).toEqual(['music', 'digital']);
+    });
+
+    it('ignores an unknown realm with a warning and places by section', () => {
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([{ realm: 'about' }, { realm: 42 }]), warn);
+      expect(works[0]).not.toHaveProperty('realm');
+      expect(works[1]).not.toHaveProperty('realm');
+      expect(msgs).toHaveLength(2);
+      expect(msgs[0]).toMatch(/First One.*realm "about"/);
+      placeWorks(works, { bySection: { Apps: 'digital' } }, ['digital']);
+      expect(works[0].realm).toBe('digital');
+    });
+
+    it('takes a valid slug override', () => {
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([{ slug: 'the-first' }, { slug: 'second-one' }]), warn);
+      expect(works.map((w: { slug: string }) => w.slug)).toEqual(['the-first', 'second-one']);
+      expect(msgs).toEqual([]);
+    });
+
+    it('ignores a badly formed or colliding slug with a warning', () => {
+      for (const bad of ['First One', 'first--one', '-first', 'Ünïcode', '', 7]) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ slug: bad }, {}]), warn);
+        expect(works[0].slug).toBe('first-one');
+        expect(msgs).toHaveLength(1);
+      }
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([{ slug: 'second-one' }, {}]), warn);
+      expect(works.map((w: { slug: string }) => w.slug)).toEqual(['first-one', 'second-one']);
+      expect(msgs[0]).toMatch(/already used by "Second One"/);
+    });
+
+    it('keeps valid change notes verbatim, newest first', () => {
+      const changes = [
+        { date: '2026-10-01', text: 'Older note.' },
+        { date: '2026-11-08', text: '  New home page, with *stars*.  ' },
+        { date: '2026-11-08', text: 'Same day, second.' },
+      ];
+      const works = worksFromStarter(exported([{ changes }, {}]), quiet);
+      expect(works[0].changes).toEqual([
+        { date: '2026-11-08', text: '  New home page, with *stars*.  ' },
+        { date: '2026-11-08', text: 'Same day, second.' },
+        { date: '2026-10-01', text: 'Older note.' },
+      ]);
+      expect(works[1]).not.toHaveProperty('changes');
+    });
+
+    it('drops invalid change notes with a warning', () => {
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([{ changes: [
+        { date: '2026-11-08', text: 'Kept.', extra: 'not copied' },
+        { date: '8 Nov 2026', text: 'Bad date.' },
+        { date: '2026-02-30', text: 'No such day.' },
+        { date: '2026-11-07', text: '   ' },
+        { date: '2026-11-07' },
+        null,
+      ] }, { changes: [{ date: 'soon', text: 'x' }] }]), warn);
+      expect(works[0].changes).toEqual([{ date: '2026-11-08', text: 'Kept.' }]);
+      expect(works[1]).not.toHaveProperty('changes');
+      expect(msgs).toHaveLength(2);
+      expect(msgs[0]).toMatch(/ignored 5 change note/);
+
+      const notList = worksFromStarter(exported([{ changes: 'yesterday' }, {}]), warn);
+      expect(notList[0]).not.toHaveProperty('changes');
+    });
+  });
+
   it('decodes cover images and reads their size', () => {
     const cover = pack.sections[0].projects[0].cover;
     const parsed = parseDataUri(cover);
