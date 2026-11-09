@@ -46,6 +46,25 @@ export function InviteLine({ invite }: { invite?: string }) {
   );
 }
 
+/**
+ * The live site, shown beside a demo or tour when the work has its own link too
+ * (YOU, YOUrigin and CommYOUnity are live in beta: the demo shows how it works,
+ * the link opens the real thing).
+ */
+export function LiveLink({ work }: { work: Work }) {
+  const action = work.action;
+  if (!work.link || !action || action.kind === 'visit' || !/^https?:\/\//i.test(work.link)) return null;
+  const label = work.status && /beta/i.test(work.status) ? 'Open the live beta' : `Visit ${work.title}`;
+  return (
+    <p className="work-page__invite">
+      <a href={work.link} target="_blank" rel="noopener noreferrer">
+        {label}<span className="visually-hidden"> of {work.title}</span> <span aria-hidden>↗</span>
+        <span className="visually-hidden"> (opens in a new tab)</span>
+      </a>
+    </p>
+  );
+}
+
 /** "tall" for portrait files (phone screenshots), so they keep a fixed height instead of shrinking into a wide box. */
 const shape = (s: { width?: number; height?: number }) => (s.width && s.height && s.height > s.width ? 'tall' : 'wide');
 

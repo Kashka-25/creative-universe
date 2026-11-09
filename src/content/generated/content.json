@@ -1,7 +1,7 @@
 {
   "$generated": "by scripts/build-content.mjs. Do not edit: change content/ and rebuild.",
   "owner": {
-    "name": "Cassidy Dugan",
+    "name": "Cassidy Rae",
     "line": "Founder and creative builder",
     "intro": "I build things where human growth, imagination and craft meet. Some are digital homes for people and their ideas; some are worlds, scents and keepsakes you can hold; some are places to heal. This is a selection of the ventures I'm shaping now.",
     "packTitle": "Selected ventures",
@@ -109,10 +109,43 @@
       "title": "YOUrigin",
       "category": "Creative technology",
       "colour": "ochre",
-      "status": "building",
+      "status": "Beta testing",
       "description": "A personal creative operating environment for ideas, writing, lyrics, research, Projects and Works.",
       "portfolioDescription": "A personal creative operating environment. YOUrigin gives ideas, writing, lyrics and research somewhere to land the moment they arrive, then helps them grow into Projects and finished Works. It is private by design, works offline, and keeps a whole creative life in one calm place.",
       "link": "https://kashka-25.github.io/YOUrigin/",
+      "action": {
+        "kind": "demo",
+        "url": "https://kashka-25.github.io/YOUrigin/?demo"
+      },
+      "preview": {
+        "images": [
+          {
+            "src": "content/previews/yourigin-demo-overview.webp",
+            "alt": "YOUrigin's demo on My Universe, for the made-up creator Juno Tidewell: \"A world made from your ideas.\", with counts of collected pieces, projects, works and collections, and a \"Demo · example data\" badge with Guide, Reset and Creative Universe.",
+            "width": 1000,
+            "height": 621
+          },
+          {
+            "src": "content/previews/yourigin-demo-project.webp",
+            "alt": "The example project Saltglass Poems, marked Building: \"A first collection of sea poems, mostly written on the night ferry between the two towns\", under a drawn cover of a gold moon over a teal sea.",
+            "width": 799,
+            "height": 506
+          },
+          {
+            "src": "content/previews/yourigin-demo-song.webp",
+            "alt": "An example song, Harbour Lights, with verse and chorus, its status, tags and the works it belongs to, and the Lyric view below showing rhymes and syllables.",
+            "width": 800,
+            "height": 500
+          },
+          {
+            "src": "content/previews/yourigin-demo-loom.webp",
+            "alt": "The Creation Atlas plate The Loom, \"How the making moved\": each example project a coloured thread across the year, with knots for pieces gathered.",
+            "width": 1000,
+            "height": 632
+          }
+        ]
+      },
+      "invite": "mailto:YourOwnUniverse.life@gmail.com",
       "realm": "digital",
       "cover": {
         "src": "content/covers/yourigin.de9c245f.webp",
