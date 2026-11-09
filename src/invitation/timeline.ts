@@ -1,7 +1,8 @@
 // The invitation's timing, as authored in Blender and exported to public/models/invitation/timeline.json:
 //
 //   { "fps": 60,
-//     "markers": { floatIn, arrive, welcome, glow, expand, engulf, luminous, dissipate, complete },
+//     "markers": { floatIn, arrive, welcome, wake, gaze, eyesClose, bow, glow, expand, engulf,
+//                  luminous, dissipate, complete },
 //     "clips":   { "<clip>": { "file", "startFrame", "endFrame" } },
 //     "coverFrame": <frame>, "adultBox": … }
 //
@@ -10,7 +11,7 @@
 // is tested in node, including missing and malformed files.
 
 export const MARKERS = [
-  'floatIn', 'arrive', 'welcome', 'glow', 'expand', 'engulf', 'luminous', 'dissipate', 'complete',
+  'floatIn', 'arrive', 'welcome', 'wake', 'gaze', 'eyesClose', 'bow', 'glow', 'expand', 'engulf', 'luminous', 'dissipate', 'complete',
 ] as const;
 export type MarkerName = (typeof MARKERS)[number];
 
@@ -18,6 +19,13 @@ export type MarkerName = (typeof MARKERS)[number];
 const REQUIRED: MarkerName[] = ['glow', 'luminous'];
 /** What the take tells: in any order, but all before the glow. */
 const STORY: MarkerName[] = ['floatIn', 'arrive', 'welcome'];
+/**
+ * His awakening, once he has arrived (build_coco_invite.py, coco-sage.json life.awaken): he opens his eyes
+ * ('wake'), looks at the visitor with them open ('gaze'), closes them ('eyesClose') and bows his head ('bow').
+ * They must run forwards, after 'arrive' (when it is there) and no later than the glow; one out of place is
+ * dropped, and without 'wake' the beat is not played.
+ */
+export const BEAT: MarkerName[] = ['wake', 'gaze', 'eyesClose', 'bow'];
 /** The transformation and the trip home: these must run forwards, as the machine and the veil follow them. */
 const CHAIN: MarkerName[] = ['glow', 'expand', 'engulf', 'luminous', 'dissipate', 'complete'];
 
@@ -79,6 +87,13 @@ export function parseTimeline(raw: unknown): Timeline | null {
     const f = found[name];
     if (f === undefined) continue;
     if (f <= glow) markers[name] = f; else dropped.push(name);
+  }
+  // the awakening: forwards, after he has arrived, before the glow
+  let beatLast = markers.arrive ?? -Infinity;
+  for (const name of BEAT) {
+    const f = found[name];
+    if (f === undefined) continue;
+    if (f >= beatLast && f <= glow && (name === 'wake' || markers.wake !== undefined)) { markers[name] = f; beatLast = f; } else dropped.push(name);
   }
   // the chain: glow and luminous are fixed; each optional beat must sit between its neighbours
   let last = -Infinity;

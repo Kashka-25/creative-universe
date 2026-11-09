@@ -7,6 +7,10 @@
 // 'float' layered on it, as at home; the ride cloud is ride-cloud.glb 'ride' (it follows his root
 // bone, see characters/rideCloud.ts); the magic cloud is magic-cloud.glb 'transform'. This file only
 // frames it, plays it on ONE clock and reports the timeline's markers as the clock passes them.
+// The sun and bolt live and his third eye blinks all the while (the loops 'radiance' and
+// 'thirdeye', as at home: characters/cocoLife.ts). At the 'wake' marker his model's own 'awaken'
+// is layered on (he opens his eyes, looks at the visitor, closes them and bows his head in
+// honour, then the glow); "Come on in" during it lets it go, easing out into the glow.
 //
 // The one clock is the master frame (`clock.master`); the take's clips play at its pace through
 // their own speed, while crossfades always run in real time. If the trip home has to wait for the
@@ -28,6 +32,7 @@ import {
 import { asset } from '../content';
 import { qualityTier, stageDpr } from '../intro/capability';
 import { ClipPlayer, smoothstep } from '../characters/ClipPlayer';
+import { AWAKEN, createCocoLife, LIFE_LOOPS, type CocoLife } from '../characters/cocoLife';
 import { createModelSource } from '../characters/modelSource';
 import {
   boxShows, cheapBox, drawOnce, materialsOf, meshesOf, neverCullSkinned, texturesUnder, uploadGradually,
@@ -38,6 +43,7 @@ import {
   clipLocalTime, cloudSpan, markersCrossed, takeStartFrame, waitLimitFrame, type ClipSpan, type MarkerName, type Timeline,
 } from './timeline';
 import { TAKE_RUNS, type InvitationState } from './invitationMachine';
+import { awakenStart, AWAKEN_RELEASE_SECONDS } from './awaken';
 import { freshPace, HOLD_CLIP, HOLD_FADE_SECONDS, slowsForWait, stepPace } from './pace';
 import { CLOUD_DEPTH_ORDER, CLOUD_ORDER, magicCloudDepthLook, magicCloudLook } from './cloudLook';
 import { veil } from '../veil/veil';
@@ -67,9 +73,10 @@ const FLOAT = 'float';
 const MODEL_FPS = 30;
 /** 'float' eases in over this long once he has arrived (it starts at rest, so it never shows a seam). */
 const FLOAT_IN_SECONDS = 1.5;
-/** The sun and bolt behind him glow softly, as at home (HomeStage): a material setting, not movement. */
-const SUN_BOLT = 'sun_bolt';
-const SUN_GLOW = { colour: '#ffd98a', intensity: 0.45 };
+/** His additive clips: the hover, the living details' loops, the welcome's beat. */
+const ADDITIVE = new Set<string>([FLOAT, ...LIFE_LOOPS, AWAKEN]);
+/** The sun and bolt's life and the third eye's blinks ease in over this long as the take starts. */
+const LIFE_IN_SECONDS = 1;
 
 /** The take's models, loaded together (in parallel) through their own source, so leaving can stop and free them. */
 const TAKE = createModelSource((L, urls) => useLoader.clear(L, urls));
@@ -131,8 +138,8 @@ interface Parts {
   cloudFade: Object3D | null;
   /** The bone the cloud in his hands rides on (where the veil grows from if the magic cloud is not up yet). */
   heldBone: Object3D | null;
-  /** The sun and bolt's own glowing copies of their materials. */
-  sun: MeshStandardMaterial[];
+  /** His living details (the sun and bolt's glow, the third eye, his open eyes). */
+  life: CocoLife;
   cloud: MeshStandardMaterial[];
   restore: [Mesh, Material | Material[]][];
   /** The magic cloud's depth-only copies (see cloudLook.ts), removed on cleanup. */
@@ -174,19 +181,8 @@ function prepareParts(coco: Object3D, cloud: Object3D): Parts {
     const copy = (mat: Material) => { const c = mat.clone() as MeshStandardMaterial; setup(c); list.push(c); return c; };
     m.material = Array.isArray(m.material) ? m.material.map(copy) : copy(m.material);
   };
-  // the sun and bolt behind him: the same soft, steady glow as at home
-  const sun: MeshStandardMaterial[] = [];
-  const sunNode = coco.getObjectByName(SUN_BOLT);
-  if (sunNode) {
-    for (const m of meshesOf(sunNode)) {
-      own(m, (c) => {
-        if (!c.emissive) return;
-        c.emissive.set(SUN_GLOW.colour);
-        c.emissiveMap = c.map ?? null;
-        c.emissiveIntensity = SUN_GLOW.intensity;
-      }, sun);
-    }
-  }
+  // the sun and bolt behind him, his third eye, his open eyes: as at home (cocoLife.ts)
+  const life = createCocoLife(coco);
   // the magic cloud: drawn after him, depth-tested against him, its own depth written just before it
   const cloudMats: MeshStandardMaterial[] = [];
   const magic = meshesOf(cloud);
@@ -201,7 +197,7 @@ function prepareParts(coco: Object3D, cloud: Object3D): Parts {
     cloudGlow: cloud.getObjectByName('ctl_glow') ?? null,
     cloudFade: cloud.getObjectByName('ctl_fade') ?? null,
     heldBone: coco.getObjectByName('cloud') ?? null,
-    sun,
+    life,
     cloud: cloudMats,
     restore,
     depth,
@@ -293,7 +289,7 @@ function Take(props: InvitationStageProps) {
   useEffect(() => {
     // his model's own clips, and his ride from the take's file (the same rig: it binds by bone name)
     const p = {
-      coco: new ClipPlayer(coco.scene, [...coco.animations, ...take.animations], { additive: (n) => n === FLOAT, fps: MODEL_FPS }),
+      coco: new ClipPlayer(coco.scene, [...coco.animations, ...take.animations], { additive: (n) => ADDITIVE.has(n), fps: MODEL_FPS }),
       cloud: new ClipPlayer(cloud.scene, cloud.animations),
       ride: new ClipPlayer(ride.scene, ride.animations),
     };
@@ -311,7 +307,7 @@ function Take(props: InvitationStageProps) {
       rideParts.current?.dispose();
       rideParts.current = null;
       for (const [m, mat] of parts.current?.restore ?? []) m.material = mat;
-      parts.current?.sun.forEach((m) => m.dispose());
+      parts.current?.life.dispose();
       parts.current?.cloud.forEach((m) => m.dispose());
       for (const d of parts.current?.depth ?? []) { d.removeFromParent(); materialsOf(d).forEach((m) => m.dispose()); }
       parts.current = null;
@@ -419,6 +415,8 @@ function Take(props: InvitationStageProps) {
     if (p.cloud.has('transform')) ends.push(cloudSpan(tl, p.cloud.duration('transform')).endFrame);
     c.waitLimit = waitLimitFrame(tl, ends);
     playAt(p.coco, frame);
+    // the sun and bolt's life and the third eye's blinks, all the way (also during his ride)
+    for (const name of LIFE_LOOPS) p.coco.loopLayer(name, { fadeIn: LIFE_IN_SECONDS });
     p.coco.refresh();
     rideAt(p.ride, frame);
     p.ride.refresh();
@@ -446,6 +444,8 @@ function Take(props: InvitationStageProps) {
     const now = masterFrame();
     if (now >= glow) return;
     c.master = glow / fps;
+    // in the middle of his awakening: it eases out (his eyes close, his head settles) as he crossfades to the glow
+    p.coco.releaseLayer(AWAKEN, JUMP_SECONDS);
     playAt(p.coco, glow, JUMP_SECONDS);
     rideAt(p.ride, glow, JUMP_SECONDS);
     if (c.cloudStarted) p.cloud.play('transform', { loop: false, time: local(p.cloud, 'transform', glow), fade: JUMP_SECONDS });
@@ -580,6 +580,7 @@ function Take(props: InvitationStageProps) {
     const speed = step / dt;
     p.coco.setSpeed(TAKE_CLIP, speed);
     p.coco.update(dt);
+    parts.current?.life.update();
     p.ride.setSpeed(RIDE_CLIP, speed);
     p.ride.update(dt);
     const frame = masterFrame();
@@ -612,6 +613,10 @@ function Take(props: InvitationStageProps) {
     if (timeline) {
       const crossed = markersCrossed(timeline, c.lastFrame, frame);
       c.lastFrame = Math.max(c.lastFrame, frame);
+      // his awakening starts at 'wake' (from the moment the clock is at); by the glow it is over, or let go
+      const start = awakenStart(timeline, crossed, frame);
+      if (start !== null && p.coco.layer(AWAKEN, { startTime: start })) p.coco.refresh();
+      if (crossed.includes('glow')) p.coco.releaseLayer(AWAKEN, AWAKEN_RELEASE_SECONDS);
       for (const name of crossed) P.onMarker(name, name === 'luminous' ? focusAt() : undefined);
     }
   });

@@ -24,7 +24,8 @@
 // 'float' (a slow hover) layered on it when the model has it; arriving from the invitation he plays
 // 'settle' first (once the cloud starts to clear, so it is seen) and joins 'breathe' at its first
 // frame; rare drifts start on a breath's loop boundary; a face flutter now and then; small
-// reactions to the visitor. His ride cloud follows his root bone (characters/rideCloud.ts).
+// reactions to the visitor. The sun and bolt behind him live ('radiance') and his third eye blinks
+// ('thirdeye'), two seamless loops layered on everything (characters/cocoLife.ts). His ride cloud follows his root bone (characters/rideCloud.ts).
 // Loads coco-sage.glb through his own loader: if home gives up on him (too slow, a lost context, an
 // error) the download stops and whatever loaded is freed. The ride cloud (ride-cloud.glb, small) is
 // loaded only once he first becomes the companion, after the page is drawn, and kept (one copy).
@@ -35,11 +36,12 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
-import { Box3, Matrix4, Vector3, type Group, type Material, type Mesh, type MeshStandardMaterial, type Object3D } from 'three';
+import { Box3, Matrix4, Vector3, type Group, type Object3D } from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { asset } from '../content';
 import { prefersReducedMotion, qualityTier, stageDpr } from '../intro/capability';
 import { ClipPlayer } from '../characters/ClipPlayer';
+import { createCocoLife, LIFE_LOOPS, type CocoLife } from '../characters/cocoLife';
 import { createModelSource } from '../characters/modelSource';
 import { drawOnce, neverCullSkinned, restBox, texturesUnder, uploadGradually } from '../characters/sceneUtils';
 
@@ -62,8 +64,9 @@ const FOV = 30;
 const FPS = 30;
 /** His slow hover, an additive loop over 'breathe' (if the model has it). */
 const FLOAT = 'float';
-const ADDITIVE = new Set<string>([...DRIFTS, 'flutter', ...REACTIONS, FLOAT]);
-const SUN_BOLT = 'sun_bolt';
+const ADDITIVE = new Set<string>([...DRIFTS, 'flutter', ...REACTIONS, FLOAT, ...LIFE_LOOPS]);
+/** The sun and bolt's life and his third eye's blinks (cocoLife.ts) ease in over this long. */
+const LIFE_IN_SECONDS = 2;
 /** On pages he is this much smaller than his calm size (Cassidy: a smaller character riding his cloud). */
 export const COMPANION_SCALE = 0.65;
 /** How far ahead (s, px at most) his own box looks for content the scroll is carrying to him. */
@@ -215,6 +218,8 @@ function Adult({ arriving, away, onReady }: AdultProps) {
   useEffect(() => {
     neverCullSkinned(gltf.scene);
     const p = new ClipPlayer(gltf.scene, gltf.animations, { additive: (n) => ADDITIVE.has(n), fps: FPS });
+    // the sun and bolt's life and the third eye's blinks: on from the start, under everything else
+    for (const name of LIFE_LOOPS) p.loopLayer(name, { fadeIn: LIFE_IN_SECONDS });
     holding.current = false;
     place.current.floating = false;
     if (arriving && p.has('settle')) {
@@ -231,31 +236,13 @@ function Adult({ arriving, away, onReady }: AdultProps) {
     return () => { p.dispose(); player.current = null; idle.current = null; };
   }, [gltf, arriving]);
 
-  // The sun and bolt behind him: a steady, soft glow (a material setting, not movement).
+  // The sun and bolt behind him glow softly, the bolt shimmers now and then, his third eye glows round its
+  // blinks: Blender's control values turned into material settings every frame (cocoLife.ts).
+  const life = useRef<CocoLife | null>(null);
   useEffect(() => {
-    const node = gltf.scene.getObjectByName(SUN_BOLT) ?? null;
-    const restore: [Mesh, Material | Material[]][] = [];
-    const mats: MeshStandardMaterial[] = [];
-    const glow = (mat: Material) => {
-      const c = mat.clone() as MeshStandardMaterial;
-      if (c.emissive) {
-        c.emissive.set('#ffd98a');
-        c.emissiveMap = c.map ?? null;
-        c.emissiveIntensity = 0.45;
-      }
-      mats.push(c);
-      return c;
-    };
-    node?.traverse((o) => {
-      const m = o as Mesh;
-      if (!m.isMesh) return;
-      restore.push([m, m.material]);
-      m.material = Array.isArray(m.material) ? m.material.map(glow) : glow(m.material);
-    });
-    return () => {
-      for (const [m, mat] of restore) m.material = mat;
-      mats.forEach((m) => m.dispose());
-    };
+    const l = createCocoLife(gltf.scene);
+    life.current = l;
+    return () => { l.dispose(); life.current = null; };
   }, [gltf]);
 
   // Warm-up, while he is hidden: compile his shaders (in parallel where the browser can) for this
@@ -784,6 +771,7 @@ function Adult({ arriving, away, onReady }: AdultProps) {
     // his slow hover, eased in on the breath once he has settled (if the model has it)
     if (!P.floating && p.current === 'breathe') { P.floating = true; p.loopLayer(FLOAT, { fadeIn: 2.5 }); }
     const res = p.update(dt);
+    life.current?.update();
     if (res.wrapped) {
       // the boundary was crossed res.mainTime ago, part-way through this frame
       const drift = id.onLoop(now, res.mainTime);

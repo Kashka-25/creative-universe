@@ -6,9 +6,11 @@
 //            ('settle' → 'breathe', no seam). A clip fading out keeps playing (never frozen), and
 //            the full-body clips' weights always add up to 1, so a crossfade that starts while
 //            another is still under way never lets three's bind pose show through.
-//   layers   additive one-shots on top (drifts, a face flutter, small reactions), made additive
-//            in three from clips that Blender exports as absolute poses (start and end at rest)
-//   loops    additive loops on top for as long as he is shown (his slow 'float' hover), eased in
+//   layers   additive one-shots on top (drifts, a face flutter, small reactions, the welcome's
+//            awakening), made additive in three from clips that Blender exports as absolute poses
+//            (start and end at rest); one can be let go early, easing out (releaseLayer)
+//   loops    additive loops on top for as long as he is shown (his slow 'float' hover, the sun and
+//            bolt's 'radiance', his third eye's 'thirdeye' blinks), eased in
 //
 // The pure helpers at the top are tested without WebGL.
 
@@ -47,7 +49,11 @@ export interface ClipPlayerOptions {
 }
 
 interface Fade { action: AnimationAction; from: number; to: number; t: number; seconds: number; done?: () => void }
-interface Layer { name: string; action: AnimationAction; fadeIn: number; fadeOut: number }
+interface Layer {
+  name: string; action: AnimationAction; fadeIn: number; fadeOut: number;
+  /** Let go before its end (releaseLayer): it eases out over `seconds`, in real time. */
+  release?: { t: number; seconds: number };
+}
 interface Loop { name: string; action: AnimationAction; t: number; fadeIn: number }
 
 export interface UpdateResult {
@@ -192,6 +198,22 @@ export class ClipPlayer {
   }
 
   layerCount() { return this.layers.length; }
+  /** An additive one-shot `name` is playing (and not already letting go). */
+  hasLayer(name: string) { return this.layers.some((l) => l.name === name && !l.release); }
+  /** The weight of a one-shot layer now (0 if it is not playing). */
+  layerWeight(name: string) { return this.layers.find((l) => l.name === name)?.action.getEffectiveWeight() ?? 0; }
+
+  /**
+   * Let a one-shot layer go before its end: it keeps playing while its weight eases to 0 over
+   * `seconds` (real time, smooth at both ends), then it stops. Returns false if it is not playing.
+   * (The welcome's awakening beat, when "Come on in" comes in the middle of it.)
+   */
+  releaseLayer(name: string, seconds: number): boolean {
+    const l = this.layers.find((x) => x.name === name);
+    if (!l || l.release) return false;
+    l.release = { t: 0, seconds: Math.max(1e-3, seconds) };
+    return true;
+  }
 
   /**
    * Loop an additive clip on top of everything for good (his 'float' hover over 'breathe'), eased
@@ -247,12 +269,14 @@ export class ClipPlayer {
 
     for (const l of [...this.layers]) {
       const d = l.action.getClip().duration;
-      if (!l.action.enabled || l.action.time >= d - 1e-6) {
+      if (l.release) l.release.t += dt;
+      if (!l.action.enabled || l.action.time >= d - 1e-6 || (l.release && l.release.t >= l.release.seconds)) {
         l.action.stop();
         this.layers.splice(this.layers.indexOf(l), 1);
         refresh = true;
       } else {
-        l.action.setEffectiveWeight(envelope(l.action.time, d, l.fadeIn, l.fadeOut));
+        const out = l.release ? 1 - smoothstep(l.release.t / l.release.seconds) : 1;
+        l.action.setEffectiveWeight(envelope(l.action.time, d, l.fadeIn, l.fadeOut) * out);
       }
     }
     if (refresh) this.mixer.update(0);
