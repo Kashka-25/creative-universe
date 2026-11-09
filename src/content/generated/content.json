@@ -198,29 +198,25 @@
       "colour": "moss",
       "status": "In development",
       "description": "A botanical brand and imaginative world with characters, realms, strain collections and an interactive Atlas.",
-      "portfolioDescription": "A botanical brand that is also a world. Atlantean Gardens pairs its strain collections with the characters and realms they come from, all mapped in an interactive Atlas, so every product opens a door into a larger story.",
+      "portfolioDescription": "The idea, in development: the story of Atlantean Gardens, bringing love, creativity and joy back to the world of plant medicine, especially cannabis. A plant guide with a real folklore story woven through it, told through painted strain cards, the Atlas and its realms, and the five Keepers. The full immersive experience is being rebuilt.",
       "link": "https://kashka-25.github.io/Atlantean-Gardens/",
-      "action": {
-        "kind": "visit",
-        "url": "https://kashka-25.github.io/Atlantean-Gardens/"
-      },
       "preview": {
         "images": [
           {
-            "src": "content/previews/atlantean-gardens-home.webp",
-            "alt": "Home page: \"Welcome to the Gardens\" in teal over a soft cream-to-green gradient, with Explore Botanicals and Members Portal buttons.",
+            "src": "content/previews/atlantean-gardens-idea-top.webp",
+            "alt": "The Atlantean Gardens idea page opens over a painted map of a forested island city: the guide emblem of a meditating chimp on his cloud, the title \"Atlantean Gardens\", \"Atlantis Rising · Myth Made Medicine\", and \"Bringing love, creativity and joy back to the world of plant medicine, especially cannabis.\"",
             "width": 1440,
             "height": 900
           },
           {
-            "src": "content/previews/atlantean-gardens-about.webp",
-            "alt": "About page: a teal banner reading \"The Legend of Atlantean Gardens\", above a section titled \"From the Depths\".",
+            "src": "content/previews/atlantean-gardens-idea-cards.webp",
+            "alt": "Chapter II, \"Each strain is a story. Each card is a character.\", above a fan of seven painted collector cards, each a chimp character with a strain name and card number.",
             "width": 1440,
             "height": 900
           },
           {
-            "src": "content/previews/atlantean-gardens-members.webp",
-            "alt": "Members Portal: a cream card titled \"Enter the Inner Gardens\" with a password field and an Enter button, on a teal background.",
+            "src": "content/previews/atlantean-gardens-idea-keepers.webp",
+            "alt": "Chapter V, \"Tended by five Keepers\": painted cards for Kasper (the Spirit, wonder), Lila (the Heart, love), Coco (the Hands, stewardship), D'Nine (the Mind, creation) and Raptor (the Will, courage), each with their question, and \"Only together does the Garden truly bloom.\"",
             "width": 1440,
             "height": 900
           }
@@ -422,11 +418,29 @@
         "music"
       ],
       "action": {
-        "kind": "visit",
-        "url": "https://kronk.info/kronk/about"
+        "kind": "tour",
+        "url": "demos/kronk/"
       },
       "preview": {
         "images": [
+          {
+            "src": "content/previews/kronk-tour-booth.webp",
+            "alt": "The Kronk tour at step 5, the Booth: a live banner for a made-up member's set above the Musik grid of example sets with play and save buttons, beside a short explanation of the Booth.",
+            "width": 1440,
+            "height": 900
+          },
+          {
+            "src": "content/previews/kronk-tour-set.webp",
+            "alt": "The Kronk tour's set page for an example set, with credits, a track list, Play next and Shoutouts.",
+            "width": 1440,
+            "height": 900
+          },
+          {
+            "src": "content/previews/kronk-tour-home.webp",
+            "alt": "The Kronk tour's Home step: a feed of made-up members' posts in time order.",
+            "width": 1440,
+            "height": 900
+          },
           {
             "src": "content/previews/kronk-about.webp",
             "alt": "Kronk's About page: a ring of round icons for About, How-it-works, Contributors, Governance, Rules, Privacy and Terms around the Kronk emblem, on a dark background.",
