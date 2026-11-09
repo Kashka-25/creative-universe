@@ -32,7 +32,7 @@ The full proposal is at https://claude.ai/artifact/Bz16tnjtbRq71HYoFKsvVc (secti
 | YOUrigin | Kashka-25/YOUrigin |
 | YOU | Kashka-25/you-app-build |
 | Wandering | Kashka-25/Wandering (private) |
-| IntoTheLighthouse | Kashka-25/HOPEIUM (rename pending) |
+| IntoTheLighthouse | Kashka-25/IntoTheLighthouse (renamed from HOPEIUM) |
 | Empatherapy/next.empatherapy (leads) | Kashka-25/next.empatherapy |
 | Empatherapy/empatherapy | Kashka-25/empatherapy |
 | CommYOUnity | Kashka-25/CommYOUnity (private) |
