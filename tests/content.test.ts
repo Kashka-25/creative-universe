@@ -30,6 +30,25 @@ describe('content pipeline', () => {
     }
   });
 
+  it('lists a work in other realms too with "alsoIn", and refuses unknown realms', () => {
+    const realmIds = ['digital', 'music', 'art'];
+    const w = [{ title: 'Two Homes', slug: 'two-homes', realm: 'digital', alsoIn: ['music', 'digital', 'music'] }];
+    expect(placeWorks(w, {}, realmIds)).toEqual([]);
+    expect(w[0].alsoIn).toEqual(['music']);
+    const same = [{ title: 'One Home', slug: 'one-home', realm: 'digital', alsoIn: ['digital'] }];
+    expect(placeWorks(same, {}, realmIds)).toEqual([]);
+    expect(same[0]).not.toHaveProperty('alsoIn');
+    const bad = [{ title: 'Lost', slug: 'lost', realm: 'digital', alsoIn: ['about'] }];
+    expect(placeWorks(bad, {}, realmIds)[0]).toMatch(/unknown realm/);
+  });
+
+  it('the generated content lists Kronk in Digital and in Music', () => {
+    const kronk = generated.works.find((x: { slug: string }) => x.slug === 'kronk');
+    expect(kronk.realm).toBe('digital');
+    expect(kronk.alsoIn).toEqual(['music']);
+    expect(kronk.category).toBe('Collaboration');
+  });
+
   it('places every starter work in a realm and refuses to guess', () => {
     const works = worksFromStarter(pack);
     expect(placeWorks(works, placement, ['digital', 'ventures', 'music', 'books', 'art'])).toEqual([]);

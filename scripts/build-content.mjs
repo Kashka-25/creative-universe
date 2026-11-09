@@ -144,6 +144,6 @@ const out = {
 mkdirSync(P('src/content/generated'), { recursive: true });
 writeFileSync(P('src/content/generated/content.json'), JSON.stringify(out, null, 2) + '\n');
 
-const byRealm = Object.fromEntries(realms.map((r) => [r.id, works.filter((w) => w.realm === r.id).length]));
+const byRealm = Object.fromEntries(realms.map((r) => [r.id, works.filter((w) => w.realm === r.id || w.alsoIn?.includes(r.id)).length]));
 console.log(`Content: ${works.length} works from ${packs.length} starter pack(s)` + (existsSync(worksDir) ? ' + content/works' : ''));
 console.log('  ' + realms.filter((r) => r.kind === 'works').map((r) => `${r.title}: ${byRealm[r.id]}`).join(' | '));

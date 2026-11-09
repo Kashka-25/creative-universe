@@ -392,6 +392,54 @@
           }
         ]
       }
+    },
+    {
+      "slug": "kronk",
+      "realm": "digital",
+      "collection": "Collaborations",
+      "source": "works/kronk.json",
+      "title": "Kronk",
+      "category": "Collaboration",
+      "description": "A community-owned social platform run by Tal. Cassidy has helped build the Booth, Kronk's stage for music.",
+      "portfolioDescription": "Kronk is a community-owned social platform at kronk.info, run by Tal. Every relationship is a mutual Mate, members choose how far each post reaches, and there is no algorithmic ranking. Changes to how it runs are proposed and decided openly on Kronk itself. It started as a fork of Mastodon and has been its own platform since 2.0 (September 2026).",
+      "role": "Contributor. Cassidy built the Booth tidy (#2127, merged 13 Oct 2026); live sets and listening tools (#2339, merged 23 Oct 2026: My sets, saves, kinds, sort, play next, Remind me, Shoutouts, First listens and a live banner); and the FreeTheDream korner, the map inside Kronk (#1988 and #2010, merged Oct 2026). More Booth work is in progress.",
+      "credits": "Kronk is run by Tal.",
+      "body": [
+        "The Booth is Kronk's stage for music, with DJ sets, mixes, tracks, albums, readings and live sets. It plays music made by members and credits who made it.",
+        "Wachuneed is Kronk's marketplace, where members offer and ask for art, stuff and services from each other. Kronk handles no payment: buyer and seller agree that between them."
+      ],
+      "alsoIn": [
+        "music"
+      ],
+      "action": {
+        "kind": "visit",
+        "url": "https://kronk.info/kronk/about"
+      },
+      "preview": {
+        "images": [
+          {
+            "src": "content/previews/kronk-about.webp",
+            "alt": "Kronk's About page: a ring of round icons for About, How-it-works, Contributors, Governance, Rules, Privacy and Terms around the Kronk emblem, on a dark background.",
+            "width": 1440,
+            "height": 900
+          },
+          {
+            "src": "content/previews/kronk-booth-musik.webp",
+            "alt": "The Booth's Musik page: a grid of sets and mixes with cover art, including My Living YOUlogy and Lavender Skies by Cassidy Rae, and Waiting For A Ride by Cassidy Rae ft Taylah Mayne.",
+            "width": 799,
+            "height": 506
+          }
+        ]
+      }
+    },
+    {
+      "slug": "wachuneed",
+      "realm": "digital",
+      "collection": "Collaborations",
+      "source": "works/wachuneed.json",
+      "title": "Wachuneed",
+      "category": "Collaboration",
+      "description": "Kronk's marketplace, where members offer and ask for art, stuff and services from each other. Kronk handles no payment: buyer and seller agree that between them."
     }
   ]
 }

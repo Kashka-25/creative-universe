@@ -6,6 +6,10 @@ Kronk Booth is Cassidy's contribution to Kronk, a community platform maintained 
 - **Fork and clone:** Kashka-25/kronk, at `C:\Users\cassi\Projects\Kronk-Booth`.
 - **Direction:** not a Spotify copy. Lift new voices, support musicians outside corrupt systems, and use Kronk branding.
 
+## Sharing permission
+
+On 9 Nov 2026 Cassidy confirmed permission to show Kronk, the Booth and the Marketplace (Wachuneed) in Creative Universe as a collaborative feature project. The cards are `content/works/kronk.json` (Digital, also listed in Music) and `content/works/wachuneed.json` (card only).
+
 ## Done
 
 | PR | What | State |
