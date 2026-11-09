@@ -271,6 +271,18 @@
   .vow div { color: var(--text-secondary); font-size: 13.5px; }
   .join-cta { display: inline-flex; gap: 8px; align-items: center; padding: 13px 26px; font-size: 16px; text-decoration: none; margin-top: 8px; }
   .join .fine { color: var(--text-muted); font-size: 13px; max-width: 480px; margin: 14px auto 0; }
+  .invite {
+    max-width: 520px; margin: 20px auto 18px; padding: 16px; text-align: left;
+    background: var(--surface-card); border: 1px solid var(--border-default); border-radius: var(--radius-medium);
+  }
+  .invite-title { font-family: var(--font-display); font-size: 20px; color: var(--text-primary); }
+  .invite .fine { margin-left: 0; margin-right: 0; }
+  .invite input, .invite textarea {
+    width: 100%; display: block; margin-bottom: 8px; padding: 9px 12px; font: inherit;
+    background: var(--surface-card-inset); color: var(--text-primary);
+    border: 1px solid var(--border-subtle); border-radius: var(--radius-small); resize: vertical;
+  }
+  .invite .join-cta { margin-top: 4px; }
 
   /* Player + nav */
   .player {
@@ -485,7 +497,7 @@
       <div class="kicker">Join Kronk</div>
       <h2>Kronk grows by invitation.</h2>
       <p>There's no open sign-up. Everyone on Kronk was invited by someone already there, and every member can invite the next person.</p>
-      <p>If you know someone on Kronk, ask them for an invite link: it opens the sign-up page. If not, start with the About page.</p>
+      <p>If you know someone on Kronk, ask them for an invite link: it opens the sign-up page. If not, ask Cassidy for one here.</p>
     </div>
     <div class="stage join">
       <div class="kicker">On the way in, every member says</div>
@@ -494,7 +506,15 @@
         <div class="vow"><b>I am a custodian of the Kronk community.</b><div>Invite with care; look after the people here.</div></div>
         <div class="vow"><b>I share responsibility for the trajectory of Kronk.</b><div>Changes are proposed and decided in the open, in Kommons.</div></div>
       </div>
-      <a class="btn join-cta" href="https://kronk.info/kronk/about" target="_blank" rel="noopener">Join Kronk <span aria-hidden="true">↗</span></a>
+      <form class="invite" id="invite-form">
+        <div class="invite-title">Interested? Ask Cassidy for an invite</div>
+        <p class="fine" style="margin:4px 0 10px">Cassidy helped build the Booth. Leave your name and a line about yourself, and your email app opens with a short note to Cassidy, ready to send. Cassidy reads every one and decides on invites personally.</p>
+        <input id="inv-name" required maxlength="80" placeholder="Your name" aria-label="Your name" autocomplete="name">
+        <textarea id="inv-why" maxlength="400" rows="3" placeholder="What draws you to Kronk? (optional)" aria-label="What draws you to Kronk"></textarea>
+        <button class="btn join-cta" type="submit">Ask for an invite <span aria-hidden="true">✉</span></button>
+        <p class="fine" style="margin-top:8px">Sends to yourownuniverse.life@gmail.com from your own email. Nothing is sent from this page.</p>
+      </form>
+      <a class="btn ghost join-cta" href="https://kronk.info/kronk/about" target="_blank" rel="noopener">Read about Kronk <span aria-hidden="true">↗</span></a>
       <p class="fine">Opens kronk.info/kronk/about in a new tab: what Kronk is, how it works, and who runs it. Already have an invite link? Open it to reach the sign-up page.</p>
     </div>
   </section>
@@ -841,6 +861,17 @@
   });
   $('#listen-live').addEventListener('click', () => { play('s8'); toast('Listening in to Juno Pell, live.'); });
   document.addEventListener('submit', e => {
+    if (e.target.id === 'invite-form') {
+      e.preventDefault();
+      const name = $('#inv-name').value.trim();
+      if (!name) { $('#inv-name').focus(); return; }
+      const why = $('#inv-why').value.trim();
+      const subject = `Kronk invite request from ${name}`;
+      const body = `Hi Cassidy,\n\nI took the Kronk tour on your Creative Universe and I'd love an invite.\n\nName: ${name}\n${why ? `What draws me to Kronk: ${why}\n` : ''}\nThanks!`;
+      window.location.href = `mailto:yourownuniverse.life@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      toast('Opening your email app with the note ready to send.');
+      return;
+    }
     if (e.target.id !== 'shout-form') return;
     e.preventDefault();
     const v = $('#shout-input').value.trim();
