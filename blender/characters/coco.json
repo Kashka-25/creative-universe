@@ -1,0 +1,227 @@
+{
+  "$comment": "Coco, the adult guide. Landmarks measured on orthographic views of blender/sculpt/coco-open.glb (Blender axes, metres: +X his left, -Y towards you, +Z up).",
+  "source": "coco-open.glb",
+  "removeBackdrop": {
+    "minY": 0.28
+  },
+  "tris": 90000,
+  "height": 1.9,
+  "face": {
+    "cx": -0.02,
+    "cz": 0.34,
+    "rx": 0.19,
+    "rz": 0.19,
+    "front": -0.06
+  },
+  "eyes": {
+    "x": -0.022,
+    "z": 0.4,
+    "dx": 0.088
+  },
+  "mouthZ": 0.256,
+  "browZ": 0.44,
+  "cheekZ": 0.31,
+  "thirdZ": 0.47,
+  "headZ": 0.1,
+  "baseZ": -0.6,
+  "joints": {
+    "root": [
+      -0.01,
+      0.1,
+      -0.9
+    ],
+    "hips": [
+      -0.01,
+      0.12,
+      -0.52
+    ],
+    "spine": [
+      -0.01,
+      0.08,
+      -0.36
+    ],
+    "chest": [
+      -0.01,
+      0.04,
+      -0.16
+    ],
+    "neck": [
+      -0.01,
+      -0.04,
+      0.04
+    ],
+    "head": [
+      -0.01,
+      -0.04,
+      0.12
+    ],
+    "upperarm_L": [
+      0.3,
+      0,
+      0.06
+    ],
+    "forearm_L": [
+      0.38,
+      -0.08,
+      -0.38
+    ],
+    "hand_L": [
+      0.07,
+      -0.3,
+      -0.34
+    ],
+    "upperarm_R": [
+      -0.34,
+      0,
+      0.06
+    ],
+    "forearm_R": [
+      -0.4,
+      -0.08,
+      -0.38
+    ],
+    "hand_R": [
+      -0.1,
+      -0.3,
+      -0.34
+    ]
+  },
+  "closed": {
+    "source": "coco-closed.glb",
+    "eyes": {
+      "x": 0.055,
+      "z": 0.624,
+      "dx": 0.115
+    },
+    "thirdZ": 0.72,
+    "mouthZ": 0.496,
+    "span": 0.7
+  },
+  "moods": {
+    "neutral": {
+      "keys": {}
+    },
+    "welcoming": {
+      "keys": {
+        "smile": 0.75,
+        "cheekRaise": 0.35
+      }
+    },
+    "curious": {
+      "keys": {
+        "browsUp": 0.4,
+        "smile": 0.2
+      }
+    },
+    "playful": {
+      "keys": {
+        "smile": 0.6,
+        "squint": 0.35,
+        "browsUp": 0.3
+      }
+    },
+    "zen": {
+      "keys": {
+        "smile": 0.3
+      },
+      "paint": {
+        "eyes": "closed"
+      }
+    },
+    "happy-high": {
+      "keys": {
+        "grin": 0.6,
+        "cheekRaise": 0.7,
+        "squint": 0.6,
+        "browsUp": 0.25
+      },
+      "paint": {
+        "base": "own",
+        "eyes": "closed",
+        "mouth": {
+          "image": "sheet-a-expressions.webp",
+          "at": [
+            0,
+            -0.045
+          ],
+          "height": 0.105,
+          "outline": [
+            [
+              733.5,
+              154
+            ],
+            [
+              743.6,
+              156.5
+            ],
+            [
+              760.7,
+              158.4
+            ],
+            [
+              777.9,
+              159.2
+            ],
+            [
+              795,
+              158.9
+            ],
+            [
+              812.1,
+              157.8
+            ],
+            [
+              827.9,
+              155.5
+            ],
+            [
+              841.5,
+              154
+            ],
+            [
+              841,
+              163
+            ],
+            [
+              835,
+              172
+            ],
+            [
+              827.9,
+              180
+            ],
+            [
+              815,
+              187.1
+            ],
+            [
+              799.3,
+              190.3
+            ],
+            [
+              782.1,
+              190.9
+            ],
+            [
+              763.6,
+              188.6
+            ],
+            [
+              749.3,
+              182.9
+            ],
+            [
+              739.3,
+              174.3
+            ],
+            [
+              734.5,
+              165
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "expressiveness": 1.4
+}
