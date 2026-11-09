@@ -407,11 +407,15 @@
         "images": [
           {
             "src": "content/previews/kronk-about.webp",
-            "alt": "Kronk's About page: a ring of round icons for About, How-it-works, Contributors, Governance, Rules, Privacy and Terms around the Kronk emblem, on a dark background."
+            "alt": "Kronk's About page: a ring of round icons for About, How-it-works, Contributors, Governance, Rules, Privacy and Terms around the Kronk emblem, on a dark background.",
+            "width": 1440,
+            "height": 900
           },
           {
             "src": "content/previews/kronk-booth-musik.webp",
-            "alt": "The Booth's Musik page: a grid of sets and mixes with cover art, including My Living YOUlogy and Lavender Skies by Cassidy Rae, and Waiting For A Ride by Cassidy Rae ft Taylah Mayne."
+            "alt": "The Booth's Musik page: a grid of sets and mixes with cover art, including My Living YOUlogy and Lavender Skies by Cassidy Rae, and Waiting For A Ride by Cassidy Rae ft Taylah Mayne.",
+            "width": 799,
+            "height": 506
           }
         ]
       }
