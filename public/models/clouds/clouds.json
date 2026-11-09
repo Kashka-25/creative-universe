@@ -1,0 +1,38 @@
+[
+  {
+    "file": "cloud-1.webp",
+    "width": 440,
+    "height": 262,
+    "kind": "cluster"
+  },
+  {
+    "file": "cloud-2.webp",
+    "width": 440,
+    "height": 288,
+    "kind": "wisp"
+  },
+  {
+    "file": "cloud-3.webp",
+    "width": 421,
+    "height": 440,
+    "kind": "single"
+  },
+  {
+    "file": "cloud-4.webp",
+    "width": 440,
+    "height": 336,
+    "kind": "wisp"
+  },
+  {
+    "file": "cloud-5.webp",
+    "width": 440,
+    "height": 351,
+    "kind": "cluster"
+  },
+  {
+    "file": "cloud-6.webp",
+    "width": 440,
+    "height": 309,
+    "kind": "cluster"
+  }
+]

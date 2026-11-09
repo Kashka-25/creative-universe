@@ -1,41 +1,38 @@
 {
-  "$comment": "Coco's Awakening, invitation page. Frames are on one 60 fps master timeline (frame / fps = seconds into the invite clip). Young Coco: blender/scripts/build_invitation.py.",
+  "$comment": "Coco's Awakening, invitation page. Frames are on one 60 fps master timeline (frame / fps = seconds into the take). Adult Coco's take: blender/scripts/build_coco_invite.py (the clip 'invite', played on models/characters/coco-sage.glb; from its last frame, 'arrive', he breathes and floats with that model's own 'breathe' and 'float'). The magic cloud: blender/scripts/build_magic_cloud.py.",
   "fps": 60,
   "markers": {
     "floatIn": 0,
-    "arrive": 239,
-    "turn": 243,
-    "smile": 282,
-    "offer": 300,
-    "lookDown": 387,
-    "glow": 396,
-    "expand": 424,
-    "engulf": 462,
-    "luminous": 498,
-    "dissipate": 552,
-    "complete": 606
+    "arrive": 540,
+    "welcome": 583,
+    "glow": 697,
+    "expand": 725,
+    "engulf": 763,
+    "luminous": 799,
+    "dissipate": 853,
+    "complete": 907
   },
   "clips": {
     "invite": {
-      "file": "models/invitation/little-coco-invite.glb",
+      "file": "models/invitation/coco-invite.glb",
       "startFrame": 0,
-      "endFrame": 690
-    },
-    "hover": {
-      "file": "models/invitation/little-coco-invite.glb",
-      "startFrame": 0,
-      "endFrame": 120,
-      "loop": true,
-      "note": "floating idle before the take (off screen to the right); its pose and velocity equal invite frame 0"
+      "endFrame": 540,
+      "note": "his ride in from stage left (the rig alone; it binds to coco-sage.glb by bone name). It ends on breathe frame 0, pose and velocity, where the site hands over to 'breathe' and 'float'."
     },
     "transform": {
       "file": "models/invitation/magic-cloud.glb",
-      "startFrame": 396,
-      "endFrame": 636,
+      "startFrame": 697,
+      "endFrame": 937,
       "note": "the magic cloud (blender/scripts/build_magic_cloud.py); its own time 0 is master frame startFrame"
+    },
+    "ride": {
+      "file": "models/clouds/ride-cloud.glb",
+      "startFrame": 0,
+      "endFrame": 807,
+      "note": "the cloud he rides in on (blender/scripts/build_ride_cloud.py): it follows his root bone, and from 'glow' it swells into the magic cloud and thins away inside it before he is hidden."
     }
   },
-  "swapFrame": 534,
+  "coverFrame": 835,
   "adultBox": [
     [
       -0.69,
@@ -48,26 +45,10 @@
       0.483
     ]
   ],
-  "young": {
-    "$comment": "Young Coco (blender/scripts/build_invitation.py). His position on any frame is the root joint PLUS the hips joint: the root carries the travel on straight segments between knots every 12 frames (kept exact by meshopt's compression), the hips the fine remainder (the curve between knots and the bob). The sum is smooth; the root alone is not, so never attach anything to the root joint (follow 'hips', 'chest', 'cloud' or another bone instead). No vertex is weighted to the root.",
-    "height": 1.9,
-    "scale": 1.12991,
-    "heldCloudAtRest": [
-      0.1672,
-      -0.3503,
-      0.3435
-    ],
-    "startOffset": [
-      6.4429,
-      0.2034,
-      -0.5085
-    ],
-    "restFrom": 264
-  },
   "cloud": {
-    "$comment": "The magic cloud (blender/scripts/build_magic_cloud.py), in the same frame as Young Coco (glTF axes, metres). Young Coco and Adult Coco are fully hidden from swapFrame-8 to swapFrame+6 (coverage masks with the site's camera). ctl_glow and ctl_fade carry glow and opacity as scale.x. adultBox: Adult Coco seated at the same origin, sun and bolt included.",
-    "hiddenFrom": 526,
-    "hiddenTo": 540,
+    "$comment": "The magic cloud (blender/scripts/build_magic_cloud.py), in the same frame as Adult Coco (glTF axes, metres). He is fully hidden from hiddenFrom to hiddenTo, coverFrame included (coverage masks with the site's camera, blender/scripts/check_cloud_cover.py). ctl_glow and ctl_fade carry glow and opacity as scale.x. adultBox: Adult Coco seated at his place, sun and bolt included.",
+    "hiddenFrom": 790,
+    "hiddenTo": 864,
     "centre": [
       -0.035,
       -0.07,

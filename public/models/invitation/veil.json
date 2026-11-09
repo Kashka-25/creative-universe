@@ -1,5 +1,5 @@
 {
- "$comment": "Cloud veil timing (src/veil/curve.ts) for veil-matte.webp. Each matte pixel (.r) is when the cloud reaches it: 0 inside the magic cloud at luminous (blender/scripts/build_magic_cloud.py, rendered with the site camera, FOV 30, the stage 75% of the window, object-fit cover), 0.15 at its outline, then the distance from that outline to 1 at the farthest corner. cover: luminous -> swapFrame (0.6 s); reveal: dissipate -> complete (0.9 s), as coverage 1 -> 0. Smootherstep eases.",
+ "$comment": "Cloud veil timing (src/veil/curve.ts) for veil-matte.webp. Each matte pixel (.r) is when the cloud reaches it: 0 inside the magic cloud at luminous (blender/scripts/build_magic_cloud.py, rendered with the site camera, FOV 30, the stage 75% of the window, object-fit cover), 0.15 at its outline, then the distance from that outline to 1 at the farthest corner. cover: luminous -> coverFrame (0.6 s); reveal: dissipate -> complete (0.9 s), as coverage 1 -> 0. Smootherstep eases.",
  "fps": 60,
  "cover": [ 0, 0.0002, 0.0016, 0.0051, 0.0115, 0.0215, 0.0355, 0.0537, 0.0764, 0.1035, 0.135, 0.1705, 0.2099, 0.2527, 0.2984, 0.3466, 0.3967, 0.448, 0.5, 0.552, 0.6033, 0.6534, 0.7016, 0.7473, 0.7901, 0.8295, 0.865, 0.8965, 0.9236, 0.9463, 0.9645, 0.9785, 0.9885, 0.9949, 0.9984, 0.9998, 1
  ],
