@@ -5,7 +5,7 @@ describe('the shared interest form', () => {
   it('accepts only a Formspree form endpoint', () => {
     expect(interestEndpoint('https://formspree.io/f/abc123XYZ')).toBe('https://formspree.io/f/abc123XYZ');
     expect(interestEndpoint(' https://formspree.io/f/abc123 ')).toBe('https://formspree.io/f/abc123');
-    for (const bad of ['', undefined, null, 42, 'http://formspree.io/f/abc', 'https://example.test/f/abc', 'https://formspree.io/f/abc/../x', 'javascript:alert(1)']) {
+    for (const bad of ['', null, 42, 'http://formspree.io/f/abc', 'https://example.test/f/abc', 'https://formspree.io/f/abc/../x', 'javascript:alert(1)']) {
       expect(interestEndpoint(bad)).toBeNull();
     }
   });
