@@ -1,0 +1,16 @@
+{
+  "$comment": "An example HTML work, published at Cassidy's request (9 Nov 2026). Words are quoted from the repo Kashka-25/living-youlogy (its description and its page); Cassidy to review. Screenshots leave out the venue and the donation details.",
+  "title": "My Living YOUlogy",
+  "realm": "music",
+  "category": "Invitation website",
+  "description": "Cassidy's invitation website for their first concert: “An evening of heart-channelled music.”",
+  "portfolioDescription": "“My invitation website to my first concert,” in Cassidy's words. YOU (Your Own Universe) presents “A Living Eulogy with Cassidy”: “An evening of music, reflection & presence.”",
+  "action": { "kind": "visit", "url": "https://kashka-25.github.io/living-youlogy/" },
+  "preview": {
+    "images": [
+      { "src": "content/previews/living-youlogy-home.webp", "alt": "The opening screen: a lit candle above the title \"My Living YOUlogy\", with \"With Cassidy\" and \"Enter\" below, on a dark background." },
+      { "src": "content/previews/living-youlogy-evening.webp", "alt": "A section headed \"An evening of music, reflection & presence\", with a few lines of invitation text below." },
+      { "src": "content/previews/living-youlogy-phone.webp", "alt": "The opening screen on a phone: the candle and the title \"My Living YOUlogy\"." }
+    ]
+  }
+}

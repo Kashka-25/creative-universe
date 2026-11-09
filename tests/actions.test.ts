@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { MemoryRouter } from 'react-router-dom';
-import { ActionButton, PreviewGallery } from '../src/portfolio/actions';
+import { ActionButton, InviteLine, PreviewGallery } from '../src/portfolio/actions';
+import { StatusPill } from '../src/portfolio/components';
 import { pageAction, type Work } from '../src/content';
 
 // Clearly fake fixtures: real project links are supplied by each project.
@@ -32,6 +33,29 @@ describe('work action button', () => {
     expect(out).toContain('target="_blank"');
     expect(out).toContain('rel="noopener noreferrer"');
     expect(out).toContain('(opens in a new tab)');
+  });
+
+  it.each([
+    ['tour', 'Take the tour'],
+    ['idea', 'See the idea'],
+  ] as const)('%s on this site: says "%s" and opens in a new tab', (kind, words) => {
+    const work = { ...base, action: { kind, url: 'demos/fake-demo/' } };
+    const out = html(createElement(ActionButton, { work, action: work.action, variant: 'card' }));
+    expect(out).toContain(`>${words}<`);
+    expect(out).toContain('target="_blank"');
+    expect(out).toContain('(opens in a new tab)');
+  });
+
+  it('the invite line shows only when set, with its mailto link', () => {
+    expect(html(createElement(InviteLine, { invite: undefined }))).toBe('');
+    const out = html(createElement(InviteLine, { invite: 'mailto:YourOwnUniverse.life@gmail.com' }));
+    expect(out).toContain('Want to join the beta, or hear when it’s published?');
+    expect(out).toContain('<a href="mailto:YourOwnUniverse.life@gmail.com">Email YourOwnUniverse.life@gmail.com</a>');
+  });
+
+  it('a free-text status gets a class-safe tag', () => {
+    const out = html(createElement(StatusPill, { status: 'In construction' }));
+    expect(out).toBe('<span class="status status--in-construction">In construction</span>');
   });
 
   it('shows nothing without a link', () => {

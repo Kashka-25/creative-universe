@@ -144,7 +144,7 @@
       "title": "Wandering",
       "category": "Travel & connection",
       "colour": "sky",
-      "status": "building",
+      "status": "Not yet released",
       "description": "A modern explorer's atlas for documenting adventures, planning journeys, preserving memories and discovering where friends are.",
       "portfolioDescription": "A modern explorer's atlas. Wandering keeps a private map of where you've been, where you dream of going and the journeys you're planning, alongside a separate map of friends who choose to share where they are, so it's easier to meet in real life.",
       "preview": {
@@ -196,7 +196,7 @@
       "title": "Atlantean Gardens",
       "category": "Worldbuilding & botanical design",
       "colour": "moss",
-      "status": "building",
+      "status": "In development",
       "description": "A botanical brand and imaginative world with characters, realms, strain collections and an interactive Atlas.",
       "portfolioDescription": "A botanical brand that is also a world. Atlantean Gardens pairs its strain collections with the characters and realms they come from, all mapped in an interactive Atlas, so every product opens a door into a larger story.",
       "link": "https://kashka-25.github.io/Atlantean-Gardens/",
@@ -257,7 +257,7 @@
       "title": "Hopeium",
       "category": "Wellbeing",
       "colour": "lavender",
-      "status": "idea",
+      "status": "In construction",
       "description": "A human-centred wellbeing and therapy concept: a warm home for growth.",
       "portfolioDescription": "A warm home for growth. Hopeium is a human-centred wellbeing and therapy concept, designed to feel welcoming from the first moment, with simplicity and kindness put ahead of clinical distance.",
       "link": "https://kashka-25.github.io/HOPEIUM/",
@@ -354,6 +354,16 @@
       "source": "works/freethedream.json",
       "title": "FreeTheDream",
       "description": "A shared map of the community's projects. Explore sixteen projects, approve new ideas as the admin, and watch a project space come to life.",
+      "portfolioDescription": "FreeTheDream is a community where we support each other in following our passions and be rewarded for making the world a better place, through heART. We all deserve to free our dreams, and together we can live that dream reality.",
+      "body": [
+        "The FreeTheDream map is a map of the projects people in the community are running, with FreeTheDream, the idea behind them all, at the centre. Each circle is a project someone runs: YOU, Kronk, Anthemos, Mayhem, SoulRise, Empatherapy, CommYOUnity, the Space, the Organisation and The $2 Push, alongside new ideas from the group. Find one you'd like to help with, or suggest your own.",
+        "Anyone can suggest a project the community could help with. A project must involve the community: personal goals belong in YOU, and posts belong on the Kronk feed. An admin reviews each suggestion, and once approved it appears on the map, run by the person who shared it. Whoever runs a project fills in its details in place on the live map: a tagline, what it is, its part in the dream, how to get involved, open questions, reflections and its own logo. Others can follow the suggestions they like and ask to run a project with them.",
+        "The map is the \"O\" from the YOU logo. The ocean side is each person's inner life; the cosmos side, in Kronk's purples, is the shared life of the community. It opens on The Great Web, every project on one ring with every link drawn, and a golden spiral winds inward to FreeTheDream at the centre.",
+        "\"Bringing a dream into waking reality is the key to setting it free. Once the door is open, together we can walk through into the great unknown of our dream reality.\"",
+        "None of it is a ladder. Healing feeds art, art feeds community, community feeds healing, and the web shows how it all flows. One example of heART: release a song, and everyone gives $2 to back the artist pushing the edge. 100 people × $2 = $200 for that release. It's a space for all dreams to make the web, so there's a strong foundation for all our dreams to be set free.",
+        "The map is also shown inside Kronk, the community's social platform.",
+        "About this demo: the people, projects and ideas in it are made up. You are the admin, so you can approve ideas, decide who runs what, and watch how a project space would run. Nothing you do leaves your browser, and Reset starts it again."
+      ],
       "action": {
         "kind": "demo",
         "url": "demos/freethedream/"
@@ -428,6 +438,41 @@
             "alt": "The Booth's Musik page: a grid of sets and mixes with cover art, including My Living YOUlogy and Lavender Skies by Cassidy Rae, and Waiting For A Ride by Cassidy Rae ft Taylah Mayne.",
             "width": 799,
             "height": 506
+          }
+        ]
+      }
+    },
+    {
+      "slug": "my-living-youlogy",
+      "realm": "music",
+      "source": "works/my-living-youlogy.json",
+      "title": "My Living YOUlogy",
+      "category": "Invitation website",
+      "description": "Cassidy's invitation website for their first concert: “An evening of heart-channelled music.”",
+      "portfolioDescription": "“My invitation website to my first concert,” in Cassidy's words. YOU (Your Own Universe) presents “A Living Eulogy with Cassidy”: “An evening of music, reflection & presence.”",
+      "action": {
+        "kind": "visit",
+        "url": "https://kashka-25.github.io/living-youlogy/"
+      },
+      "preview": {
+        "images": [
+          {
+            "src": "content/previews/living-youlogy-home.webp",
+            "alt": "The opening screen: a lit candle above the title \"My Living YOUlogy\", with \"With Cassidy\" and \"Enter\" below, on a dark background.",
+            "width": 800,
+            "height": 500
+          },
+          {
+            "src": "content/previews/living-youlogy-evening.webp",
+            "alt": "A section headed \"An evening of music, reflection & presence\", with a few lines of invitation text below.",
+            "width": 800,
+            "height": 500
+          },
+          {
+            "src": "content/previews/living-youlogy-phone.webp",
+            "alt": "The opening screen on a phone: the candle and the title \"My Living YOUlogy\".",
+            "width": 488,
+            "height": 1055
           }
         ]
       }

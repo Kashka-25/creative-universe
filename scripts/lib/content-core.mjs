@@ -100,7 +100,39 @@ export function cleanChanges(changes) {
 }
 
 /** The kinds of primary action a work may offer, and the words its button uses. */
-export const ACTION_KINDS = ['visit', 'demo', 'vision'];
+export const ACTION_KINDS = ['visit', 'demo', 'vision', 'tour', 'idea'];
+
+/** The longest status label a card shows, e.g. "Not yet released". */
+export const STATUS_MAX = 32;
+
+/**
+ * Reads a work's status label: short free text on one line ("building",
+ * "In construction"). Returns it as written, or undefined (with a warning).
+ */
+export function readStatus(value, name, warn) {
+  if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value !== 'string' || value.trim() === '' || value.length > STATUS_MAX || /[\r\n]/.test(value)) {
+    warn(`${name}: status ${JSON.stringify(value)} must be short text on one line (at most ${STATUS_MAX} characters); showing none.`);
+    return undefined;
+  }
+  return value;
+}
+
+/** The one address an invite may use: Cassidy's public contact. */
+export const INVITE_EMAIL = 'YourOwnUniverse.life@gmail.com';
+
+/**
+ * Reads a work's optional invite: "mailto:YourOwnUniverse.life@gmail.com".
+ * Anything else is refused with a warning. Returns the mailto link or undefined.
+ */
+export function readInvite(value, name, warn) {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== 'string' || value.toLowerCase() !== `mailto:${INVITE_EMAIL}`.toLowerCase()) {
+    warn(`${name}: invite ${JSON.stringify(value)} is not "mailto:${INVITE_EMAIL}"; showing no invite.`);
+    return undefined;
+  }
+  return `mailto:${INVITE_EMAIL}`;
+}
 
 /** True for an absolute http(s) URL with a host. */
 export function isWebUrl(s) {
@@ -261,6 +293,10 @@ export function worksFromStarter(pack, warn = (msg) => console.warn(`  ! ${msg}`
     if (action) work.action = action;
     const preview = readPreview(p.preview, name, warn);
     if (preview) work.preview = preview;
+    const status = readStatus(p.status, name, warn);
+    if (status) work.status = status; else delete work.status;
+    const invite = readInvite(p.invite, name, warn);
+    if (invite) work.invite = invite;
   });
   return works;
 }

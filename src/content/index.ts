@@ -28,7 +28,7 @@ export interface ChangeNote { date: string; text: string }
  * A work's one primary action. The url is an http(s) address, or a demo hosted
  * on this site ("demos/<project>/"); both are checked at build time.
  */
-export interface WorkAction { kind: 'visit' | 'demo' | 'vision'; url: string }
+export interface WorkAction { kind: 'visit' | 'demo' | 'vision' | 'tour' | 'idea'; url: string }
 /** Screenshots and an optional short clip. Local files are paths inside public/. */
 export interface Preview {
   /** width and height are filled in at build time for local files. */
@@ -48,6 +48,7 @@ export interface Work {
   source: string;
   category?: string;
   colour?: Colour | string;
+  /** A short status label, shown as written on the card and page (e.g. "In construction"). */
   status?: 'idea' | 'building' | 'complete' | string;
   description?: string;
   portfolioDescription?: string;
@@ -59,6 +60,8 @@ export interface Work {
   action?: WorkAction;
   /** Preview gallery shown on the work's page. */
   preview?: Preview;
+  /** Optional invite line on the page; only ever "mailto:YourOwnUniverse.life@gmail.com" (checked at build time). */
+  invite?: string;
   // Optional fields for hand-written works (content/works/*.json)
   year?: string;
   role?: string;
@@ -111,6 +114,8 @@ export const actionLabel: Record<WorkAction['kind'], string> = {
   visit: 'Visit',
   demo: 'Try the demo',
   vision: 'See the vision',
+  tour: 'Take the tour',
+  idea: 'See the idea',
 };
 
 /**
