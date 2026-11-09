@@ -53,3 +53,18 @@ Return:
 ## Scope exclusions
 
 Do not create demo tasks for Sweet Vital Nectar, Rhythm Relics, Living YOUlogy, Creative Wellness or Kronk Marketplace. They were previously excluded from this Creative Universe active-project split. Kronk Booth remains included as its own project/korner within the Kronk repository.
+
+
+## Project-session task links
+
+Use these GitHub issues as the handoff brief for the Claude Code session opened in each repository:
+
+- YOU: https://github.com/Kashka-25/you-app-build/issues/107
+- YOUrigin + Creation Atlas assessment: https://github.com/Kashka-25/YOUrigin/issues/37
+- Wandering: https://github.com/Kashka-25/Wandering/issues/3
+- IntoTheLighthouse (formerly HOPEIUM): https://github.com/Kashka-25/IntoTheLighthouse/issues/3
+- Empatherapy live-site audit: https://github.com/Kashka-25/empatherapy/issues/7
+- CommYOUnity: https://github.com/Kashka-25/CommYOUnity/issues/37
+- Atlantean Gardens: https://github.com/Kashka-25/Atlantean-Gardens/issues/2
+- FreeTheDream: https://github.com/Kashka-25/free-the-dream-map/issues/2
+- Kronk Booth: Issues are disabled in the Kronk repository, so use `docs/CREATIVE_UNIVERSE_BOOTH_DEMO.md` in that repo as the session brief.
