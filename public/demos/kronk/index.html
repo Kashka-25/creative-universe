@@ -282,7 +282,12 @@
     background: var(--surface-card-inset); color: var(--text-primary);
     border: 1px solid var(--border-subtle); border-radius: var(--radius-small); resize: vertical;
   }
+  .invite { position: relative; }
   .invite .join-cta { margin-top: 4px; }
+  .invite .join-cta:disabled { opacity: .6; cursor: default; }
+  .invite-status { margin: 8px 0 0; font-size: 14px; min-height: 0; }
+  .invite-status.sent { color: var(--accent-text); font-weight: 600; }
+  .invite-status.error { color: #f28b9b; }
 
   /* Player + nav */
   .player {
@@ -508,11 +513,14 @@
       </div>
       <form class="invite" id="invite-form">
         <div class="invite-title">Interested? Ask Cassidy for an invite</div>
-        <p class="fine" style="margin:4px 0 10px">Cassidy helped build the Booth. Leave your name and a line about yourself, and your email app opens with a short note to Cassidy, ready to send. Cassidy reads every one and decides on invites personally.</p>
-        <input id="inv-name" required maxlength="80" placeholder="Your name" aria-label="Your name" autocomplete="name">
-        <textarea id="inv-why" maxlength="400" rows="3" placeholder="What draws you to Kronk? (optional)" aria-label="What draws you to Kronk"></textarea>
-        <button class="btn join-cta" type="submit">Ask for an invite <span aria-hidden="true">✉</span></button>
-        <p class="fine" style="margin-top:8px">Sends to yourownuniverse.life@gmail.com from your own email. Nothing is sent from this page.</p>
+        <p class="fine" style="margin:4px 0 10px">Cassidy helped build the Booth. Leave your name, email and a line about yourself. Cassidy reads every one and decides on invites personally.</p>
+        <input id="inv-name" name="name" required maxlength="80" placeholder="Your name" aria-label="Your name" autocomplete="name">
+        <input id="inv-email" name="email" type="email" required maxlength="160" placeholder="Your email" aria-label="Your email" autocomplete="email">
+        <textarea id="inv-why" name="message" maxlength="1000" rows="3" placeholder="What draws you to Kronk? (optional)" aria-label="What draws you to Kronk"></textarea>
+        <input type="text" name="_gotcha" id="inv-gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+        <button class="btn join-cta" type="submit" id="inv-submit">Ask for an invite <span aria-hidden="true">✉</span></button>
+        <p class="invite-status" id="inv-status" role="status" aria-live="polite"></p>
+        <p class="fine" style="margin-top:8px">Your details go to Cassidy through Formspree and are used only to reply to you.</p>
       </form>
       <a class="btn ghost join-cta" href="https://kronk.info/kronk/about" target="_blank" rel="noopener">Read about Kronk <span aria-hidden="true">↗</span></a>
       <p class="fine">Opens kronk.info/kronk/about in a new tab: what Kronk is, how it works, and who runs it. Already have an invite link? Open it to reach the sign-up page.</p>
@@ -859,17 +867,42 @@
     else if ('message' in d) toast(`In Kronk this opens a message to ${people[d.message].name} in Nudges.`);
     else if ('reply' in d) toast('In Kronk this opens a reply.');
   });
+  // ── Invite request: the tour's one network call (Cassidy's Formspree form) ──
+  const FORMSPREE_ENDPOINT = 'https://formspree.io/f/moeeoorq';
+  async function sendInvite(form) {
+    const status = $('#inv-status'), btn = $('#inv-submit');
+    const setStatus = (text, cls) => { status.textContent = text; status.className = 'invite-status' + (cls ? ' ' + cls : ''); };
+    const sent = () => { setStatus('Thank you. Cassidy will be in touch about Kronk.', 'sent'); form.querySelectorAll('input, textarea, button').forEach(el => { el.disabled = true; }); };
+    if (!form.reportValidity()) return;
+    const name = $('#inv-name').value.trim();
+    const email = $('#inv-email').value.trim();
+    const message = $('#inv-why').value.trim();
+    if ($('#inv-gotcha').value) { sent(); return; } // honeypot filled: a bot, post nothing
+    const data = new FormData();
+    data.append('name', name);
+    data.append('email', email);
+    if (message) data.append('message', message);
+    data.append('project', 'Kronk');
+    data.append('page', location.href);
+    data.append('subject', `[Kronk] Interest from ${name}`);
+    data.append('_gotcha', '');
+    btn.disabled = true;
+    setStatus('Sending…');
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      sent();
+    } catch (err) {
+      btn.disabled = false;
+      setStatus('Sorry, that didn\'t send. Please try again, or email yourownuniverse.life@gmail.com.', 'error');
+    }
+  }
+
   $('#listen-live').addEventListener('click', () => { play('s8'); toast('Listening in to Juno Pell, live.'); });
   document.addEventListener('submit', e => {
     if (e.target.id === 'invite-form') {
       e.preventDefault();
-      const name = $('#inv-name').value.trim();
-      if (!name) { $('#inv-name').focus(); return; }
-      const why = $('#inv-why').value.trim();
-      const subject = `Kronk invite request from ${name}`;
-      const body = `Hi Cassidy,\n\nI took the Kronk tour on your Creative Universe and I'd love an invite.\n\nName: ${name}\n${why ? `What draws me to Kronk: ${why}\n` : ''}\nThanks!`;
-      window.location.href = `mailto:yourownuniverse.life@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      toast('Opening your email app with the note ready to send.');
+      sendInvite(e.target);
       return;
     }
     if (e.target.id !== 'shout-form') return;
