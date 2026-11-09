@@ -112,31 +112,13 @@ describe('a change of page', () => {
     expect(layout).toMatch(/onBlur=\{onBlur\}/);
   });
 
-  it("keeps Coco's anchor as a data attribute (React rewrites the layer's class list and would drop a class)", () => {
-    const css = readFileSync(new URL('../src/styles/intro.css', import.meta.url), 'utf8');
-    expect(css).toMatch(/\.guide-layer\[data-attached\] \{ position: absolute; bottom: auto; \}/);
-    const home = readFileSync(new URL('../src/guide/HomeStage.tsx', import.meta.url), 'utf8');
-    expect(home).toContain("layerEl.dataset.attached = ''");
-    expect(home).toContain('delete layerEl.dataset.attached');
-    expect(home).not.toMatch(/classList/);
-  });
-
-  it('never lets Coco measure a hero that has already left the page', () => {
-    // registered and cleared in layout effects (the cleanup runs in the same task as the removal),
-    // and read through heroRect (a detached or empty box is no hero: see guide.test.ts)
-    const components = readFileSync(new URL('../src/portfolio/components.tsx', import.meta.url), 'utf8');
-    expect(components).toMatch(/useLayoutEffect\(\(\) => \{\s*stage\.set\(ref\.current\);\s*return \(\) => stage\.set\(null\);\s*\}, \[\]\);/);
-    const home = readFileSync(new URL('../src/guide/HomeStage.tsx', import.meta.url), 'utf8');
-    expect(home).toContain('const r = heroRect(stage.el);');
-    expect(home).not.toMatch(/stage\.el\?\.getBoundingClientRect/);
-  });
-
-  it('draws Coco only while he can be seen: stepped aside below the edge, his canvas does no GPU work and his clips hold where they are', () => {
+  it('draws Coco only while he can be seen: out of the window or faded out on About, his canvas does no GPU work and his clips hold where they are', () => {
     const home = readFileSync(new URL('../src/guide/HomeStage.tsx', import.meta.url), 'utf8');
     // a frame callback with a priority turns R3F's own render off; his draws while he is in view,
     // and once more as he leaves it (so no sliver of him is left on the canvas)
     expect(home).toMatch(/useFrame\(\(state\) => \{\s*const seen = place\.current\.seen;\s*if \(seen \|\| drawnSeen\.current\) state\.gl\.render\(state\.scene, state\.camera\);\s*drawnSeen\.current = seen;\s*\}, 1\);/);
-    expect(home).toMatch(/P\.seen = inView;\s*if \(!inView\) \{ attention\.take\(\); return; \}\s*clock\.current \+= dt;/);
+    expect(home).toMatch(/P\.seen = inView && !faded && !!at;/);
+    expect(home).toMatch(/if \(!P\.seen\) \{ attention\.take\(\); return; \}\s*clock\.current \+= dt;/);
   });
 });
 

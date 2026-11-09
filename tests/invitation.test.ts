@@ -15,21 +15,21 @@ import {
   createHeaderWatch, createQuietWatch, createWaitWatch, HEADER_QUIET_MS, POINTER_RECENT_MS, usingHeader, type HeaderDoc,
 } from '../src/invitation/headerHold';
 import { freshPace, guardStep, slowsForWait, stepPace, WAIT_PACE, type PaceState } from '../src/invitation/pace';
-import { CLOUD_DEPTH_ORDER, CLOUD_ORDER, heldCloudLook, HELD_ORDER, magicCloudDepthLook, magicCloudLook } from '../src/invitation/cloudLook';
+import { CLOUD_DEPTH_ORDER, CLOUD_ORDER, magicCloudDepthLook, magicCloudLook } from '../src/invitation/cloudLook';
 import { HEADING_MARKERS } from '../src/invitation/invitationMachine';
 import { createPausableScheduler } from '../src/intro/machine';
 import { fakeClock } from './helpers/fakeClock';
 
-// A timeline shaped like the Blender export (60 fps, master frames). As in Blender's take, he turns
-// to the visitor while he is still arriving: 'turn' comes before 'arrive'.
+// A timeline shaped like the Blender export (60 fps, master frames): Adult Coco floats down and
+// arrives, the heading comes in ('welcome'), then the magic cloud.
 const RAW = {
   fps: 60,
-  markers: { floatIn: 0, turn: 90, arrive: 120, smile: 160, offer: 200, lookDown: 250, glow: 280, expand: 320, engulf: 360, luminous: 400, dissipate: 460, complete: 520 },
+  markers: { floatIn: 0, arrive: 120, welcome: 160, glow: 280, expand: 320, engulf: 360, luminous: 400, dissipate: 460, complete: 520 },
   clips: {
-    invite: { file: 'little-coco-invite.glb', startFrame: 0, endFrame: 420 },
+    invite: { file: 'coco-invite.glb', startFrame: 0, endFrame: 120 },
     transform: { file: 'magic-cloud.glb', startFrame: 270, endFrame: 520 },
   },
-  swapFrame: 440,
+  coverFrame: 440,
   adultBox: { x: 0, y: 0, w: 1, h: 1 },
 };
 const TL = parseTimeline(RAW)!;
@@ -87,11 +87,11 @@ describe('where a visit begins', () => {
 });
 
 describe('the timeline from Blender', () => {
-  it('reads markers, clips and the swap frame', () => {
+  it('reads markers, clips and the cover frame', () => {
     expect(TL.fps).toBe(60);
     expect(TL.markers.glow).toBe(280);
     expect(TL.clips.transform.startFrame).toBe(270);
-    expect(TL.swapFrame).toBe(440);
+    expect(TL.coverFrame).toBe(440);
     expect(takeStartFrame(TL)).toBe(0);
   });
 
@@ -104,18 +104,18 @@ describe('the timeline from Blender', () => {
     expect(parseTimeline({ ...RAW, clips: { ...RAW.clips, invite: { file: 'x', startFrame: 300, endFrame: 400 } } })).toBeNull(); // the take starts after its glow
     // optional beats may be missing; broken clip entries are dropped
     const partial = parseTimeline({ fps: 30, markers: { glow: 10, luminous: 20 }, clips: { bad: { startFrame: 5, endFrame: 1 } } })!;
-    expect(partial.markers.turn).toBeUndefined();
+    expect(partial.markers.welcome).toBeUndefined();
     expect(partial.clips).toEqual({});
     expect(partial.dropped).toEqual([]);
   });
 
   it('leaves out an optional marker that is out of place, instead of the whole file', () => {
-    const late = parseTimeline({ ...RAW, markers: { ...RAW.markers, smile: 999 } })!;                    // a story beat after the glow
-    expect(late.markers.smile).toBeUndefined();
+    const late = parseTimeline({ ...RAW, markers: { ...RAW.markers, welcome: 999 } })!;                  // a story beat after the glow
+    expect(late.markers.welcome).toBeUndefined();
     expect(late.markers.glow).toBe(280);
-    expect(late.dropped).toEqual(['smile']);
-    const broken = parseTimeline({ ...RAW, markers: { ...RAW.markers, turn: 'soon', engulf: 300, expand: 340 } })!;
-    expect(broken.markers.turn).toBeUndefined();                                                         // not a number
+    expect(late.dropped).toEqual(['welcome']);
+    const broken = parseTimeline({ ...RAW, markers: { ...RAW.markers, welcome: 'soon', engulf: 300, expand: 340 } })!;
+    expect(broken.markers.welcome).toBeUndefined();                                                      // not a number
     expect(broken.markers.engulf).toBeUndefined();                                                       // before expand
     expect(broken.markers.expand).toBe(340);
     const pastLuminous = parseTimeline({ ...RAW, markers: { ...RAW.markers, engulf: 450, dissipate: 380 } })!;
@@ -124,46 +124,43 @@ describe('the timeline from Blender', () => {
     expect(pastLuminous.markers.complete).toBe(520);
   });
 
-  it("reads Blender's own marker order: he turns before he has fully arrived", () => {
-    // a timeline shaped like Blender's (build_invitation.py lists the beats by name, not by frame),
-    // with the later beats the magic-cloud build adds; the real file is checked below
+  it('reports the beats in the order the clock reaches them, whatever order the file lists them in', () => {
+    // a timeline shaped like Blender's, its markers listed out of order (the real file is checked below)
     const blender = {
       fps: 60,
-      markers: { floatIn: 0, turn: 108, arrive: 174, smile: 192, offer: 213, lookDown: 291, glow: 300 },
-      clips: { invite: { file: 'models/invitation/little-coco-invite.glb', startFrame: 0, endFrame: 600 }, hover: { file: 'x', startFrame: 0, endFrame: 120, loop: true } },
-      swapFrame: null,
+      markers: { glow: 547, welcome: 433, floatIn: 0, arrive: 390 },
+      clips: { invite: { file: 'models/invitation/coco-invite.glb', startFrame: 0, endFrame: 390 } },
+      coverFrame: null,
       adultBox: null,
     };
-    expect(parseTimeline(blender)).toBeNull();                                                           // no luminous yet: not playable
-    const full = parseTimeline({ ...blender, markers: { ...blender.markers, expand: 330, engulf: 380, luminous: 430, dissipate: 470, complete: 540 } })!;
+    expect(parseTimeline(blender)).toBeNull();                                                           // no luminous: not playable
+    const full = parseTimeline({ ...blender, markers: { ...blender.markers, expand: 575, engulf: 613, luminous: 649, dissipate: 703, complete: 757 } })!;
     expect(full).not.toBeNull();
     expect(full.dropped).toEqual([]);
-    expect(full.markers.turn).toBe(108);
-    expect(full.markers.arrive).toBe(174);
-    // reported in the order the clock reaches them, not the order of any list
-    expect(markersCrossed(full, 100, 180)).toEqual(['turn', 'arrive']);
-    expect(markersCrossed(full, -0.001, 300)).toEqual(['floatIn', 'turn', 'arrive', 'smile', 'offer', 'lookDown', 'glow']);
+    expect(full.markers.arrive).toBe(390);
+    expect(markersCrossed(full, 380, 440)).toEqual(['arrive', 'welcome']);
+    expect(markersCrossed(full, -0.001, 547)).toEqual(['floatIn', 'arrive', 'welcome', 'glow']);
   });
 
-  // PROVISIONAL. TODO(magic-cloud build): once the Blender cloud build adds 'luminous' (and the
-  // later beats) to public/models/invitation/timeline.json, this must parse the real file UNMODIFIED
-  // and expect it to be playable; drop the branch that adds stand-in beats. Until then the shipped
-  // file is rejected and every visitor gets the illustrated invitation.
-  it('[provisional] the real timeline.json: its beats so far are in order (stand-in later beats until the cloud build adds them)', () => {
+  it("the real timeline.json: Adult Coco's take and the magic cloud, playable as shipped", () => {
     const file = new URL('../public/models/invitation/timeline.json', import.meta.url);
     if (!existsSync(file)) return;                                                                       // not exported yet
-    const raw = JSON.parse(readFileSync(file, 'utf8')) as { markers?: Record<string, unknown> };
-    const later = { expand: 1e6, engulf: 1e6 + 1, luminous: 1e6 + 2, dissipate: 1e6 + 3, complete: 1e6 + 4 };
-    if (raw.markers && 'luminous' in raw.markers) {
-      const t = parseTimeline(raw);
-      expect(t, 'public/models/invitation/timeline.json').not.toBeNull();
-      expect(t!.dropped).toEqual([]);
-    } else {
-      // the magic-cloud build has not added its beats yet: what is there must already be in order
-      const t = parseTimeline({ ...raw, markers: { ...raw.markers, ...later } });
-      expect(t, 'public/models/invitation/timeline.json (with the later beats added)').not.toBeNull();
-      expect(t!.dropped).toEqual([]);
-    }
+    const raw = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown> & { markers: Record<string, number> };
+    const t = parseTimeline(raw)!;
+    expect(t, 'public/models/invitation/timeline.json').not.toBeNull();
+    expect(t.dropped).toEqual([]);
+    // his story only: no beat of the earlier take, no swap inside the cloud
+    expect(Object.keys(raw.markers).sort()).toEqual([...MARKERS].sort());
+    expect(raw).not.toHaveProperty('swapFrame');
+    expect(raw).not.toHaveProperty('young');
+    expect(t.clips.invite.file).toBe('models/invitation/coco-invite.glb');
+    for (const clip of Object.values(t.clips)) expect(existsSync(new URL(`../public/${clip.file}`, import.meta.url)), clip.file).toBe(true);
+    // the heading comes in on the same cue as before: 43 frames after he arrives
+    expect(t.markers.welcome! - t.markers.arrive!).toBe(43);
+    // he is fully hidden while the veil covers the screen
+    const cloud = raw.cloud as { hiddenFrom: number; hiddenTo: number };
+    expect(cloud.hiddenFrom).toBeLessThanOrEqual(t.markers.luminous);
+    expect(cloud.hiddenTo).toBeGreaterThanOrEqual(t.coverFrame!);
   });
 
   it('copes with a missing or wrong file: no timeline, so the illustrated invitation', async () => {
@@ -192,23 +189,22 @@ describe('the timeline from Blender', () => {
 
   it('takes the veil timing from the beats after luminous', () => {
     expect(veilSecondsFrom(TL)).toEqual({ cover: 40 / 60, reveal: 60 / 60 });
-    const noSwap = parseTimeline({ ...RAW, swapFrame: undefined })!;
-    expect(veilSecondsFrom(noSwap).cover).toBeCloseTo(60 / 60);
+    const noCover = parseTimeline({ ...RAW, coverFrame: undefined })!;
+    expect(veilSecondsFrom(noCover).cover).toBeCloseTo(60 / 60);
     expect(veilSecondsFrom(parseTimeline({ fps: 60, markers: { glow: 1, luminous: 2 } })!)).toEqual({ cover: null, reveal: null });
   });
 
   it('reports each marker once, in order, as the clock passes it', () => {
     expect(markersCrossed(TL, -0.001, 0)).toEqual(['floatIn']);
-    expect(markersCrossed(TL, 80, 170)).toEqual(['turn', 'arrive', 'smile']);
+    expect(markersCrossed(TL, 80, 170)).toEqual(['arrive', 'welcome']);
     expect(markersCrossed(TL, 170, 170)).toEqual([]);
     // "Come on in" jumps to the glow: the skipped beats stay unspoken, the glow comes next
     expect(markersCrossed(TL, 280 - 0.001, 281)).toEqual(['glow']);
   });
 
-  it('shows the heading from the first of the smile and the offer, by frame', () => {
+  it("shows the heading on the 'welcome' beat, a moment after he has arrived, by frame", () => {
+    expect(HEADING_MARKERS).toEqual(['welcome']);
     expect(firstFrameOf(TL, HEADING_MARKERS)).toBe(160);
-    const offerFirst = parseTimeline({ ...RAW, markers: { ...RAW.markers, smile: 230, offer: 210 } })!;
-    expect(firstFrameOf(offerFirst, HEADING_MARKERS)).toBe(210);
     const neither = parseTimeline({ fps: 60, markers: { glow: 280, luminous: 400 } })!;
     expect(firstFrameOf(neither, HEADING_MARKERS)).toBe(280);                                          // else with the glow
   });
@@ -251,7 +247,7 @@ describe('the invitation machine', () => {
     const { m } = setup();
     toTake(m);
     expect(m.state).toBe('take');
-    m.send({ type: 'MARKER', name: 'smile' });
+    m.send({ type: 'MARKER', name: 'welcome' });
     expect(m.state).toBe('take');
     m.send({ type: 'MARKER', name: 'glow' });
     expect(m.state).toBe('transforming');
@@ -511,20 +507,18 @@ describe('the invitation machine', () => {
 
   it('narrates only what is on screen, for known beats', () => {
     for (const name of Object.keys(NARRATION)) expect(MARKERS).toContain(name);
-    expect(NARRATION.floatIn).toBe('Young Coco floats in on his cloud.');
+    expect(NARRATION.floatIn).toMatch(/^Coco floats gently down/);
+    expect(Object.values(NARRATION).join(' ')).not.toMatch(/young|smile|turns|offer|looks down/i);   // only what Adult Coco does
   });
 
   it('speaks beats that Blender puts close together as one line, when the last of them happens', () => {
-    // synthetic spacing: smile 192, offer 213 (0.35 s); lookDown 291, glow 300 (0.15 s); engulf 0.83 s before luminous
-    const t = parseTimeline({ fps: 60, markers: { floatIn: 0, turn: 108, arrive: 174, smile: 192, offer: 213, lookDown: 291, glow: 300, expand: 320, engulf: 380, luminous: 430 } })!;
+    // synthetic spacing: arrive 280, glow 300 (0.33 s); engulf 0.83 s before luminous
+    const t = parseTimeline({ fps: 60, markers: { floatIn: 0, arrive: 280, welcome: 290, glow: 300, expand: 320, engulf: 380, luminous: 430 } })!;
     const say = createNarrator(t);
     expect(say('floatIn')).toBe(NARRATION.floatIn);
-    expect(say('turn')).toBe(NARRATION.turn);                 // 1.4 s before the smile: on its own
-    expect(say('arrive')).toBeNull();                         // not narrated
-    expect(say('smile')).toBeNull();                          // the offer follows 0.35 s later: wait for it
-    expect(say('offer')).toBe(NARRATION.smile + ' ' + NARRATION.offer);
-    expect(say('lookDown')).toBeNull();
-    expect(say('glow')).toBe(NARRATION.lookDown + ' ' + NARRATION.glow);
+    expect(say('arrive')).toBeNull();                         // the glow follows 0.33 s later: wait for it
+    expect(say('welcome')).toBeNull();                        // not narrated (the heading itself is read)
+    expect(say('glow')).toBe(NARRATION.arrive + ' ' + NARRATION.glow);
     // the trip follows the engulf closely: its line is held back and handed to the veil, which
     // speaks it with the trip (never two announcements a moment apart from two live regions)
     expect(say('engulf')).toBeNull();
@@ -540,13 +534,12 @@ describe('the invitation machine', () => {
   });
 
   it('never speaks a beat the clock skipped ("Come on in" jumps to the glow), nor one it held back before the jump', () => {
-    const t = parseTimeline({ fps: 60, markers: { floatIn: 0, turn: 213, smile: 252, offer: 270, lookDown: 291, glow: 366, luminous: 500 } })!;
+    const t = parseTimeline({ fps: 60, markers: { floatIn: 0, arrive: 300, glow: 366, luminous: 500 } })!;
     const say = createNarrator(t);
     expect(say('floatIn')).toBe(NARRATION.floatIn);
-    expect(say('turn')).toBeNull();                           // the smile follows closely: held back
-    expect(say('smile')).toBeNull();
+    expect(say('arrive')).toBeNull();                         // the glow follows closely: held back
     say.skip();                                               // "Come on in": the clock jumps to the glow
-    expect(say('glow')).toBe(NARRATION.glow);                 // not "He turns. He smiles. ... It glows." a second late
+    expect(say('glow')).toBe(NARRATION.glow);                 // not "He settles. ... It glows." a second late
   });
 
   /**
@@ -585,23 +578,21 @@ describe('the invitation machine', () => {
   it('narrates the real timeline.json by the rule: close beats spoken together at the last, none before it happens, none twice', () => {
     const file = new URL('../public/models/invitation/timeline.json', import.meta.url);
     if (!existsSync(file)) return;                                                                       // not exported yet
-    const raw = JSON.parse(readFileSync(file, 'utf8')) as { markers?: Record<string, unknown> };
-    const later = { expand: 1e6, engulf: 1e6 + 1, luminous: 1e6 + 2, dissipate: 1e6 + 3, complete: 1e6 + 4 };
-    const t = parseTimeline(raw.markers && 'luminous' in raw.markers ? raw : { ...raw, markers: { ...raw.markers, ...later } })!;
+    const t = parseTimeline(JSON.parse(readFileSync(file, 'utf8')))!;
     expect(t).not.toBeNull();
     checkNarration(t);
   });
 
-  it('narrates by the same rule when the trip follows the last beats closely (the later markers Blender will add)', () => {
-    // today's beats, with plausible later ones: luminous close behind the glow and the engulf
+  it('narrates by the same rule when the trip follows the last beats closely', () => {
+    // luminous close behind the arrival, the glow and the engulf
     const t = parseTimeline({
       fps: 60,
-      markers: { floatIn: 0, arrive: 239, turn: 243, smile: 282, offer: 300, lookDown: 387, glow: 396, expand: 420, engulf: 460, luminous: 520, dissipate: 600, complete: 660 },
+      markers: { floatIn: 0, arrive: 380, glow: 396, expand: 420, engulf: 460, luminous: 520, dissipate: 600, complete: 660 },
     })!;
     const { leftover } = checkNarration(t);
-    expect(leftover).toBe([NARRATION.lookDown, NARRATION.glow, NARRATION.engulf].join(' '));             // spoken with the trip
+    expect(leftover).toBe([NARRATION.arrive, NARRATION.glow, NARRATION.engulf].join(' '));                // spoken with the trip
     // and with the trip well behind them, each is spoken as it happens
-    checkNarration(parseTimeline({ fps: 60, markers: { floatIn: 0, turn: 243, smile: 282, offer: 300, lookDown: 387, glow: 396, engulf: 460, luminous: 560 } })!);
+    checkNarration(parseTimeline({ fps: 60, markers: { floatIn: 0, arrive: 300, glow: 396, engulf: 480, luminous: 600 } })!);
   });
 
   it('speaks a line held back for the trip as soon as the trip has to wait for the visitor, and only once', () => {
@@ -753,7 +744,7 @@ describe('waiting for a visitor who is using the header', () => {
   });
 
   it('with only the fraction of a second of room before the next beat, brakes over most of a second, not a third', () => {
-    // the planned magic cloud: 0.6 s of authored time between luminous and the swap
+    // the magic cloud: 0.6 s of authored time between luminous and the veil's full cover
     for (const fps of [60, 10]) {
       const speeds = drive(freshPace(), 2, fps, () => ({ waiting: true, roomSeconds: 0 }), { left: 0.6 });
       const at = (s: number) => speeds[Math.round(s * fps) - 1];
@@ -829,32 +820,27 @@ describe('waiting for a visitor who is using the header', () => {
   });
 
   it('takes the room it may use from the next beat after luminous, else the end of its clips', () => {
-    expect(waitLimitFrame(TL, [420, 520])).toBe(420);              // the end of the invite clip (420) comes first
-    expect(waitLimitFrame(TL, [600])).toBe(440);                   // else the swap (440), before dissipate (460)
-    const noSwap = parseTimeline({ ...RAW, swapFrame: undefined })!;
-    expect(waitLimitFrame(noSwap, [600])).toBe(460);               // else dissipate
+    expect(waitLimitFrame(TL, [420, 520])).toBe(420);              // the end of a clip (420) comes first
+    expect(waitLimitFrame(TL, [600])).toBe(440);                   // else the veil's full cover (440), before dissipate (460)
+    const noCover = parseTimeline({ ...RAW, coverFrame: undefined })!;
+    expect(waitLimitFrame(noCover, [600])).toBe(460);              // else dissipate
     const bare = parseTimeline({ fps: 60, markers: { glow: 100, luminous: 200 } })!;
     expect(waitLimitFrame(bare, [600])).toBe(600);
     expect(waitLimitFrame(bare, [150])).toBe(200);                 // nothing after luminous: no room at all
   });
 });
 
-describe('the two clouds', () => {
-  it('keeps the held cloud exactly as authored and draws the magic cloud over it, depth-tested but not writing depth', () => {
-    const held = heldCloudLook(new MeshStandardMaterial({ color: '#ffffff' }));
-    expect(held.transparent).toBe(false);                          // opaque, as authored: never thinned
-    expect(held.opacity).toBe(1);
-    expect(held.depthWrite).toBe(true);
-    expect(held.colorWrite).toBe(true);
-    expect(held.emissive.getHexString()).toBe('96ebfb');           // the glow colour, dark until ctl_glow
-    expect(held.emissiveIntensity).toBe(0);
+describe('the magic cloud', () => {
+  it('draws the magic cloud over him, depth-tested but not writing depth', () => {
     const magic = magicCloudLook(new MeshStandardMaterial());
     expect(magic.transparent).toBe(true);
     expect(magic.depthWrite).toBe(false);
-    expect(magic.depthTest).toBe(true);                            // hidden behind him and the held cloud where it is behind them
+    expect(magic.depthTest).toBe(true);                            // hidden behind him where it is behind him
     expect(magic.polygonOffset).toBe(true);
-    expect(magic.polygonOffsetFactor).toBeLessThan(0);             // wins where it starts on the held cloud's surface
-    expect(HELD_ORDER).toBeLessThan(CLOUD_ORDER);                  // drawn after him, the magic cloud after the held one
+    expect(magic.polygonOffsetFactor).toBeLessThan(0);             // wins where it starts on the surface of the cloud in his hands
+    expect(magic.emissive.getHexString()).toBe('96ebfb');          // the glow colour, dark until ctl_glow
+    expect(magic.emissiveIntensity).toBe(0);
+    expect(CLOUD_ORDER).toBeGreaterThan(0);                        // drawn after him
   });
 
   it("writes the magic cloud's own depth just before it, so only its nearest surface shows at any opacity", () => {
@@ -868,17 +854,16 @@ describe('the two clouds', () => {
     expect(depth.polygonOffsetFactor).toBe(magic.polygonOffsetFactor);
     expect(depth.polygonOffsetUnits).toBe(magic.polygonOffsetUnits);
     expect(magic.depthFunc).toBe(LessEqualDepth);                  // so the visible surface passes where its depth was written
-    expect(HELD_ORDER).toBeLessThan(CLOUD_DEPTH_ORDER);            // after the held cloud: it never hides it
+    expect(CLOUD_DEPTH_ORDER).toBeGreaterThan(0);                  // after him: it never hides him
     expect(CLOUD_DEPTH_ORDER).toBeLessThan(CLOUD_ORDER);
     const stage = readFileSync(new URL('../src/invitation/InvitationStage.tsx', import.meta.url), 'utf8');
     expect(stage).toMatch(/const depth = magic\.map\(depthCopy\)/);
     expect(stage).toMatch(/copy\.morphTargetInfluences = m\.morphTargetInfluences/);   // moves exactly with it
   });
 
-  it('never hides the held cloud in code: a depth-only held cloud would punch holes in the magic cloud', () => {
+  it('never hides him in code: a depth-only copy of him would punch holes in the magic cloud', () => {
     const stage = readFileSync(new URL('../src/invitation/InvitationStage.tsx', import.meta.url), 'utf8');
     expect(stage).not.toMatch(/colorWrite\s*=\s*false/);
-    expect(stage).toMatch(/own\(m, heldCloudLook, heldCloud\)/);
     expect(stage).toMatch(/own\(m, magicCloudLook, cloudMats\)/);
   });
 });

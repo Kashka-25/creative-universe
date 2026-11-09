@@ -153,18 +153,15 @@ export function invitationVisual(state: InvitationState, illustratedNow: boolean
 
 /** What a screen reader hears as each beat begins: only what is happening on screen. */
 export const NARRATION: Partial<Record<MarkerName, string>> = {
-  floatIn: 'Young Coco floats in on his cloud.',
-  turn: 'He turns towards you.',
-  smile: 'He smiles at you.',
-  offer: 'He holds his cloud out towards you.',
-  lookDown: 'He looks down at the cloud.',
+  floatIn: 'Coco floats gently down on his cloud, meditating, his eyes closed.',
+  arrive: 'He settles in front of you and breathes slowly.',
   glow: 'The cloud begins to glow.',
   engulf: 'The cloud grows and wraps around him.',
   luminous: 'The glowing cloud fills the screen and carries you home.',
 };
 
-/** The heading fades in once he has smiled at the visitor and offers the cloud. */
-export const HEADING_MARKERS: MarkerName[] = ['smile', 'offer'];
+/** The heading fades in a moment after he has settled in front of the visitor. */
+export const HEADING_MARKERS: MarkerName[] = ['welcome'];
 
 /**
  * Beats closer together than this (authored time) are spoken as one line: a polite live region

@@ -6,7 +6,7 @@
 // What plays meanwhile is best authored: a looping HOLD_CLIP in a model (Blender), which the stage
 // crossfades into while it waits and out of when the trip carries on; the take itself then eases
 // to rest underneath, unseen. Without one, the take glides on through the little authored time it
-// has before its next beat (the swap under the veil, or the cloud dissipating), never reaching it:
+// has before its next beat (the veil's full cover, or the cloud dissipating), never reaching it:
 //   - it eases down from full speed with no step in speed (a critically damped spring), more firmly
 //     when there is little room, so the slowing uses at most DECEL_SHARE of it;
 //   - then it glides at most WAIT_PACE, and never faster than the room left spread over
@@ -19,7 +19,7 @@
 // the veil, reaching its next beat just as the cloud covers the screen, never while the screen is
 // still clear (the frames authored to play under the veil stay under it).
 
-import { springStep } from '../guide/docking';
+import { springStep } from '../guide/glide';
 import { WAIT_IDLE_MS, type InvitationState } from './invitationMachine';
 
 /**

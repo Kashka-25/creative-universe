@@ -2,11 +2,11 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { AnimationClip, Group, NumberKeyframeTrack, Object3D, VectorKeyframeTrack } from 'three';
 import { createIdleScheduler, reactionFor, type IdleOptions } from '../src/guide/idle';
+import { FLOAT_OMEGA, FOLLOW_NEAR, followWeight, glideStep, retarget, springStep, type Glide } from '../src/guide/glide';
 import {
-  ASIDE, ASIDE_OMEGA, belowCorner, carryAcross, carryFrom, columnRight, controlInCorner, CORNER_MARGIN, cornerClear, createAside, createSmallViewport, createStableViewport, DOCK,
-  endRoom, FIGURE, FOLLOW_NEAR, followWeight, glideStep, glideStiffness, heroRect, layerAnchor, nextDocked, nextLayerMode, PEEK, placement, springStep,
-  stepAside, tuckDrop, type Box, type Glide, type LayerInputs,
-} from '../src/guide/docking';
+  companionOn, createRoam, findSpace, freeHeight, pathClear, ROAM, roamStep, spaceSizes, spotBox, stillClear, visibleShare,
+  type Rect, type RoamInput, type SpaceOptions, type Spot,
+} from '../src/guide/space';
 import { ClipPlayer, envelope, loopWrapped, makeAdditive, smoothstep } from '../src/characters/ClipPlayer';
 import { createSectionWatch } from '../src/guide/attention';
 import { freshPace, stepPace } from '../src/invitation/pace';
@@ -138,362 +138,292 @@ describe('his meditation: rare, varied idles on the breath', () => {
   });
 });
 
-// ── docking ────────────────────────────────────────────────
+// ── the negative space he floats in ────────────────────────
 
-const box = (top: number, height = 400): Box => ({ top, bottom: top + height, left: 600, width: 400, height });
+const R = (left: number, top: number, right: number, bottom: number): Rect => ({ left, top, right, bottom });
+const overlaps = (a: Rect, b: Rect) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+const opts = (W: number, H: number, aspect = 0.9): SpaceOptions => ({ ...spaceSizes(W, H), aspect });
 
-describe('docking to the corner', () => {
-  const H = 900;
-  it('uses separate thresholds to leave and to come back, so he never hops at the edge', () => {
-    // in the hero: he stays while the hero is still reasonably in view
-    expect(nextDocked(false, box(-200), H)).toBe(false);            // bottom at 200 (> 20%)
-    expect(nextDocked(false, box(-300), H)).toBe(true);             // bottom at 100 (< 20%): docks
-    // docked: he only comes back once the hero is clearly in view
-    expect(nextDocked(true, box(-200), H)).toBe(true);              // bottom 200 < 35%
-    expect(nextDocked(true, box(-50), H)).toBe(false);              // bottom 350 > 35%
-    // scrolling back and forth around one edge: one change, not a flicker
-    let docked = false;
-    const changes: number[] = [];
-    for (const top of [-150, -200, -240, -200, -100, -150, -240, -40]) {
-      const next = nextDocked(docked, box(top), H);
-      if (next !== docked) changes.push(top);
-      docked = next;
+describe('finding empty space', () => {
+  it('measures the largest box of his shape that touches no content and stays in the window', () => {
+    const view = R(0, 0, 1000, 800);
+    // nothing about: as large as the window allows (here, its width at aspect 1)
+    expect(freeHeight(500, 400, [], 1, view)).toBe(800);
+    expect(freeHeight(500, 400, [], 2, view)).toBe(500);
+    // a block to the left, 100 px from the centre: his half-width may reach it, or his half-height clear it
+    expect(freeHeight(500, 400, [R(0, 300, 400, 500)], 1)).toBe(200);
+    // a block just above: clear in height up to it
+    expect(freeHeight(500, 400, [R(0, 0, 1000, 350)], 1)).toBe(100);
+    // on content: nothing
+    expect(freeHeight(500, 400, [R(450, 350, 550, 450)], 1)).toBe(0);
+    // off the window: nothing
+    expect(freeHeight(-10, 400, [], 1, view)).toBe(0);
+  });
+
+  it('never places him on content, at every window size, and keeps him inside the window', () => {
+    // a column of text and cards down the middle, a header across the top
+    for (const [W, H] of [[390, 844], [768, 1024], [1280, 800], [1920, 1080]]) {
+      const col = Math.min(1180, W - 32);
+      const left = (W - col) / 2;
+      const content = [R(0, 0, W, 64), R(left, 120, left + col * 0.55, 420), R(left, 470, left + col, 760)];
+      const o = opts(W, H);
+      const s = findSpace(R(0, 0, W, H), content, o);
+      if (!s) continue;                                                    // no room: he fades out (below)
+      const box = spotBox(s, o.aspect);
+      for (const c of content) expect(overlaps(box, c), `${W} x ${H}`).toBe(false);
+      expect(box.left).toBeGreaterThanOrEqual(0);
+      expect(box.right).toBeLessThanOrEqual(W);
+      expect(box.top).toBeGreaterThanOrEqual(0);
+      expect(box.bottom).toBeLessThanOrEqual(H);
+      expect(s.h).toBeGreaterThanOrEqual(o.minH);
+      expect(s.h).toBeLessThanOrEqual(o.maxH);
     }
-    expect(changes).toEqual([-240, -40]);
-    expect(DOCK.enter.bottom).toBeGreaterThan(DOCK.leave.bottom);
   });
 
-  it('anchors his layer in the page while he sits in the hero, and changes only while the page is still or he is out of view', () => {
-    const i = (o: Partial<LayerInputs> = {}): LayerInputs => ({ inHero: true, scrollIdle: true, outOfView: false, settled: true, fits: true, ...o });
-    // in the hero, arrived, page still: anchored in the page (the browser scrolls him with it)
-    expect(nextLayerMode('fixed', i())).toBe('attached');
-    // not while the page is moving, not mid-glide, not if the hero would not fit
-    expect(nextLayerMode('fixed', i({ scrollIdle: false }))).toBe('fixed');
-    expect(nextLayerMode('fixed', i({ settled: false }))).toBe('fixed');
-    expect(nextLayerMode('fixed', i({ fits: false }))).toBe('fixed');
-    expect(nextLayerMode('fixed', i({ inHero: false }))).toBe('fixed');
-    // anchored: he stays with the hero while it is in the hero (scrolling or not)
-    expect(nextLayerMode('attached', i({ scrollIdle: false }))).toBe('attached');
-    // time to dock: only once the page is still, or he has scrolled out of view with the hero
-    expect(nextLayerMode('attached', i({ inHero: false, scrollIdle: false }))).toBe('attached');
-    expect(nextLayerMode('attached', i({ inHero: false, scrollIdle: false, outOfView: true }))).toBe('fixed');
-    expect(nextLayerMode('attached', i({ inHero: false }))).toBe('fixed');
-    // a resized page that no longer holds the hero inside the layer: let go at the next still moment
-    expect(nextLayerMode('attached', i({ fits: false, scrollIdle: false }))).toBe('attached');
-    expect(nextLayerMode('attached', i({ fits: false }))).toBe('fixed');
+  it('finds the empty side of the home hero at the top, and prefers the space the page keeps for him', () => {
+    const W = 1280, H = 800;
+    const header = R(0, 0, W, 72), words = R(64, 160, 600, 620);
+    const hero = R(660, 120, 1200, 700);                                   // the hero stage: kept empty for him
+    const o = opts(W, H);
+    const s = findSpace(R(0, 0, W, H), [header, words], o, { hints: [hero] })!;
+    expect(s.cx).toBeGreaterThan(hero.left);
+    expect(s.cx).toBeLessThan(hero.right);
+    expect(s.cy).toBeGreaterThan(hero.top);
+    expect(s.cy).toBeLessThan(hero.bottom);
+    expect(s.h).toBe(o.maxH);                                              // a calm size: never larger than the ceiling
   });
 
-  it('anchors the layer on the hero, inside the page, so it never makes the page longer', () => {
-    expect(layerAnchor(100, 600, 900, 4000)).toEqual({ top: 0, fits: true });        // near the top: from the page's top
-    expect(layerAnchor(1500, 400, 900, 4000)).toEqual({ top: 1250, fits: true });    // centred on the hero
-    expect(layerAnchor(3800, 150, 900, 4000)).toEqual({ top: 3100, fits: true });    // near the bottom: kept inside the page
-    expect(layerAnchor(100, 1200, 900, 4000).fits).toBe(false);                     // taller than the layer: stays fixed
+  it('has no room on a dense phone page (he fades out), and is smaller on a phone', () => {
+    const W = 390, H = 844;
+    const dense = [R(0, 0, W, 60), R(16, 70, 374, 300), R(16, 316, 374, 560), R(16, 576, 374, 844)];
+    expect(findSpace(R(0, 0, W, H), dense, opts(W, H))).toBeNull();
+    expect(spaceSizes(390, 844).maxH).toBeLessThan(spaceSizes(1280, 800).maxH);
+    expect(spaceSizes(390, 844).minH).toBeLessThan(spaceSizes(1280, 800).minH);
   });
 
-  it('docks on pages without a hero', () => {
-    expect(nextDocked(false, null, H)).toBe(true);
+  it('stays near where he is among spaces as good', () => {
+    const W = 1920, H = 1080;
+    const column = R(370, 0, 1550, H);                                     // both margins empty and alike
+    const o = opts(W, H);
+    expect(findSpace(R(0, 0, W, H), [column], o, { near: { cx: 1700, cy: 500 } })!.cx).toBeGreaterThan(1550);
+    expect(findSpace(R(0, 0, W, H), [column], o, { near: { cx: 200, cy: 500 } })!.cx).toBeLessThan(370);
   });
 
-  it('ignores a phone URL bar sliding in and out (the large viewport height)', () => {
-    const stable = createStableViewport();
-    expect(stable(390, 664)).toBe(664);
-    expect(stable(390, 740)).toBe(740);        // bar hidden
-    expect(stable(390, 664)).toBe(740);        // bar back: still the large height
-    expect(stable(844, 340)).toBe(340);        // rotated: start again
-    expect(stable(844, 200)).toBe(200);        // a window made much shorter is a real change
+  it('measures how much of him is in view and whether his space is still clear', () => {
+    const view = R(0, 0, 1000, 800);
+    expect(visibleShare({ cx: 500, cy: 400, h: 200 }, 1, view)).toBe(1);
+    expect(visibleShare({ cx: 500, cy: 800, h: 200 }, 1, view)).toBeCloseTo(0.5);
+    expect(visibleShare({ cx: 500, cy: 1200, h: 200 }, 1, view)).toBe(0);
+    const s = { cx: 500, cy: 400, h: 200 };
+    expect(stillClear(s, [R(0, 0, 300, 800)], 1, 16)).toBe(true);
+    expect(stillClear(s, [R(0, 0, 420, 800)], 1, 16)).toBe(false);       // content has moved in on him
   });
+});
 
-  it('measures the corner from the small viewport, so the URL bar never moves him or hides him', () => {
-    const small = createSmallViewport();
-    expect(small(390, 740)).toBe(740);
-    expect(small(390, 664)).toBe(664);       // bar showing
-    expect(small(390, 740)).toBe(664);       // bar hidden: the corner stays where it was
-    expect(small(844, 340)).toBe(340);       // rotated: start again
-    expect(small(844, 600)).toBe(600);       // a window made much taller is a real change
-    // he peeks up from the corner of what is always visible, not from behind the bar
-    expect(placement(true, null, 390, 664, true).cy).toBeLessThan(664);
-    expect(placement(true, null, 390, 664, true).cy).toBeLessThan(placement(true, null, 390, 740, true).cy);
-  });
+describe('keeping his space (no restless wandering)', () => {
+  const at = (cy: number, h = 200): Spot => ({ cx: 500, cy, h });
+  const input = (o: Partial<RoamInput> = {}): RoamInput => ({ now: 0, scrollIdle: true, best: at(400), clear: true, visible: 1, ...o });
 
-  it('places him in the hero, docked beside the column, or as the small companion peeking up from the corner', () => {
-    expect(placement(false, box(100), 1440, 900)).toEqual({ cx: 800, cy: 300, h: 368 });
-    const corner = placement(true, null, 1920, 1080);
-    expect(corner.h).toBe(170);
-    expect(corner.cx).toBeCloseTo(1920 - 170 * 0.62);
-    // peeking: small (at most 118 px on a phone, a little larger on a tablet or laptop), against the
-    // right edge, with only his top PEEK.show above the bottom edge
-    for (const [W, H, most] of [[375, 667, 118], [390, 844, 118], [768, 1024, 150], [1280, 800, 150], [1440, 900, 150]]) {
-      const p = placement(true, null, W, H, true);
-      expect(p.h, `${W} x ${H}`).toBeLessThanOrEqual(most);
-      expect(p.h, `${W} x ${H}`).toBeLessThanOrEqual(H * 0.19 + 1e-9);
-      expect(p.h, `${W} x ${H}`).toBeGreaterThan(80);
-      const top = p.cy - (p.h * FIGURE) / 2, bottom = p.cy + (p.h * FIGURE) / 2;
-      expect(H - top, `${W} x ${H}`).toBeCloseTo(p.h * PEEK.show);                 // his head, shoulders, sun and bolt show
-      expect(bottom, `${W} x ${H}`).toBeGreaterThan(H);                            // the rest below the edge
-      expect(p.cx + (p.h * FIGURE) / 2, `${W} x ${H}`).toBeLessThanOrEqual(W);     // inside the window
+  it('stays while his space is clear and in view, even when other spaces as good come and go', () => {
+    const r = createRoam();
+    r.spot = at(400);
+    const mine = r.spot;
+    for (let t = 0; t < 60; t += 0.25) {
+      expect(roamStep(r, input({ now: t, best: { cx: 200 + (t * 37) % 600, cy: 300, h: 220 } }))).toBe('stay');
     }
-    expect(placement(true, null, 375, 812, true).h).toBeCloseTo(118);
-    expect(placement(true, null, 1280, 800, true).h).toBeGreaterThan(placement(true, null, 390, 844, true).h);
+    expect(r.spot).toBe(mine);
   });
 
-  it('glides with an eased, critically damped spring: no jump, no overshoot', () => {
-    let x = 0, v = 0;
-    const path: number[] = [];
-    for (let i = 0; i < 240; i++) {
-      [x, v] = springStep(x, v, 1, glideStiffness(i / 60), 1 / 60);
-      path.push(x);
-    }
-    expect(path[0]).toBeLessThan(0.01);                 // starts gently (zero speed)
-    expect(Math.max(...path)).toBeLessThanOrEqual(1 + 1e-9);
-    expect(path[239]).toBeGreaterThan(0.999);
-    for (let i = 1; i < path.length; i++) expect(path[i]).toBeGreaterThanOrEqual(path[i - 1] - 1e-12);
-    expect(glideStiffness(0)).toBeLessThan(glideStiffness(5));
+  it('moves to a clearly better space only once it has held for a while, with the page still', () => {
+    const r = createRoam();
+    r.spot = at(400, 140);
+    const big = at(600, 300);
+    expect(roamStep(r, input({ now: 0, best: big }))).toBe('stay');
+    expect(roamStep(r, input({ now: ROAM.betterS - 0.1, best: big }))).toBe('stay');
+    expect(roamStep(r, input({ now: ROAM.betterS + 0.1, best: big, scrollIdle: false }))).toBe('stay');   // not while scrolling
+    expect(roamStep(r, input({ now: ROAM.betterS + 0.2, best: big }))).toBe('move');
+    expect(r.spot).toBe(big);
+    // a better space that does not last starts the count again
+    const q = createRoam();
+    q.spot = at(400, 140);
+    roamStep(q, input({ now: 0, best: big }));
+    roamStep(q, input({ now: 2, best: at(400, 150) }));
+    expect(roamStep(q, input({ now: 3.5, best: big }))).toBe('stay');
   });
 
-  // drives glideStep as HomeStage does (since resets when he changes place, then counts up)
-  const glideTo = (g: Glide, spotAt: (t: number) => { cx: number; cy: number; h: number }, seconds: number, each: (prev: { x: number; y: number }, spot: { cx: number; cy: number }) => void) => {
-    const dt = 1 / 60;
-    for (let i = 0; i < seconds * 60; i++) {
-      const spot = spotAt(i * dt);
-      const prev = { x: g.x, y: g.y };
-      glideStep(g, spot, dt);
-      each(prev, spot);
-      g.since += dt;
-    }
-  };
+  it('leaves at once when content crowds his space: to the best space, or fades out if there is none', () => {
+    const r = createRoam();
+    r.spot = at(400);
+    const other = at(700);
+    expect(roamStep(r, input({ clear: false, best: other, scrollIdle: false }))).toBe('move');
+    expect(r.spot).toBe(other);
+    expect(roamStep(r, input({ clear: false, best: null }))).toBe('none');
+    expect(r.spot).toBeNull();
+  });
 
-  it('glides back to a hero that is moving (scrolling up to it) without ever moving away from it or dipping off the window', () => {
-    // docked in the corner of a 1200 x 800 window; a smooth scroll back to the top brings the hero
-    // down from above the window, and he heads back once docking says it is clearly in view
-    const W = 1200, H = 800;
-    const corner = placement(true, null, W, H);
-    const easeOut = (u: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, u)), 3);
-    for (const seconds of [0.5, 0.9, 1.4]) {
-      const g: Glide = { x: corner.cx, vx: 0, y: corner.cy, vy: 0, h: corner.h, vh: 0, tx: corner.cx, ty: corner.cy, since: 0 };
-      let docked: boolean = true;
-      let lowest = g.y;
-      let returned = false;
-      const dt = 1 / 60;
-      for (let i = 0; i < 4 * 60; i++) {
-        const top = 170 - 1400 * (1 - easeOut((i * dt) / seconds));          // the hero box ends at 170..670
-        const rect: Box = { top, bottom: top + 500, left: 350, width: 500, height: 500 };
-        const was: boolean = docked;
-        docked = nextDocked(docked, rect, H);
-        if (docked !== was) { g.since = 0; returned = true; }
-        const spot = docked ? corner : placement(false, rect, W, H);
-        const prev = { x: g.x, y: g.y };
-        glideStep(g, spot, dt);
-        const step = { x: g.x - prev.x, y: g.y - prev.y };
-        const toward = { x: spot.cx - prev.x, y: spot.cy - prev.y };
-        expect(step.x * toward.x + step.y * toward.y, `${seconds} s scroll, frame ${i}`).toBeGreaterThanOrEqual(-1e-6);   // never away from it
-        lowest = Math.max(lowest, g.y);
-        g.since += dt;
-      }
-      expect(returned).toBe(true);
-      expect(lowest, `${seconds} s scroll`).toBeLessThanOrEqual(corner.cy + 1e-6);   // no dip towards the bottom edge
-      expect(Math.abs(g.y - 420)).toBeLessThan(1);                                    // and there: the hero's centre
+  it('goes with his space as it scrolls away, and floats to a new one once it has held and the page is still', () => {
+    const r = createRoam();
+    r.spot = at(400);
+    const mine = r.spot;
+    const next = at(900);
+    // scrolling: his space leaving the window, a new one in view, but the page is moving
+    for (let t = 0; t < 3; t += 0.25) expect(roamStep(r, input({ now: t, visible: 0.3, best: next, scrollIdle: false }))).toBe('stay');
+    expect(r.spot).toBe(mine);
+    // the page still again, the new space having held for more than ROAM.openS: he floats to it
+    expect(roamStep(r, input({ now: 3.1, visible: 0, best: next }))).toBe('move');
+    expect(r.spot).toBe(next);
+  });
+
+  it('is never left cut off by the header or an edge: once the page is still he finds a space wholly in view', () => {
+    const r = createRoam();
+    r.spot = at(400);
+    const mine = r.spot;
+    const next = at(600);
+    // scrolling, partly under the header: he goes with the page
+    for (let t = 0; t < 2; t += 0.25) expect(roamStep(r, input({ now: t, visible: 0.8, best: next, scrollIdle: false }))).toBe('stay');
+    expect(r.spot).toBe(mine);
+    // the page still: a whole space must hold for a moment, then he floats to it
+    expect(roamStep(r, input({ now: 2, visible: 0.8, best: next }))).toBe('stay');
+    expect(roamStep(r, input({ now: 2 + ROAM.openS + 0.05, visible: 0.8, best: next }))).toBe('move');
+    expect(r.spot).toBe(next);
+    // wholly in view (within a hair): he stays
+    const q = createRoam();
+    q.spot = at(400);
+    for (let t = 0; t < 5; t += 0.25) expect(roamStep(q, input({ now: t, visible: 0.98, best: next }))).toBe('stay');
+  });
+
+  it('comes back from fading out only when a space has held for a moment', () => {
+    const r = createRoam();
+    expect(roamStep(r, input({ now: 0 }))).toBe('stay');
+    expect(roamStep(r, input({ now: 0.3, best: null }))).toBe('stay');        // the space closed again
+    expect(roamStep(r, input({ now: 0.5 }))).toBe('stay');
+    expect(roamStep(r, input({ now: 0.5 + ROAM.openS }))).toBe('move');
+  });
+
+  it('a page scrolled back and forth past a gap does not make him hop (fewer than one move per pass)', () => {
+    // a phone page with gaps every 600 px; the visitor scrolls 3000 px down and back up, steadily
+    const r = createRoam();
+    let moves = 0;
+    for (let i = 0; i <= 600; i++) {
+      const t = i / 60;
+      const y = 1500 - 1500 * Math.cos((Math.PI * 2 * i) / 600);
+      const gapAt = Math.round(y / 600) * 600 + 300;                         // the nearest gap, in the document
+      const best = Math.abs(gapAt - (y + 422)) < 300 ? { cx: 195, cy: gapAt, h: 110 } : null;
+      const mine = r.spot;
+      const visible = mine ? Math.max(0, 1 - Math.abs(mine.cy - (y + 422)) / 422) : 0;
+      if (roamStep(r, { now: t, scrollIdle: false, best, clear: true, visible }) !== 'stay') moves++;
     }
-    // once there he moves with it exactly (no swimming behind it as the page scrolls)
+    expect(moves).toBe(0);                                                    // never while the page is moving
+  });
+});
+
+describe('his float between spaces', () => {
+  it('glides with a soft, critically damped spring: from rest, no overshoot, never a dash, settled in a few seconds', () => {
+    const g: Glide = { x: 100, vx: 0, y: 600, vy: 0, h: 200, vh: 0, tx: 100, ty: 600 };
+    const to = { cx: 900, cy: 200, h: 260 };
+    retarget(g, to);
+    const d0 = Math.hypot(to.cx - g.x, to.cy - g.y);
+    let prev = { x: g.x, y: g.y };
+    let maxSpeed = 0, first = -1;
+    for (let i = 0; i < 6 * 60; i++) {
+      glideStep(g, to, 1 / 60);
+      const step = Math.hypot(g.x - prev.x, g.y - prev.y);
+      if (first < 0) first = step;
+      maxSpeed = Math.max(maxSpeed, step * 60);
+      expect(g.x).toBeLessThanOrEqual(to.cx + 1e-6);                        // no overshoot
+      expect(g.y).toBeGreaterThanOrEqual(to.cy - 1e-6);
+      prev = { x: g.x, y: g.y };
+    }
+    expect(first).toBeLessThan(1);                                         // starts from rest: no pop
+    expect(maxSpeed).toBeLessThan(d0 * 0.65);                              // calm: under two thirds of the way per second at most
+    expect(Math.hypot(to.cx - g.x, to.cy - g.y)).toBeLessThan(2);         // there within 6 s
+    expect(Math.abs(g.h - 260)).toBeLessThan(1);
+  });
+
+  it('moves with his space exactly as the page scrolls, once he is there (no swimming over the content beside it)', () => {
     expect(followWeight(0)).toBe(1);
     expect(followWeight(FOLLOW_NEAR)).toBe(0);
-    const g: Glide = { x: 600, vx: 0, y: 420, vy: 0, h: 380, vh: 0, tx: 600, ty: 420, since: 5 };
-    glideStep(g, { cx: 600, cy: 470, h: 380 }, 1 / 60);
-    expect(g.y).toBeCloseTo(470, 6);
+    const g: Glide = { x: 600, vx: 0, y: 420, vy: 0, h: 300, vh: 0, tx: 600, ty: 420 };
+    for (let i = 1; i <= 30; i++) {
+      glideStep(g, { cx: 600, cy: 420 - i * 25, h: 300 }, 1 / 60);       // a quick scroll: 1500 px/s
+      expect(g.y).toBeCloseTo(420 - i * 25, 4);
+    }
   });
 
-  it('stays on the bottom edge when a phone URL bar slides, even while he is stepping aside', () => {
-    // his layer is held to the window's bottom edge (100lvh tall), and he stands on the layer's own
-    // bottom: as the bar hides and comes back (innerHeight 664 -> 740 -> 664, the layer's top
-    // -76 -> 0 -> -76) his place in the layer never changes, so nothing jumps, tucked or not
-    const W = 390, lvh = 740, small = 664;
-    const css = readFileSync(new URL('../src/styles/intro.css', import.meta.url), 'utf8');
-    expect(css).toMatch(/\.guide-layer \{[^}]*top: auto;[^}]*bottom: 0;/);
+  it('springs exactly for any frame length', () => {
+    let a: [number, number] = [0, 0];
+    for (let i = 0; i < 4; i++) a = springStep(a[0], a[1], 1, FLOAT_OMEGA, 0.25);
+    const b = springStep(0, 0, 1, FLOAT_OMEGA, 1);
+    expect(a[0]).toBeCloseTo(b[0], 10);
+    expect(a[1]).toBeCloseTo(b[1], 10);
+  });
+
+  it('never glides across content: a way blocked by a card is faded instead', () => {
+    const card: Rect = { left: 400, top: 300, right: 700, bottom: 500 };
+    const from = { cx: 200, cy: 400, h: 120 }, to = { cx: 900, cy: 400, h: 120 };
+    expect(pathClear(from, to, [card], 0.9)).toBe(false);                  // straight through the card
+    expect(pathClear({ ...from, cy: 150 }, { ...to, cy: 150 }, [card], 0.9)).toBe(true);   // above it
+    expect(pathClear(to, to, [card], 0.9)).toBe(true);                     // standing still beside it
+    expect(pathClear({ cx: 550, cy: 400, h: 120 }, { cx: 550, cy: 400, h: 120 }, [card], 0.9)).toBe(false);
+    // a corner clipped part-way, though both ends are clear
+    expect(pathClear({ cx: 300, cy: 200, h: 100 }, { cx: 800, cy: 600, h: 100 }, [card], 0.9)).toBe(false);
+  });
+
+  it('after a change of page waits for the dwell before he looks, and fades rather than crossing content', () => {
     const home = readFileSync(new URL('../src/guide/HomeStage.tsx', import.meta.url), 'utf8');
-    expect(home).toMatch(/placement\(true, null, W, cornerH, peek, L\.height\)/);
-    expect(home).toMatch(/const y = P\.y \+ P\.tuck \* tuckDrop\(P\.h\);/);
-    const spot = placement(true, null, W, small, true, lvh);                       // in the layer's px
-    const g: Glide = { x: spot.cx, vx: 0, y: spot.cy, vy: 0, h: spot.h, vh: 0, tx: spot.cx, ty: spot.cy, since: 5 };
-    let tuck = 0, vtuck = 0, prevScreen = NaN, maxStep = 0, minTuck = 1, maxTuck = 0;
-    for (let i = 0; i < 180; i++) {
-      // stepping aside from frame 0; the bar hides at frame 12 (tuck about 0.3) and returns at frame 20
-      const vh = i >= 12 && i < 20 ? lvh : small;
-      const layerTop = vh - lvh;
-      glideStep(g, placement(true, null, W, small, true, lvh), 1 / 60);
-      g.since += 1 / 60;
-      [tuck, vtuck] = springStep(tuck, vtuck, 1, ASIDE_OMEGA, 1 / 60);
-      if (i >= 12 && i < 20) { minTuck = Math.min(minTuck, tuck); maxTuck = Math.max(maxTuck, tuck); }
-      const y = g.y + tuck * tuckDrop(g.h);
-      // on the screen (the bar's 76 px above the window when it shows): the layer's bottom is the screen's
-      const screen = (lvh - vh) + layerTop + y;
-      if (i > 0) maxStep = Math.max(maxStep, Math.abs(screen - prevScreen));
-      prevScreen = screen;
-    }
-    expect(minTuck).toBeGreaterThan(0.2);                // the bar moved while he was partly tucked
-    expect(maxTuck).toBeLessThan(0.6);
-    expect(maxStep).toBeLessThan(6);                     // never a jump: only the eased step aside
+    const poster = readFileSync(new URL('../src/guide/PosterCompanion.tsx', import.meta.url), 'utf8');
+    expect(home).toMatch(/if \(!P\.init\) P\.page = page;\s*else if \(page !== P\.page\) \{\s*P\.page = page;\s*layout\.current\?\.invalidate\(\);/);
+    expect(home).toMatch(/!pathClear\(here, here, sweep\(m\.obstacles, 0, GUARD\), P\.riding \? companionAspect : aspect\)\) hideQuietly\(true\);/);
+    // content come under him: a quick fade out (never a pop), and always a slow fade back in
+    expect(home).toMatch(/if \(quick\) layerEl\.dataset\.quick = ''; else delete layerEl\.dataset\.quick;/);
+    expect(readFileSync(new URL('../src/styles/intro.css', import.meta.url), 'utf8')).toMatch(/\.guide-layer\[data-quick\] \{ transition-duration: 240ms; \}/);
+    // the way is checked against the content (companion.ts planMove, clearOf = space.ts pathClear)
+    expect(home).toMatch(/const kind = moveKind\(pathClear\(here, win\(P\.aim\.spot\), m\.obstacles, a\), hereClear && hereStays\);/);
+    expect(poster).toMatch(/const SETTLE_MS = 400;/);
+    expect(poster).toMatch(/!wayClear\(/);
+    // no debugging hooks left on the window
+    expect(home + poster).not.toMatch(/__coco|window as unknown as/);
+  });
+});
+
+describe('where he appears', () => {
+  it('keeps the visitor company on every page but About', () => {
+    for (const p of ['/', '/realm/music', '/work/yourigin', '/realm/digital', '/nowhere']) expect(companionOn(p), p).toBe(true);
+    for (const p of ['/about', '/about/', '/About']) expect(companionOn(p), p).toBe(false);
   });
 
-  it('comes up into the corner from just below the window when a fling carried the hero (and him) out of view', () => {
-    const corner = placement(true, null, 1200, 800);
-    const b = belowCorner(corner, 800);
-    expect(b.x).toBe(corner.cx);
-    expect(b.h).toBe(corner.h);                                                             // already corner-sized
-    expect(b.y - b.h * 0.5).toBeGreaterThan(800);                                           // starts just out of sight below
-    const g: Glide = { x: b.x, vx: 0, y: b.y, vy: 0, h: b.h, vh: 0, tx: corner.cx, ty: corner.cy, since: 0 };
-    let prevY = g.y;
-    glideTo(g, () => corner, 3, () => {
-      expect(g.y).toBeLessThanOrEqual(prevY + 1e-9);                                        // only ever upwards: never across the page
-      expect(g.y).toBeGreaterThanOrEqual(corner.cy - 1e-6);                                 // no overshoot
-      prevY = g.y;
-    });
-    expect(Math.abs(g.y - corner.cy)).toBeLessThan(1);
-  });
-
-  it('stays where he is on screen when the hero leaves with the page (a change of page), and glides on from there', () => {
-    // 1280 x 800 window, scrolled 0; his layer anchored in the page with the hero at 120..620
-    const W = 1280, H = 800;
-    const hero: Box = { top: 120, bottom: 620, left: 640, width: 520, height: 500 };
-    const spot = placement(false, hero, W, H);
-    const g: Glide = { x: spot.cx, vx: 0, y: spot.cy, vy: 0, h: spot.h, vh: 0, tx: spot.cx, ty: spot.cy, since: 5 };
-    const attachedLayer = { left: 0, top: 0 };
-    // the route changes: the hero is gone (stage.el null), so the layer lets go: fixed in the window
-    const next = nextLayerMode('attached', { inHero: false, scrollIdle: true, outOfView: true, settled: true, fits: false });
-    expect(next).toBe('fixed');
-    const before = { x: g.x + attachedLayer.left, y: g.y + attachedLayer.top };          // on screen
-    const fixedLayer = { left: 0, top: 0 };
-    const fromBelow = carryAcross(g, attachedLayer, fixedLayer, next, null, H);
-    expect(fromBelow).toBe(false);                                                          // not a fling: no jump below the window
-    expect(g.x + fixedLayer.left).toBe(before.x);
-    expect(g.y + fixedLayer.top).toBe(before.y);
-    // and from there he glides: no frame moves him more than a gentle step
-    const corner = placement(true, null, W, H);
-    g.since = 0;
-    let prev = { x: g.x, y: g.y };
-    let maxStep = 0;
-    for (let i = 0; i < 180; i++) {
-      glideStep(g, corner, 1 / 60);
-      maxStep = Math.max(maxStep, Math.hypot(g.x - prev.x, g.y - prev.y));
-      prev = { x: g.x, y: g.y };
-      g.since += 1 / 60;
-    }
-    expect(maxStep).toBeLessThan(15);
-
-    // the page scrolled, so the anchored layer sat 300 px up the window: its place is carried exactly
-    const g2: Glide = { x: 500, vx: 0, y: 670, vy: 0, h: 400, vh: 0, tx: 500, ty: 670, since: 5 };
-    expect(carryAcross(g2, { left: 0, top: -300 }, { left: 0, top: 0 }, 'fixed', null, H)).toBe(false);
-    expect(g2.y).toBe(370);
-    expect(g2.ty).toBe(370);
-    // a fling: the hero is still on the page but out of view above: he comes up from below instead
-    const flung: Box = { top: -900, bottom: -400, left: 640, width: 520, height: 500 };
-    expect(carryAcross({ ...g2 }, { left: 0, top: -1200 }, { left: 0, top: 0 }, 'fixed', flung, H)).toBe(true);
-    expect(carryAcross({ ...g2 }, { left: 0, top: 0 }, { left: 0, top: -100 }, 'attached', flung, H)).toBe(false);
-  });
-
-  it('stays where he was last seen when the page changes after a little scroll (the new page scrolls to the top first)', () => {
-    // 1280 x 800, home scrolled 250 px with the hero still in view: his layer is anchored at 15 in
-    // the page, so it was last drawn at -235 in the window
-    const H = 800;
-    const g: Glide = { x: 921, vx: 0, y: 439, vy: 0, h: 460, vh: 0, tx: 921, ty: 439, since: 5 };
-    const painted = { left: 0, top: -235 };
-    const seen = { x: g.x + painted.left, y: g.y + painted.top };
-    // the route changes: the hero has gone, and the new page's scrollTo(0) lands before his next
-    // frame, so the anchored layer now measures at +15; it lets go, fixed in the window at 0
-    const measured = { left: 0, top: 15 };
-    const fixed = { left: 0, top: 0 };
-    expect(carryAcross(g, carryFrom(painted, measured, null), fixed, 'fixed', null, H)).toBe(false);
-    expect(g.x + fixed.left).toBe(seen.x);
-    expect(g.y + fixed.top).toBe(seen.y);                                                    // not 250 px lower
-    expect(g.ty + fixed.top).toBe(seen.y);
-    // with the hero still on the page, the browser scrolled him with it: the layer is where it measures
-    const hero: Box = { top: 120, bottom: 620, left: 640, width: 520, height: 500 };
-    expect(carryFrom(painted, measured, hero)).toBe(measured);
-    expect(carryFrom(null, measured, null)).toBe(measured);                                  // nothing drawn yet
-    // and HomeStage carries his place from there, remembering where the layer was each frame
-    const home = readFileSync(new URL('../src/guide/HomeStage.tsx', import.meta.url), 'utf8');
-    expect(home).toMatch(/carryAcross\(P, carryFrom\(painted\.current, L, r\), moved, next, r, vh\)/);
-    expect(home).toMatch(/painted\.current = \{ top: L\.top, left: L\.left \}/);
-  });
-
-  it('reads a hero that has left the page (a detached box measures all zeros) as no hero, so a change of page never snaps him', () => {
-    const zeros = { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0 };
-    const box: Box = { top: 120, bottom: 620, left: 640, width: 520, height: 500 };
-    const detached = { isConnected: false, getBoundingClientRect: () => zeros };
-    expect(heroRect(detached)).toBeNull();
-    expect(heroRect({ isConnected: true, getBoundingClientRect: () => zeros })).toBeNull();   // no size: no hero either
-    expect(heroRect({ isConnected: true, getBoundingClientRect: () => box })).toBe(box);
-    expect(heroRect(null)).toBeNull();
-    // and the zero box itself never reads as a hero that a fling carried out of the window
-    const g0: Glide = { x: 900, vx: 0, y: 370, vy: 0, h: 460, vh: 0, tx: 900, ty: 370, since: 5 };
-    expect(carryAcross(g0, { left: 0, top: 0 }, { left: 0, top: 0 }, 'fixed', zeros, 800)).toBe(false);
-
-    // the frame after the click, as HomeStage runs it: he sat in the hero, his layer anchored in the page
-    for (const [W, H] of [[1280, 800], [1920, 1080]]) {
-      const spot = placement(false, box, W, H);
-      const g: Glide = { x: spot.cx, vx: 0, y: spot.cy, vy: 0, h: spot.h, vh: 0, tx: spot.cx, ty: spot.cy, since: 5 };
-      const r = heroRect(detached);
-      const docked = nextDocked(false, r, H);
-      const clear = cornerClear(W, H, 0.9);
-      const withHero = !!r && !docked;
-      const next = nextLayerMode('attached', { inHero: withHero, scrollIdle: true, outOfView: !r, settled: true, fits: !!r });
-      expect(next).toBe('fixed');
-      expect(carryAcross(g, { left: 0, top: 0 }, { left: 0, top: 0 }, next, r, H), `${W}`).toBe(false);   // never from below
-      const atHero = !!r && (withHero || next === 'attached');
-      expect(atHero, `${W}`).toBe(false);                                                      // never to a zero-size hero at the top-left
-      // to the corner: docked beside the column where it is clear, else peeking up (a glide either way)
-      const to = placement(true, null, W, H, !clear);
-      const distance = Math.hypot(to.cx - g.x, to.cy - g.y);
-      g.since = 0;
-      let prev = { x: g.x, y: g.y };
-      const steps: number[] = [];
-      for (let i = 0; i < 240; i++) {
-        glideStep(g, to, 1 / 60);
-        steps.push(Math.hypot(g.x - prev.x, g.y - prev.y));
-        expect(g.y, `${W}, frame ${i}`).toBeGreaterThan(spot.cy - 1);                        // never up towards the top-left
-        prev = { x: g.x, y: g.y };
-        g.since += 1 / 60;
-      }
-      expect(steps[0], `${W}`).toBeLessThan(Math.max(1, distance * 0.005));                   // starts from rest: no snap
-      expect(Math.max(...steps), `${W}`).toBeLessThan(Math.max(1, distance * 0.03));           // the move spread over the glide
-      expect(Math.hypot(to.cx - g.x, to.cy - g.y), `${W}`).toBeLessThan(2);                    // and there
-    }
-  });
-
-  it('docks beside the content column only where the corner lies clear of it (elsewhere he peeks)', () => {
-    const share = 0.9;
-    for (const [w, h] of [[375, 667], [390, 844], [812, 375], [1024, 768], [1280, 800], [1440, 900]]) {
-      expect(cornerClear(w, h, share), `${w} x ${h}`).toBe(false);
-    }
-    for (const [w, h] of [[1920, 1080], [2560, 1440]]) {
-      expect(cornerClear(w, h, share), `${w} x ${h}`).toBe(true);
-      const c = placement(true, null, w, h);
-      expect(c.cx - (c.h * share) / 2, `${w} x ${h}`).toBeGreaterThanOrEqual(columnRight(w) + CORNER_MARGIN);   // wholly outside the column
-    }
-    // the column: the page width centred, inside the gutters
-    expect(columnRight(375)).toBe(359);
-    expect(columnRight(1920)).toBe((1920 + 1180) / 2);
-    // a window resized across the edge does not flicker between the two (hysteresis)
-    let at = 0;
-    for (let w = 1500; w <= 1700; w++) if (cornerClear(w, 900, share)) { at = w; break; }
-    expect(at).toBeGreaterThan(0);
-    expect(cornerClear(at - 4, 900, share, true)).toBe(true);
-    expect(cornerClear(at - 4, 900, share, false)).toBe(false);
-  });
-
-  it('is with the visitor on every page at every window size: loaded everywhere, never faded away', () => {
-    const provider = readFileSync(new URL('../src/guide/PosterCompanion.tsx', import.meta.url), 'utf8');
+  it('fades out on About and does not load there on a direct visit', () => {
     const guide = readFileSync(new URL('../src/guide/GuideProvider.tsx', import.meta.url), 'utf8');
+    const css = readFileSync(new URL('../src/styles/intro.css', import.meta.url), 'utf8');
+    expect(guide).toMatch(/if \(placed \|\| !live3D \|\| !companionOn\(location\.pathname\)\) return;/);
+    expect(guide).toMatch(/\$\{away \? ' is-away' : ''\}/);
+    expect(css).toMatch(/\.guide-layer\.is-away \{ opacity: 0; \}/);
+    expect(css).toMatch(/\.guide-layer \{[^}]*transition: opacity 700ms/);
+    // with no room anywhere he fades out where he is, and appears in a new space faded in, never
+    // gliding in across the content from an edge
+    expect(css).toMatch(/\.guide-layer\.is-ready \{ opacity: var\(--coco-fade, 1\); \}/);
+    expect(css).toMatch(/\.guide-layer\[data-appear\] \{ opacity: 0; transition: none; \}/);
+    // the veil's instant reveal never turns the fade on About into a pop
+    expect(guide).toMatch(/instant && !wasAway && !away \? ' is-instant'/);
+  });
+
+  it('rides with the visitor (no waiting); his still companion moves once scrolling stops', () => {
     const home = readFileSync(new URL('../src/guide/HomeStage.tsx', import.meta.url), 'utf8');
-    // mounted on every page (home at once, elsewhere once the page is idle), and stays for the visit
-    expect(guide).toMatch(/\{staged && \(\s*<div className=\{`guide-layer/);
-    expect(guide).toMatch(/requestIdleCallback\(\(\) => setPlaced\(true\), \{ timeout: IDLE_LOAD_MS \}\)/);
-    expect(guide).toMatch(/useState\(\(\) => location\.pathname === '\/'\)/);
-    expect(guide).not.toMatch(/setPlaced\(false\)/);
-    expect(guide).toMatch(/if \(!staged \|\| ready\) return;/);
-    // no fading away where the corner overlaps the column: nothing of the old rule is left
-    expect(guide + home).not.toMatch(/guideCanShow|presence/);
-    // lite: his still, only if there is one
-    expect(guide).toMatch(/!live3D && mode !== 'off' && <PosterCompanion/);
-    expect(provider).toMatch(/onError=\{\(\) => setMissing\(true\)\}/);
+    expect(home).toMatch(/followStep\(P\.rider, P\.target, dt\);/);
+    expect(home).not.toMatch(/dwelled\(|TEMP/);
+    const poster = readFileSync(new URL('../src/guide/PosterCompanion.tsx', import.meta.url), 'utf8');
+    expect(poster).toMatch(/const onScroll = \(\) => touch\(dwell, performance\.now\(\) \/ 1000\);/);
+  });
+
+  it('treats the hero space as empty, and the header, cards, text and the drifting swirl clouds as content', () => {
+    const ns = readFileSync(new URL('../src/guide/negativeSpace.ts', import.meta.url), 'utf8');
+    expect(ns).toMatch(/el\.closest\('\[data-guide-space\], \[data-backdrop\], \.visually-hidden'\)/);
+    expect(ns).toMatch(/querySelector\('\.site-header'\)/);              // the header is the view's top edge
+    expect(ns).toMatch(/obstacles\.push\(\.\.\.cloudRects\(W, H, band\)\);/);  // the swirl clouds, over their whole drift
+    const clouds = readFileSync(new URL('../src/portfolio/SkyClouds.tsx', import.meta.url), 'utf8');
+    expect(clouds).toMatch(/className="sky-clouds" data-backdrop aria-hidden/);
+    const components = readFileSync(new URL('../src/portfolio/components.tsx', import.meta.url), 'utf8');
+    expect(components).toMatch(/className="hero-stage hero-stage--live" data-guide-space/);
   });
 
   it('draws him above the page\'s content and below the header, its menu, the grain and the veil; taps pass through', () => {
@@ -502,125 +432,30 @@ describe('docking to the corner', () => {
     const z = (src: string, sel: string) => Number(new RegExp(`${sel.replace(/[.[\]()]/g, '\\$&')}\\s*\\{[^}]*?z-index:\\s*(-?\\d+)`).exec(src)?.[1]);
     const coco = z(intro, '.guide-layer');
     expect(z(intro, '.guide-poster')).toBe(coco);
-    expect(coco).toBeGreaterThan(2);                                       // over the hero's words and anything positioned in the page
-    expect(z(portfolio, '.site-header')).toBeGreaterThan(coco);            // the header and its open menu (inside it) over him
+    expect(z(portfolio, '.site-header')).toBeGreaterThan(coco);
     expect(z(base, '.paper-grain')).toBeGreaterThan(coco);
     expect(z(invitation, '.cloud-veil')).toBeGreaterThan(coco);
-    // .site is no stacking context of its own (it would put the whole page, header included, on one side of him)
     expect(intro + portfolio + base).not.toMatch(/(^|\n)\.site\s*\{[^}]*z-index/);
-    // the same order during a view transition
     const vt = (name: string) => Number(new RegExp(`::view-transition-group\\(${name}\\)\\s*\\{[^}]*z-index:\\s*(\\d+)`).exec(base)?.[1]);
     const content = Number(/::view-transition-group\(\*\)\s*\{[^}]*z-index:\s*(\d+)/.exec(base)?.[1]);
     expect(vt('guide')).toBeGreaterThan(content);
     expect(vt('site-header')).toBeGreaterThan(vt('guide'));
     expect(vt('veil')).toBeGreaterThan(vt('site-header'));
-    // never takes a tap
     expect(intro).toMatch(/\.guide-layer \* \{ pointer-events: none !important; \}/);
     expect(intro).toMatch(/\.guide-poster \{[^}]*pointer-events: none/);
-    // the end of every page keeps room for him
-    expect(portfolio).toMatch(/\.site-footer \{[^}]*var\(--guide-room, 0px\)/);
-    // focus and anchor scrolling stop above his peek
-    expect(base).toMatch(/html \{[^}]*scroll-padding-bottom: var\(--guide-room, 0px\)/);
+    // nothing of the old corner companion is left
+    expect(intro + portfolio + base).not.toMatch(/--guide-room|data-attached|hero-stage__greet/);
   });
 
-  it('keeps room at the end of every page for the last line to scroll clear of him', () => {
-    for (const [W, H] of [[390, 844], [768, 1024], [1280, 800]]) {
-      const p = placement(true, null, W, H, true);
-      const top = p.cy - (p.h * FIGURE) / 2;
-      expect(endRoom(p.h), `${W} x ${H}`).toBeGreaterThanOrEqual(H - top);
-    }
-    // a touch phone with its URL bar hidden: sized from the small viewport, he peeks from the window's
-    // current bottom, so the room still clears him and he never floats above the edge
-    const p = placement(true, null, 390, 664, true, 740);
-    const top = p.cy - (p.h * FIGURE) / 2;
-    expect(endRoom(p.h)).toBeGreaterThanOrEqual(740 - top);
-    expect(p.h).toBe(placement(true, null, 390, 664, true).h);
-    expect(top + p.h * FIGURE).toBeGreaterThan(740);
-  });
-
-  it('keeps out of the way of a focused control in his corner, never of <main> focused after a change of page', () => {
-    const W = 375, H = 812, room = 82, width = 141;
-    // a small link at the bottom right, under his peek
-    expect(controlInCorner({ top: 770, bottom: 794, left: 300, right: 360, height: 24 }, 0, W, H, room, width)).toBe(true);
-    // the same link elsewhere: not in his corner
-    expect(controlInCorner({ top: 400, bottom: 424, left: 300, right: 360, height: 24 }, 0, W, H, room, width)).toBe(false);
-    expect(controlInCorner({ top: 770, bottom: 794, left: 20, right: 80, height: 24 }, 0, W, H, room, width)).toBe(false);
-    // below the window (scrolled past): not hidden by him
-    expect(controlInCorner({ top: 830, bottom: 854, left: 300, right: 360, height: 24 }, 0, W, H, room, width)).toBe(false);
-    // <main id="main" tabIndex={-1}> focused after a page change or by the skip link: runs through his corner
-    const main = { top: 64, bottom: 3183, left: 0, right: 375.2, height: 3119 };
-    expect(controlInCorner(main, -1, W, H, room, width)).toBe(false);
-    expect(controlInCorner(main, 0, W, H, room, width)).toBe(false);                         // as tall as the window
-    expect(controlInCorner({ top: 700, bottom: 800, left: 0, right: 375, height: 100 }, -1, W, H, room, width)).toBe(false);
-    // and the companions ask it through focusInCorner
-    const docking = readFileSync(new URL('../src/guide/docking.ts', import.meta.url), 'utf8');
-    expect(docking).toMatch(/return controlInCorner\(el\.getBoundingClientRect\(\), el\.tabIndex, window\.innerWidth, window\.innerHeight, room, width\);/);
-  });
-
-  it('adds up slow, sub-pixel reading scrolls into a step aside', () => {
-    const s = createAside(0, 0);
-    let y = 0;
-    for (let i = 1; i <= 79; i++) { y += 0.5; stepAside(s, y, i / 120, false); }
-    expect(s.away).toBe(false);
-    y += 0.5;
-    expect(stepAside(s, y, 80 / 120, false)).toBe(true);
-  });
-
-  it('steps aside while the visitor scrolls down to read, and peeks back up when they stop, scroll up or reach the end', () => {
-    const s = createAside(0, 0);
-    let t = 0, y = 0;
-    const scroll = (dy: number, dt = 1 / 60, atEnd = false) => { t += dt; y += dy; return stepAside(s, y, t, atEnd); };
-    // a few px down is not reading: he stays
-    for (let i = 0; i < 5; i++) expect(scroll(5)).toBe(false);
-    // a clear run down: he steps aside, and stays aside while they keep reading
-    expect(scroll(20)).toBe(true);
-    for (let i = 0; i < 30; i++) expect(scroll(i % 3 === 0 ? 0 : 8)).toBe(true);
-    // a jitter back up of a few px does not bring him back (hysteresis)
-    expect(scroll(-6)).toBe(true);
-    expect(scroll(4)).toBe(true);
-    // a clear run up brings him back
-    expect(scroll(-10)).toBe(true);
-    expect(scroll(-10)).toBe(false);
-    // down again, then still for a moment: he peeks back up after ASIDE.idle, not before
-    for (let i = 0; i < 10; i++) scroll(10);
-    expect(s.away).toBe(true);
-    expect(scroll(0, ASIDE.idle * 0.5)).toBe(true);
-    expect(scroll(0, ASIDE.idle * 0.6)).toBe(false);
-    // after the pause it takes another clear run down to send him away again (no bob on one px)
-    expect(scroll(1)).toBe(false);
-    expect(scroll(1)).toBe(false);
-    // the end of the page: he is back, however they got there
-    for (let i = 0; i < 10; i++) scroll(10);
-    expect(scroll(10, 1 / 60, true)).toBe(false);
-    // the mobile menu open: out of the way, whatever the scroll
-    expect(stepAside(s, y, t + 5, false, true)).toBe(true);
-    expect(stepAside(s, y, t + 5.1, false, false)).toBe(false);
-    // tiny back-and-forth jitter never moves him
-    const j = createAside(0, 0);
-    for (let i = 0; i < 300; i++) expect(stepAside(j, i % 2 ? 3 : 0, i / 60, false)).toBe(false);
-  });
-
-  it('slips below the edge and back with a gentle, eased spring: no pop, no overshoot, wholly out of sight', () => {
-    for (const [W, H, lvh] of [[390, 664, 740], [768, 1024, 1024], [1280, 800, 800]]) {
-      const p = placement(true, null, W, H, true);
-      const drop = tuckDrop(p.h);
-      // stepped aside, no part of him is in the window: below the bottom edge he peeks from (his
-      // layer's, held to the window's), even with the URL bar hidden
-      const q = placement(true, null, W, H, true, lvh);
-      expect(p.cy + drop - (p.h * FIGURE) / 2, `${W}`).toBeGreaterThanOrEqual(H + p.h * 0.1);
-      expect(q.cy + drop - (q.h * FIGURE) / 2, `${W}`).toBeGreaterThanOrEqual(lvh + q.h * 0.1);
-      let x = 0, v = 0, maxSpeed = 0, first = 0;
-      for (let i = 0; i < 120; i++) {
-        const prev = x;
-        [x, v] = springStep(x, v, 1, ASIDE_OMEGA, 1 / 60);
-        if (i === 0) first = (x - prev) * drop;
-        maxSpeed = Math.max(maxSpeed, ((x - prev) * drop) * 60);
-        expect(x).toBeLessThanOrEqual(1 + 1e-9);
-      }
-      expect(first, `${W}`).toBeLessThan(1);                    // starts from rest
-      expect(maxSpeed, `${W}`).toBeLessThan(400);               // a glide, never a dash (px/s)
-      expect(x).toBeGreaterThan(0.99);                          // and there within 2 s
-    }
+  it('is mounted on every page (home at once, elsewhere once the page is idle) and stays for the visit; lite gets his still', () => {
+    const guide = readFileSync(new URL('../src/guide/GuideProvider.tsx', import.meta.url), 'utf8');
+    const poster = readFileSync(new URL('../src/guide/PosterCompanion.tsx', import.meta.url), 'utf8');
+    expect(guide).toMatch(/\{staged && \(\s*<div className=\{`guide-layer/);
+    expect(guide).toMatch(/requestIdleCallback\(\(\) => setPlaced\(true\), \{ timeout: IDLE_LOAD_MS \}\)/);
+    expect(guide).toMatch(/useState\(\(\) => location\.pathname === '\/'\)/);
+    expect(guide).not.toMatch(/setPlaced\(false\)/);
+    expect(guide).toMatch(/!live3D && mode !== 'off' && <PosterCompanion away=\{away\} \/>/);
+    expect(poster).toMatch(/onError=\{\(\) => setMissing\(true\)\}/);
   });
 });
 
@@ -686,6 +521,39 @@ describe('the clip player', () => {
     expect(p.layerCount()).toBe(0);
     expect(bone.position.y).toBeCloseTo(0, 5);        // back to rest
     expect(bone.position.x).toBeGreaterThanOrEqual(0); // the breath went on underneath
+  });
+
+  it('loops his float additively over the breath, eased in, alongside drifts (and does without it if the model has none)', () => {
+    const { root, bone } = rig();
+    // float: a slow hover, y 0 -> 0.1 -> 0 over 7 s
+    const float = new AnimationClip('float', 7, [new NumberKeyframeTrack('bone.position[y]', [0, 3.5, 7], [0, 0.1, 0])]);
+    const p = new ClipPlayer(root, [breathe, drift, float], { additive: (n) => n.startsWith('drift') || n === 'float' });
+    p.play('breathe');
+    expect(p.loopLayer('float', { fadeIn: 2 })).toBe(true);
+    expect(p.loopLayer('float')).toBe(false);                     // once
+    let prevW = 0, prevY = 0, maxStep = 0;
+    for (let i = 0; i < 120; i++) {
+      p.update(1 / 60);
+      const w = p.loopWeight('float');
+      expect(w).toBeGreaterThanOrEqual(prevW);                    // eased in, never a jump
+      maxStep = Math.max(maxStep, Math.abs(bone.position.y - prevY));
+      prevW = w; prevY = bone.position.y;
+    }
+    expect(p.loopWeight('float')).toBeCloseTo(1, 5);
+    expect(maxStep).toBeLessThan(0.002);
+    expect(p.layerCount()).toBe(0);                               // not a one-shot: drifts still come and go on their own
+    expect(p.layer('drift_a')).toBe(true);
+    // it keeps looping: 3 loops on, still hovering, still breathing underneath
+    let peak = 0;
+    for (let i = 0; i < 60 * 21; i++) { p.update(1 / 60); peak = Math.max(peak, bone.position.y); }
+    expect(p.loopWeight('float')).toBeCloseTo(1, 5);
+    expect(peak).toBeGreaterThan(0.09);
+    expect(bone.position.x).toBeGreaterThanOrEqual(0);
+    p.dispose();
+    const none = new ClipPlayer(root, [breathe]);
+    none.play('breathe');
+    expect(none.loopLayer('float')).toBe(false);
+    none.dispose();
   });
 
   it('makes layered clips additive one at a time (a warm-up spreads them over frames), or when first layered', () => {

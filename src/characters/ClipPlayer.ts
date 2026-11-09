@@ -8,6 +8,7 @@
 //            another is still under way never lets three's bind pose show through.
 //   layers   additive one-shots on top (drifts, a face flutter, small reactions), made additive
 //            in three from clips that Blender exports as absolute poses (start and end at rest)
+//   loops    additive loops on top for as long as he is shown (his slow 'float' hover), eased in
 //
 // The pure helpers at the top are tested without WebGL.
 
@@ -47,6 +48,7 @@ export interface ClipPlayerOptions {
 
 interface Fade { action: AnimationAction; from: number; to: number; t: number; seconds: number; done?: () => void }
 interface Layer { name: string; action: AnimationAction; fadeIn: number; fadeOut: number }
+interface Loop { name: string; action: AnimationAction; t: number; fadeIn: number }
 
 export interface UpdateResult {
   /** The main loop passed its first frame during this update (a loop boundary). */
@@ -69,6 +71,7 @@ export class ClipPlayer {
   private names = new Map<AnimationAction, string>();
   private fades: Fade[] = [];
   private layers: Layer[] = [];
+  private loops: Loop[] = [];
   private disposed = false;
 
   constructor(readonly root: Object3D, clips: AnimationClip[], opts: ClipPlayerOptions = {}) {
@@ -190,6 +193,25 @@ export class ClipPlayer {
 
   layerCount() { return this.layers.length; }
 
+  /**
+   * Loop an additive clip on top of everything for good (his 'float' hover over 'breathe'), eased
+   * in over `fadeIn` seconds. Returns false if the clip is missing or already looping.
+   */
+  loopLayer(name: string, opts: { fadeIn?: number } = {}): boolean {
+    const a = this.action(name);
+    if (!a || this.disposed || this.loops.some((l) => l.name === name)) return false;
+    a.reset();
+    a.setLoop(LoopRepeat, Infinity);
+    const fadeIn = opts.fadeIn ?? 0;
+    a.setEffectiveWeight(fadeIn > 0 ? 0 : 1);
+    a.play();
+    this.loops.push({ name, action: a, t: 0, fadeIn });
+    return true;
+  }
+
+  /** The weight of a looping layer now (0 if it is not looping). */
+  loopWeight(name: string) { return this.loops.find((l) => l.name === name)?.action.getEffectiveWeight() ?? 0; }
+
   /** Advance every clip by dt seconds. */
   update(dt: number): UpdateResult {
     if (this.disposed) return { wrapped: false, mainTime: 0 };
@@ -207,6 +229,10 @@ export class ClipPlayer {
       f.action.setEffectiveWeight(f.from + (f.to - f.from) * smoothstep(f.t / f.seconds));
     }
     this.balance();
+    for (const l of this.loops) {
+      l.t += dt;
+      l.action.setEffectiveWeight(l.fadeIn > 0 ? smoothstep(l.t / l.fadeIn) : 1);
+    }
     this.mixer.update(dt);
 
     let refresh = false;
@@ -268,6 +294,7 @@ export class ClipPlayer {
     this.mixer.uncacheRoot(this.root);
     this.fades = [];
     this.layers = [];
+    this.loops = [];
     this.names.clear();
     this.main = null;
     this.intro = null;

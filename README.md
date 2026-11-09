@@ -2,7 +2,7 @@
 
 **The central project:** the front door to everything Cassidy makes. Every venture is its own world with its own repo; this site connects them and lets visitors discover and enter them. Lives at `C:\Users\cassi\Projects\CreativeUniverse`, next to the other projects. Plan: [docs/ROADMAP.md](docs/ROADMAP.md).
 
-An artist portfolio introduced by Cassidy's guide, the meditating chimp from the Atlantean Gardens emblem. On a first visit Young Coco floats in on his cloud and offers it to you; the cloud carries you home, where Adult Coco sits meditating and keeps you company as you explore.
+An artist portfolio introduced by Cassidy's guide, the meditating chimp from the Atlantean Gardens emblem. On a first visit Adult Coco floats gently down into view, meditating, and welcomes you; the magic cloud glows from the cloud in his hands, wraps around him and carries you home, where he sits meditating and keeps you company as you explore.
 
 Built with Vite, React 19, Three.js (React Three Fiber) and a Blender → glTF pipeline.
 

@@ -5,6 +5,7 @@ import {
 } from '../content';
 import { Cover, HeroStage, RealmMedallion, StatusPill, WorkCard, realmCount, realmHref } from './components';
 import { CloudScroll, LeafDivider, Vine } from './ornaments';
+import { SkyClouds } from './SkyClouds';
 import { useDocumentTitle } from './useDocumentTitle';
 import { prefersReducedMotion } from '../intro/capability';
 
@@ -29,7 +30,8 @@ export function WorldPage() {
 
   return (
     <>
-      <section className="hero" aria-labelledby="hero-title">
+      <section className="hero has-clouds" aria-labelledby="hero-title">
+        <SkyClouds seed="home:hero" count={1} />
         <Vine className="hero__vine hero__vine--left" />
         <div className="hero__words">
           <p className="eyebrow">Cassidy’s Creative Universe</p>
@@ -48,9 +50,10 @@ export function WorldPage() {
 
       <LeafDivider className="divider" />
 
-      <section id="realms" className="realms" aria-labelledby="realms-title" tabIndex={-1}>
+      <section id="realms" className="realms has-clouds" aria-labelledby="realms-title" tabIndex={-1}>
+        <SkyClouds seed="home:realms" />
         <header className="section-head">
-          <h2 id="realms-title">The realms</h2>
+          <h2 id="realms-title" data-coco-stop="realms">The realms</h2>
           <p>Six regions of one world. Wander in any order.</p>
         </header>
         <ol className="realm-path">
@@ -69,9 +72,10 @@ export function WorldPage() {
         </ol>
       </section>
 
-      <section className="works" aria-labelledby="works-title">
+      <section className="works has-clouds" aria-labelledby="works-title">
+        <SkyClouds seed="home:works" />
         <header className="section-head">
-          <h2 id="works-title">Works in this world</h2>
+          <h2 id="works-title" data-coco-stop="works">Works in this world</h2>
           <CloudScroll className="section-head__cloud" />
         </header>
         <div className="chips" role="group" aria-label="Show works from">
@@ -84,7 +88,7 @@ export function WorldPage() {
             </button>
           ))}
         </div>
-        <div className="work-grid">
+        <div className="work-grid" data-coco-stop="bottom">
           {shown.map((w) => <WorkCard key={w.slug} work={w} />)}
         </div>
       </section>
@@ -105,7 +109,8 @@ export function RealmPage() {
   const groups = groupByCollection(list);
 
   return (
-    <article className="realm-page" data-colour={realm.accent}>
+    <article className="realm-page has-clouds" data-colour={realm.accent}>
+      <SkyClouds seed={`realm:${realm.id}`} count={3} />
       <header className="page-head">
         <nav className="crumbs" aria-label="Breadcrumb"><Link to="/">World</Link> <span aria-hidden>›</span> <span aria-current="page">{realm.title}</span></nav>
         <RealmMedallion realm={realm} size="lg" />
@@ -156,7 +161,8 @@ export function WorkPage() {
   const { prev, next } = neighbours(work);
 
   return (
-    <article className="work-page" data-colour={work.colour}>
+    <article className="work-page has-clouds" data-colour={work.colour}>
+      <SkyClouds seed={`work:${work.slug}`} count={3} />
       <nav className="crumbs" aria-label="Breadcrumb">
         <Link to="/">World</Link> <span aria-hidden>›</span>{' '}
         <Link to={realmHref(realm)}>{realm.title}</Link> <span aria-hidden>›</span>{' '}
@@ -220,7 +226,8 @@ export function AboutPage() {
   useDocumentTitle(realm.title);
   const counts = useMemo(() => realms.filter((r) => r.kind === 'works').map((r) => [r, worksIn(r.id).length] as const), []);
   return (
-    <article className="about-page">
+    <article className="about-page has-clouds">
+      <SkyClouds seed="about" count={2} />
       <nav className="crumbs" aria-label="Breadcrumb"><Link to="/">World</Link> <span aria-hidden>›</span> <span aria-current="page">{realm.title}</span></nav>
       <div className="about-page__grid">
         {about.portrait && (

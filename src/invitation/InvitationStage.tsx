@@ -1,10 +1,15 @@
-// The invitation's 3D take: Young Coco floats in on his cloud, turns to the visitor, smiles, offers
-// his cloud, looks down as it glows, and the magic cloud grows and engulfs him. Every movement is
-// the Blender take (little-coco-invite.glb 'invite', magic-cloud.glb 'transform'); this file only
+// The invitation's 3D take: Adult Coco rides in from stage left on his swirl cloud, meditating with
+// his eyes closed, settles under the heading, and breathes and floats there; the magic cloud then
+// glows from the cloud in his hands, grows and engulfs him, and his ride cloud swells into it and
+// thins away inside it. Every movement is Blender's: his model is home's own (coco-sage.glb), his
+// ride the clip 'invite' (coco-invite.glb, the same rig, so it binds by bone name), then that
+// model's own 'breathe' loop from its first frame (where 'invite' ends, pose and velocity) with
+// 'float' layered on it, as at home; the ride cloud is ride-cloud.glb 'ride' (it follows his root
+// bone, see characters/rideCloud.ts); the magic cloud is magic-cloud.glb 'transform'. This file only
 // frames it, plays it on ONE clock and reports the timeline's markers as the clock passes them.
 //
-// The one clock is the master frame (`clock.master`); every clip plays at the take's pace through
-// its own speed, while crossfades always run in real time. If the trip home has to wait for the
+// The one clock is the master frame (`clock.master`); the take's clips play at its pace through
+// their own speed, while crossfades always run in real time. If the trip home has to wait for the
 // visitor (see pace.ts), a model with an authored hold loop crossfades into it meanwhile.
 //
 // Lazy chunk with its own Canvas (three.js arrives only on this route). Everything it creates
@@ -27,13 +32,14 @@ import { createModelSource } from '../characters/modelSource';
 import {
   boxShows, cheapBox, drawOnce, materialsOf, meshesOf, neverCullSkinned, texturesUnder, uploadGradually,
 } from '../characters/sceneUtils';
-import { INVITATION } from '../guide/paths';
+import { ADULT_URL, INVITATION, RIDE_CLOUD_URL } from '../guide/paths';
+import { applyRideLook, createRootFollow, prepareRide, type RideParts } from '../characters/rideCloud';
 import {
   clipLocalTime, cloudSpan, markersCrossed, takeStartFrame, waitLimitFrame, type ClipSpan, type MarkerName, type Timeline,
 } from './timeline';
 import { TAKE_RUNS, type InvitationState } from './invitationMachine';
 import { freshPace, HOLD_CLIP, HOLD_FADE_SECONDS, slowsForWait, stepPace } from './pace';
-import { CLOUD_DEPTH_ORDER, CLOUD_ORDER, heldCloudLook, HELD_ORDER, magicCloudDepthLook, magicCloudLook } from './cloudLook';
+import { CLOUD_DEPTH_ORDER, CLOUD_ORDER, magicCloudDepthLook, magicCloudLook } from './cloudLook';
 import { veil } from '../veil/veil';
 
 const CAMERA_Z = 10;
@@ -53,10 +59,25 @@ const MAX_DT = 0.1;
 const GLOW_STRENGTH = 1.6;
 /** Measuring his pose skins at most this many vertices per mesh (an even spread), never all 70k. */
 const POSE_SAMPLES = 4000;
+/** His ride in (coco-invite.glb), then his model's own loops, as at home. */
+const TAKE_CLIP = 'invite';
+const BREATHE = 'breathe';
+/** His slow hover, an additive loop over 'breathe' (coco-sage.glb authors it at 30 fps). */
+const FLOAT = 'float';
+const MODEL_FPS = 30;
+/** 'float' eases in over this long once he has arrived (it starts at rest, so it never shows a seam). */
+const FLOAT_IN_SECONDS = 1.5;
+/** The sun and bolt behind him glow softly, as at home (HomeStage): a material setting, not movement. */
+const SUN_BOLT = 'sun_bolt';
+const SUN_GLOW = { colour: '#ffd98a', intensity: 0.45 };
 
 /** The take's models, loaded together (in parallel) through their own source, so leaving can stop and free them. */
 const TAKE = createModelSource((L, urls) => useLoader.clear(L, urls));
-const modelUrls = () => [asset(INVITATION.young), asset(INVITATION.cloud)];
+const modelUrls = () => [asset(ADULT_URL), asset(INVITATION.take), asset(INVITATION.cloud), asset(RIDE_CLOUD_URL)];
+/** The ride cloud's clip on the master timeline. */
+const RIDE_CLIP = 'ride';
+/** Draw order of the ride cloud: after him, before the magic cloud. */
+const RIDE_ORDER = 1;
 
 export interface InvitationStageProps {
   phase: InvitationState;
@@ -106,12 +127,12 @@ function poseBox(root: Object3D, out = new Box3()) {
 }
 
 interface Parts {
-  youngGlow: Object3D | null;
   cloudGlow: Object3D | null;
   cloudFade: Object3D | null;
-  /** The bone the held cloud rides on (where the veil grows from if the magic cloud is not up yet). */
+  /** The bone the cloud in his hands rides on (where the veil grows from if the magic cloud is not up yet). */
   heldBone: Object3D | null;
-  heldCloud: MeshStandardMaterial[];
+  /** The sun and bolt's own glowing copies of their materials. */
+  sun: MeshStandardMaterial[];
   cloud: MeshStandardMaterial[];
   restore: [Mesh, Material | Material[]][];
   /** The magic cloud's depth-only copies (see cloudLook.ts), removed on cleanup. */
@@ -146,39 +167,41 @@ function depthCopy(m: Mesh): Mesh {
 }
 
 /** Finds the control empties and gives the glowing parts their own materials (restored on cleanup). */
-function prepareParts(young: Object3D, cloud: Object3D): Parts {
+function prepareParts(coco: Object3D, cloud: Object3D): Parts {
   const restore: Parts['restore'] = [];
   const own = (m: Mesh, setup: (c: MeshStandardMaterial) => void, list: MeshStandardMaterial[]) => {
     restore.push([m, m.material]);
     const copy = (mat: Material) => { const c = mat.clone() as MeshStandardMaterial; setup(c); list.push(c); return c; };
     m.material = Array.isArray(m.material) ? m.material.map(copy) : copy(m.material);
   };
-  const heldCloud: MeshStandardMaterial[] = [];
-  const cloudMats: MeshStandardMaterial[] = [];
-  // the small cloud he holds: its own object in the Blender export (named for the cloud), kept
-  // exactly as authored; the magic cloud fades in over it (see cloudLook.ts)
-  for (const m of meshesOf(young)) {
-    if (/cloud/i.test(m.name) || /cloud/i.test(m.parent?.name ?? '')) {
-      m.renderOrder = HELD_ORDER;
-      own(m, heldCloudLook, heldCloud);
+  // the sun and bolt behind him: the same soft, steady glow as at home
+  const sun: MeshStandardMaterial[] = [];
+  const sunNode = coco.getObjectByName(SUN_BOLT);
+  if (sunNode) {
+    for (const m of meshesOf(sunNode)) {
+      own(m, (c) => {
+        if (!c.emissive) return;
+        c.emissive.set(SUN_GLOW.colour);
+        c.emissiveMap = c.map ?? null;
+        c.emissiveIntensity = SUN_GLOW.intensity;
+      }, sun);
     }
   }
-  // the magic cloud: drawn after him and the held cloud, depth-tested against them, its own depth
-  // written just before it
+  // the magic cloud: drawn after him, depth-tested against him, its own depth written just before it
+  const cloudMats: MeshStandardMaterial[] = [];
   const magic = meshesOf(cloud);
   for (const m of magic) {
     m.renderOrder = CLOUD_ORDER;
     own(m, magicCloudLook, cloudMats);
   }
   const depth = magic.map(depthCopy);
-  neverCullSkinned(young);
+  neverCullSkinned(coco);
   neverCullSkinned(cloud);
   return {
-    youngGlow: young.getObjectByName('ctl_glow') ?? null,
     cloudGlow: cloud.getObjectByName('ctl_glow') ?? null,
     cloudFade: cloud.getObjectByName('ctl_fade') ?? null,
-    heldBone: young.getObjectByName('cloud') ?? null,
-    heldCloud,
+    heldBone: coco.getObjectByName('cloud') ?? null,
+    sun,
     cloud: cloudMats,
     restore,
     depth,
@@ -204,7 +227,7 @@ const freshClock = () => ({
 // ── the take ───────────────────────────────────────────────
 
 function Take(props: InvitationStageProps) {
-  const [young, cloud] = useLoader(TAKE.Loader, modelUrls());
+  const [coco, take, cloud, ride] = useLoader(TAKE.Loader, modelUrls());
   const gl = useThree((s) => s.gl);
   const camera = useThree((s) => s.camera);
   const scene = useThree((s) => s.scene);
@@ -213,13 +236,16 @@ function Take(props: InvitationStageProps) {
   live.current = props;
   const { phase, timeline, jump } = props;
 
-  const players = useRef<{ young: ClipPlayer; cloud: ClipPlayer } | null>(null);
+  const players = useRef<{ coco: ClipPlayer; cloud: ClipPlayer; ride: ClipPlayer } | null>(null);
   const parts = useRef<Parts | null>(null);
+  const rideParts = useRef<RideParts | null>(null);
+  // the ride cloud rides on his root bone (its rest is captured before any clip poses him)
+  const follow = useMemo(() => { const f = createRootFollow(coco.scene, ride.scene); f.capture(); return f; }, [coco, ride]);
   // his pose at his spot, and on the take's first frame, measured once in the take's own units (metres)
   const framing = useRef<{ size: Vector3; centre: Vector3 } | null>(null);
   const startBox = useRef<Box3 | null>(null);
   const clock = useRef(freshClock());
-  const values = useRef({ held: 0, glow: 0, fade: 1 });
+  const values = useRef({ glow: 0, fade: 1 });
   const resumed = useRef(false);
   const tmp = useMemo(() => ({ box: new Box3(), v: new Vector3(), m: new Matrix4() }), []);
 
@@ -229,28 +255,70 @@ function Take(props: InvitationStageProps) {
     name === 'transform' && timeline && p ? cloudSpan(timeline, p.duration('transform')) : timeline?.clips[name];
   const masterFrame = () => clock.current.master * fps;
   const local = (p: ClipPlayer, clip: string, frame: number) => clipLocalTime(span(clip, p), frame, p.duration(clip), fps);
+  /** The master frame his ride ends on ('invite' ends on breathe frame 0): from here he breathes and floats. */
+  const arrivedFrame = (p: ClipPlayer) => {
+    const s = timeline?.clips[TAKE_CLIP];
+    return s ? s.endFrame : (timeline ? takeStartFrame(timeline) : 0) + p.duration(TAKE_CLIP) * fps;
+  };
+
+  /**
+   * Puts him where the take is at master frame `frame`: his ride in, or (once he has arrived) his
+   * model's own 'breathe' loop at the same moment of it, with 'float' layered on. `fade` > 0 eases
+   * there from wherever he is (a crossfade, in real time).
+   */
+  /** The ride cloud where the take is at master frame `frame` (`fade`: a crossfade, in real time). */
+  function rideAt(p: ClipPlayer, frame: number, fade = 0) {
+    if (p.has(RIDE_CLIP)) p.play(RIDE_CLIP, { loop: false, time: local(p, RIDE_CLIP, frame), fade });
+  }
+
+  /** Moves the ride cloud with his root bone and gives it Blender's glow and opacity. */
+  function rideLook() {
+    follow.follow();
+    const rp = rideParts.current;
+    ride.scene.visible = !!rp && applyRideLook(rp) > 0.002;
+  }
+
+  function playAt(p: ClipPlayer, frame: number, fade = 0) {
+    const arrived = arrivedFrame(p);
+    if (frame < arrived || !p.has(BREATHE)) {
+      p.play(TAKE_CLIP, { loop: false, time: local(p, TAKE_CLIP, frame), fade });
+      return;
+    }
+    const loop = Math.max(1e-3, p.duration(BREATHE));
+    p.play(BREATHE, { time: ((frame - arrived) / fps) % loop, fade });
+    p.loopLayer(FLOAT, { fadeIn: Math.max(fade, FLOAT_IN_SECONDS) });
+  }
 
   // players and glowing materials: created here, torn down completely
   useEffect(() => {
-    const p = { young: new ClipPlayer(young.scene, young.animations), cloud: new ClipPlayer(cloud.scene, cloud.animations) };
+    // his model's own clips, and his ride from the take's file (the same rig: it binds by bone name)
+    const p = {
+      coco: new ClipPlayer(coco.scene, [...coco.animations, ...take.animations], { additive: (n) => n === FLOAT, fps: MODEL_FPS }),
+      cloud: new ClipPlayer(cloud.scene, cloud.animations),
+      ride: new ClipPlayer(ride.scene, ride.animations),
+    };
     players.current = p;
-    parts.current = prepareParts(young.scene, cloud.scene);
+    parts.current = prepareParts(coco.scene, cloud.scene);
+    rideParts.current = prepareRide(ride.scene, RIDE_ORDER);
     cloud.scene.visible = false;
     rig.current.visible = false;            // nothing is drawn until the take starts
-    if (p.young.has('invite')) live.current.onLoaded();
-    else { console.warn('[invitation] the young model has no "invite" clip'); live.current.onFail(); }
+    if (p.coco.has(TAKE_CLIP)) live.current.onLoaded();
+    else { console.warn(`[invitation] coco-invite.glb has no "${TAKE_CLIP}" clip`); live.current.onFail(); }
     return () => {
-      p.young.dispose();
+      p.coco.dispose();
       p.cloud.dispose();
+      p.ride.dispose();
+      rideParts.current?.dispose();
+      rideParts.current = null;
       for (const [m, mat] of parts.current?.restore ?? []) m.material = mat;
-      parts.current?.heldCloud.forEach((m) => m.dispose());
+      parts.current?.sun.forEach((m) => m.dispose());
       parts.current?.cloud.forEach((m) => m.dispose());
       for (const d of parts.current?.depth ?? []) { d.removeFromParent(); materialsOf(d).forEach((m) => m.dispose()); }
       parts.current = null;
       players.current = null;
       clock.current = freshClock();
     };
-  }, [young, cloud]);
+  }, [coco, take, cloud, ride]);
 
   // A hidden tab: the clock holds (see useFrame). Coming back, the first step is one frame long,
   // never the whole time away.
@@ -261,39 +329,49 @@ function Take(props: InvitationStageProps) {
   }, []);
 
   // Warming: measure his pose at his spot (for the framing) and on the take's first frame (is it
-  // off-screen?), compile every shader and upload every texture while the 'hover' loop plays
-  // unseen, then report. All the heavy work happens here, before anything is on screen.
+  // off-screen?), make 'float' additive, compile every shader and upload every texture, unseen,
+  // then report. All the heavy work happens here, before anything is on screen.
   useEffect(() => {
     if (phase !== 'warming' || !timeline || !players.current) return;
     const p = players.current;
     let cancelled = false;
-    if (p.young.has('invite')) {
+    if (p.coco.has(TAKE_CLIP)) {
       rig.current.updateWorldMatrix(true, false);
       const toRig = tmp.m.copy(rig.current.matrixWorld).invert();
-      const m = timeline.markers;
-      // framed on the moment he faces the visitor at his spot (the smile), else his arrival
-      p.young.play('invite', { loop: false, time: local(p.young, 'invite', m.smile ?? m.offer ?? m.arrive ?? m.glow) });
-      p.young.refresh();
-      const box = poseBox(young.scene, new Box3()).applyMatrix4(toRig);
+      // framed on him at rest at his spot (the end of his ride)
+      // (him and the ride cloud under him: the stage keeps room for both)
+      const withRide = (frame: number, box: Box3) => {
+        if (!p.ride.has(RIDE_CLIP)) return box;
+        rideAt(p.ride, frame);
+        p.ride.refresh();
+        follow.follow();
+        ride.scene.updateWorldMatrix(true, true);
+        return box.union(cheapBox(ride.scene, new Box3()).applyMatrix4(toRig));
+      };
+      const arrive = timeline.markers.arrive ?? arrivedFrame(p.coco);
+      p.coco.play(TAKE_CLIP, { loop: false, time: local(p.coco, TAKE_CLIP, arrive) });
+      p.coco.refresh();
+      const box = withRide(arrive, poseBox(coco.scene, new Box3()).applyMatrix4(toRig));
       if (!box.isEmpty()) framing.current = { size: box.getSize(new Vector3()), centre: box.getCenter(new Vector3()) };
-      p.young.play('invite', { loop: false, time: local(p.young, 'invite', takeStartFrame(timeline)) });
-      p.young.refresh();
-      const first = poseBox(young.scene, new Box3()).applyMatrix4(toRig);
+      p.coco.play(TAKE_CLIP, { loop: false, time: local(p.coco, TAKE_CLIP, takeStartFrame(timeline)) });
+      p.coco.refresh();
+      const first = withRide(takeStartFrame(timeline), poseBox(coco.scene, new Box3()).applyMatrix4(toRig));
       startBox.current = first.isEmpty() ? null : first;
     }
-    if (p.young.has('hover')) p.young.play('hover');
-    const textures = new Set([...texturesUnder(young.scene), ...texturesUnder(cloud.scene)]);
+    while (p.coco.prepareNext()) { /* 'float' made additive now, not on the frame he arrives */ }
+    const textures = new Set([...texturesUnder(coco.scene), ...texturesUnder(cloud.scene), ...texturesUnder(ride.scene)]);
     (async () => {
       try {
         // compiled for the scene's own lights, though nothing is visible yet; both models at once
         if (gl.compileAsync) {
-          await Promise.all([gl.compileAsync(young.scene, camera, scene), gl.compileAsync(cloud.scene, camera, scene)]);
+          await Promise.all([gl.compileAsync(coco.scene, camera, scene), gl.compileAsync(cloud.scene, camera, scene), gl.compileAsync(ride.scene, camera, scene)]);
         } else {
-          gl.compile(young.scene, camera, scene);
+          gl.compile(coco.scene, camera, scene);
           gl.compile(cloud.scene, camera, scene);
+          gl.compile(ride.scene, camera, scene);
         }
         await uploadGradually(gl, textures, () => cancelled);
-        // one frame of everything (him, the held cloud, the magic cloud), drawn while the canvas is
+        // one frame of everything (him and the magic cloud), drawn while the canvas is
         // still invisible: vertex buffers, morph textures and sort bounds are built now, not on the
         // take's first frame or the frame the magic cloud appears
         if (!cancelled) {
@@ -335,14 +413,16 @@ function Take(props: InvitationStageProps) {
     c.lastFrame = frame - 1e-3;           // so a marker on the very first frame (floatIn) is reported
     c.cloudStart = span('transform', p.cloud)?.startFrame ?? tl.markers.glow;
     if (!tl.clips.transform) console.warn('[invitation] timeline.json has no "transform" clip: the magic cloud starts at the glow');
-    // how far the take may drift if the trip home has to wait: the next beat, or the end of its clips
+    // how far the take may drift if the trip home has to wait: the next beat, or the end of the
+    // cloud's clip (he breathes on for as long as it takes)
     const ends: number[] = [];
-    const invite = tl.clips.invite;
-    ends.push(invite ? invite.endFrame : takeStartFrame(tl) + p.young.duration('invite') * fps);
     if (p.cloud.has('transform')) ends.push(cloudSpan(tl, p.cloud.duration('transform')).endFrame);
     c.waitLimit = waitLimitFrame(tl, ends);
-    p.young.play('invite', { loop: false, time: local(p.young, 'invite', frame) });
-    p.young.refresh();
+    playAt(p.coco, frame);
+    p.coco.refresh();
+    rideAt(p.ride, frame);
+    p.ride.refresh();
+    rideLook();
     if (frame >= c.cloudStart) startCloud(frame);
     placeRig();
     rig.current.visible = true;
@@ -366,7 +446,8 @@ function Take(props: InvitationStageProps) {
     const now = masterFrame();
     if (now >= glow) return;
     c.master = glow / fps;
-    p.young.play('invite', { loop: false, time: local(p.young, 'invite', glow), fade: JUMP_SECONDS });
+    playAt(p.coco, glow, JUMP_SECONDS);
+    rideAt(p.ride, glow, JUMP_SECONDS);
     if (c.cloudStarted) p.cloud.play('transform', { loop: false, time: local(p.cloud, 'transform', glow), fade: JUMP_SECONDS });
     else if (glow >= c.cloudStart) startCloud(glow, JUMP_SECONDS);
     c.lastFrame = glow - 1e-3;            // the skipped beats stay unspoken; the glow is next
@@ -419,7 +500,8 @@ function Take(props: InvitationStageProps) {
 
   /**
    * Where the cloud is in the window (0..1 from the top left), for the veil's origin. Cheap: the
-   * magic cloud's stored bounds, else the held cloud's bone, else his framed centre. Never per-vertex.
+   * magic cloud's stored bounds, else the bone of the cloud in his hands, else his framed centre.
+   * Never per-vertex.
    */
   function focusAt() {
     const v = tmp.v;
@@ -463,7 +545,6 @@ function Take(props: InvitationStageProps) {
     if (resumed.current) { resumed.current = false; dt = Math.min(dt, 1 / 60); }
     const c = clock.current;
     if (!c.started) {
-      if (P.phase === 'warming') p.young.update(dt);  // the hover loop, while compiling (unseen)
       return;
     }
     // the trip home waits for the visitor: models with an authored hold loop crossfade into it,
@@ -474,11 +555,11 @@ function Take(props: InvitationStageProps) {
     if (waiting !== c.holding) {
       c.holding = waiting;
       if (waiting) {
-        if (p.young.has(HOLD_CLIP)) p.young.play(HOLD_CLIP, { fade: HOLD_FADE_SECONDS });
+        if (p.coco.has(HOLD_CLIP)) p.coco.play(HOLD_CLIP, { fade: HOLD_FADE_SECONDS });
         if (c.cloudStarted && p.cloud.has(HOLD_CLIP)) p.cloud.play(HOLD_CLIP, { fade: HOLD_FADE_SECONDS });
       } else {
         const f = masterFrame();
-        if (p.young.current === HOLD_CLIP) p.young.play('invite', { loop: false, time: local(p.young, 'invite', f), fade: HOLD_FADE_SECONDS });
+        if (p.coco.current === HOLD_CLIP) playAt(p.coco, f, HOLD_FADE_SECONDS);
         if (p.cloud.current === HOLD_CLIP) p.cloud.play('transform', { loop: false, time: local(p.cloud, 'transform', f), fade: HOLD_FADE_SECONDS });
       }
     }
@@ -490,16 +571,25 @@ function Take(props: InvitationStageProps) {
     }
     // the one clock, at the take's pace: full speed, or slower while the trip home waits
     const room = Number.isFinite(c.waitLimit) ? (c.waitLimit - masterFrame()) / fps : Infinity;
-    const holdingAll = waiting && p.young.has(HOLD_CLIP) && (!c.cloudStarted || p.cloud.has(HOLD_CLIP));
+    const holdingAll = waiting && p.coco.has(HOLD_CLIP) && (!c.cloudStarted || p.cloud.has(HOLD_CLIP));
     const step = stepPace(c.pace, { waiting, roomSeconds: room, holding: holdingAll, coverLeft }, dt);
     c.master += step;
     // the take's clips at that pace, every copy of them (one still fading out under a crossfade
-    // keeps in step with the clock, never running on past the beat); a hold loop plays at its own
-    // pace; crossfades run in real time
+    // keeps in step with the clock, never running on past the beat); his breathing, a hold loop and
+    // crossfades run in real time
     const speed = step / dt;
-    p.young.setSpeed('invite', speed);
-    p.young.update(dt);
+    p.coco.setSpeed(TAKE_CLIP, speed);
+    p.coco.update(dt);
+    p.ride.setSpeed(RIDE_CLIP, speed);
+    p.ride.update(dt);
     const frame = masterFrame();
+    // he has arrived: his ride ends on breathe frame 0 (pose and velocity), so 'breathe' takes
+    // over at once, from the moment the clock is at, and 'float' eases in on top
+    if (p.coco.current === TAKE_CLIP && frame >= arrivedFrame(p.coco)) {
+      playAt(p.coco, frame);
+      p.coco.refresh();
+    }
+    rideLook();
     if (!c.cloudStarted && frame >= c.cloudStart) startCloud(frame);
     else if (c.cloudStarted) {
       p.cloud.setSpeed('transform', speed);
@@ -511,10 +601,8 @@ function Take(props: InvitationStageProps) {
     if (pa) {
       const e = 1 - Math.exp(-dt * 14);
       const vals = values.current;
-      vals.held += ((pa.youngGlow?.scale.x ?? 0) - vals.held) * e;
       vals.glow += ((pa.cloudGlow?.scale.x ?? 0) - vals.glow) * e;
       vals.fade += ((pa.cloudFade?.scale.x ?? 1) - vals.fade) * e;
-      for (const m of pa.heldCloud) m.emissiveIntensity = Math.max(0, vals.held) * GLOW_STRENGTH;
       if (c.cloudIn < 1) c.cloudIn = Math.min(1, c.cloudIn + dt / Math.max(1e-3, c.cloudInSeconds));
       const opacity = c.cloudStarted ? Math.min(1, Math.max(0, vals.fade)) * smoothstep(c.cloudIn) : 0;
       for (const m of pa.cloud) { m.emissiveIntensity = Math.max(0, vals.glow) * GLOW_STRENGTH; m.opacity = opacity; }
@@ -532,7 +620,8 @@ function Take(props: InvitationStageProps) {
   // would skin him on the CPU to cull him and compile every shader on the spot
   return (
     <group ref={rig} visible={false}>
-      <primitive object={young.scene} />
+      <primitive object={coco.scene} />
+      <primitive object={ride.scene} />
       <primitive object={cloud.scene} />
     </group>
   );

@@ -70,8 +70,7 @@ main > * { max-width: var(--page); margin-inline: auto; }
 
 .site-footer {
   text-align: center;
-  /* the end keeps room for Coco peeking up from the corner, so the last line scrolls clear of him */
-  padding: var(--space-5) var(--gutter) calc(var(--space-4) + var(--guide-room, 0px));
+  padding: var(--space-5) var(--gutter) var(--space-4);
   color: var(--ink-soft);
   display: grid;
   gap: 0.35rem;
@@ -364,7 +363,7 @@ a.text-button { display: inline-flex; align-items: center; }
 .studio__panel figcaption { text-align: center; font-weight: 650; font-size: 0.85rem; padding: 0.5rem; border-top: 1px solid var(--rule); color: var(--ink-soft); }
 @media (max-width: 860px) { .studio__grid { grid-template-columns: 1fr 1fr; } }
 
-/* The live hero: the guide layer draws Coco over it; a quiet button lets the visitor say hello. */
+/* The live hero: space kept empty for Coco (the guide layer draws him in the page's empty space). */
 .hero-stage--live { display: grid; place-items: center; }
 .hero-stage--live > * { grid-area: 1 / 1; }
 /* A still of him while the 3D one loads; it fades away as he appears. */
@@ -378,11 +377,28 @@ a.text-button { display: inline-flex; align-items: center; }
 }
 /* he fades in over the poster first (the layer's 700 ms), then only the poster fades: no dip */
 .hero-stage__poster.is-leaving { opacity: 0; transition-delay: 700ms; }
-.hero-stage__greet {
-  width: 58%;
-  height: 78%;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
+
+/* ── Coco's swirl clouds, drifting behind a section's content (SkyClouds) ── */
+/* the host is a stacking context of its own, so the clouds sit above its background and below
+   everything in it; they never take a click. The layer spans the window's width (the side gutters
+   are room for clouds too), and SkyClouds places each cloud only where there is no content */
+.has-clouds { position: relative; isolation: isolate; }
+.sky-clouds { position: absolute; top: 0; bottom: 0; left: calc(50% - 50vw); right: calc(50% - 50vw); z-index: -1; pointer-events: none; }
+.sky-cloud {
+  position: absolute;
+  height: auto;
+  max-width: none;
+  opacity: 0;
+  transition: opacity 1200ms var(--ease);
+  /* one slow sway, there and back, started part-way through so no two move together */
+  animation: cloud-drift var(--dur, 28s) ease-in-out var(--delay, 0s) infinite alternate;
+  will-change: transform;
+}
+.sky-cloud.is-loaded { opacity: var(--alpha, 0.7); }
+@keyframes cloud-drift {
+  from { transform: translate3d(0, 0, 0) rotate(0deg); }
+  to { transform: translate3d(var(--dx, 12px), var(--dy, 6px), 0) rotate(var(--tilt, 1.5deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky-cloud { animation: none; }
 }

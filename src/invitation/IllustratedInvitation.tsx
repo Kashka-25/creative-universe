@@ -1,11 +1,11 @@
 // The invitation without motion: for reduced motion, data saver, low memory, no WebGL, or when
-// the 3D take cannot load. A still of Young Coco from Blender if there is one, otherwise Cassidy's
-// painting, still. No auto-advance: the visitor comes in when they choose.
+// the 3D take cannot load. A still of Adult Coco rendered in Blender from his own model (the same
+// still home shows while he loads) if there is one, otherwise Cassidy's painting, still. No auto-advance: the visitor comes in when they choose.
 
 import { useEffect, useRef, useState } from 'react';
 import { asset } from '../content';
 import { LivingPainting } from '../living/LivingPainting';
-import { INVITATION } from '../guide/paths';
+import { ADULT_POSTER } from '../guide/paths';
 
 /** The painting appears anyway after this long, even if an image is slow (it never stays empty). */
 const PAINTING_WAIT_MS = 2500;
@@ -45,6 +45,9 @@ function StillPainting() {
 const PAINTING_ALT =
   "Cassidy's guide: a chimp in an orange beanie and dungarees, meditating on a turquoise cloud, a third eye on his forehead, the sun and a lightning bolt behind him.";
 
+const STILL_ALT =
+  'Coco meditating on his cloud, his eyes closed, a third eye on his forehead, the sun and a lightning bolt behind him.';
+
 export function IllustratedInvitation() {
   const [still, setStill] = useState<'trying' | 'shown' | 'missing'>('trying');
   return (
@@ -52,8 +55,8 @@ export function IllustratedInvitation() {
       {still !== 'missing' && (
         <img
           className={`invitation__still${still === 'shown' ? ' is-shown' : ''}`}
-          src={asset(INVITATION.youngStill)}
-          alt="Young Coco on his cloud."
+          src={asset(ADULT_POSTER)}
+          alt={STILL_ALT}
           decoding="async"
           onLoad={() => setStill('shown')}
           onError={() => setStill('missing')}

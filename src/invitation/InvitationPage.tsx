@@ -1,9 +1,9 @@
 // The invitation: its own page (#/invitation), outside the portfolio's Layout.
 //
-// Young Coco's Blender take plays once; the cloud he offers grows, engulfs him and carries the
-// visitor home under the cloud veil, where Adult Coco sits meditating. "Come on in" is always
-// there: during the take it jumps straight to the glow, so the transformation and the trip home
-// start at once. Escape goes home at once. The realms stay one click away in the header, and the
+// Adult Coco's Blender take plays once: he rides in from stage left on his swirl cloud, meditating, settles and breathes;
+// then the magic cloud glows from the cloud in his hands, engulfs him and carries the visitor home
+// under the cloud veil, where he sits meditating. "Come on in" is always there: during the take it
+// jumps straight to the glow, so the transformation and the trip home start at once. Escape goes home at once. The realms stay one click away in the header, and the
 // cloud never covers the header while the visitor is using it: the trip home waits for them.
 //
 // Visible words are Cassidy's own: the heading and the button. Everything else is narration of
@@ -18,7 +18,7 @@ import { Header, SkipLink } from '../portfolio/Layout';
 import { welcomeNavigate } from '../portfolio/transitions';
 import { useDocumentTitle } from '../portfolio/useDocumentTitle';
 import { SceneBoundary } from '../scene/SceneBoundary';
-import { INVITATION } from '../guide/paths';
+import { ADULT_URL, INVITATION } from '../guide/paths';
 import { prefetchAdult } from '../guide/prefetch';
 import { veil } from '../veil/veil';
 import { forcedIntro, invitationStart } from './entry';
@@ -114,7 +114,7 @@ function Invitation({ mode }: { mode: 'full' | 'lite' }) {
     if (mode !== 'full') return;
     const ctl = new AbortController();
     warming.current = ctl;
-    for (const url of [INVITATION.young, INVITATION.cloud]) warmFetch(asset(url), ctl.signal);
+    for (const url of [ADULT_URL, INVITATION.take, INVITATION.cloud]) warmFetch(asset(url), ctl.signal);
     return () => { ctl.abort(); warming.current = null; };
   }, [mode]);
 

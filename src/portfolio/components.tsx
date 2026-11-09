@@ -1,11 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { asset, statusLabel, worksIn, type Realm, type Work } from '../content';
 import { useGuide } from '../guide/GuideProvider';
-import { stage } from '../scene/stage';
 import { RealmEmblem } from './ornaments';
 import { LivingPainting } from '../living/LivingPainting';
-import { attention } from '../guide/attention';
 import { ADULT_POSTER } from '../guide/paths';
 
 export function StatusPill({ status }: { status?: string }) {
@@ -71,40 +69,21 @@ export function realmCount(r: Realm) {
 }
 
 /**
- * Coco's home in the hero. With 3D running, the guide layer draws him over this box: until he is
- * ready a still poster of him holds his place (if there is one), then an invisible button over him
- * lets a pointer say hello. His reaction is purely visual (the 3D layer is hidden from assistive
- * technology), so the button is not a tab stop and is hidden from screen readers too.
- * Otherwise Cassidy's living painting is his home.
+ * Coco's space in the hero. With 3D running it is kept empty for him ([data-guide-space]: the
+ * negative space he floats in is best here at the top of home), and a still poster of him holds it
+ * until he is ready (if there is one). Otherwise Cassidy's living painting fills it.
  */
 export function HeroStage() {
   const { live3D, ready, instant } = useGuide();
-  const ref = useRef<HTMLDivElement>(null);
-  // a layout effect: its cleanup runs in the same task that takes the hero out of the page, so no
-  // frame of his ever sees a hero that has already gone (a detached box measures all zeros)
-  useLayoutEffect(() => {
-    stage.set(ref.current);
-    return () => stage.set(null);
-  }, []);
   if (live3D) {
     return (
-      <div className="hero-stage hero-stage--live" ref={ref}>
+      <div className="hero-stage hero-stage--live" data-guide-space>
         <Poster leaving={ready} instant={instant} />
-        {ready && (
-          <button
-            type="button"
-            className="hero-stage__greet"
-            tabIndex={-1}
-            aria-hidden
-            title="Say hello to Coco"
-            onClick={() => attention.push({ kind: 'tap' })}
-          />
-        )}
       </div>
     );
   }
   return (
-    <div className="hero-stage" ref={ref} aria-hidden>
+    <div className="hero-stage" aria-hidden>
       <LivingPainting className="hero-stage__living" />
     </div>
   );

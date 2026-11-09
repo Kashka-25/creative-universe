@@ -1,13 +1,12 @@
 /* ── Coco, the companion: one transparent 3D layer over the page's content, under its header ── */
 /* Stacking, on every page: content < Coco < the sticky header and its open menu < the paper grain
    < the cloud veil. .site is no stacking context of its own, so the header (z 20) and Coco (z 10)
-   order against each other directly. In the hero he sits in an empty box; elsewhere he keeps to the
-   corner, beside the content column or peeking up from the bottom edge and stepping aside while the
-   visitor reads (src/guide/docking.ts), and the end of every page keeps room for him (--guide-room). */
+   order against each other directly. He floats only in the page's empty space (src/guide/space.ts),
+   so being above the content never hides any of it. */
 .guide-layer {
   position: fixed;
-  /* held to the window's bottom edge, which he stands on in the corner: while a phone's URL bar
-     slides, the browser keeps the layer (and him) on that edge, and his place in it never changes */
+  /* held to the window's bottom edge: while a phone's URL bar slides, the browser keeps the layer
+     on that edge (HomeStage measures it each frame) */
   top: auto;
   bottom: 0;
   left: 0;
@@ -23,37 +22,45 @@
   /* a change of page never crossfades him with a frozen copy of himself (see base.css) */
   view-transition-name: guide;
 }
-.guide-layer.is-ready { opacity: 1; }
-/* while he sits in the hero the layer is anchored in the page (HomeStage sets its top and this
-   attribute; an attribute, because React owns the class list): the browser scrolls him with the
-   hero on the compositor, so he never swims over it */
-.guide-layer[data-attached] { position: absolute; bottom: auto; }
+.guide-layer.is-ready { opacity: var(--coco-fade, 1); }
+/* (--coco-fade: 0 while no empty space fits him; he fades out where he is, and back in at the next) */
 /* arriving under the cloud veil: the cloud is the reveal, so no fade of its own */
 .guide-layer.is-instant { transition: none; }
+/* on About he is not there: a gentle fade out, and back in when the visitor leaves */
+.guide-layer.is-away { opacity: 0; }
+/* content has come under him (a new page, a layout change): a quick fade out (HomeStage) */
+.guide-layer[data-quick] { transition-duration: 240ms; }
+/* placed, out of sight, in a new space: hidden at once, then faded in there (HomeStage) */
+.guide-layer[data-appear] { opacity: 0; transition: none; }
+/* flying in from beside the window: he is out of sight, so the layer is shown at once (HomeStage) */
+.guide-layer[data-fly] { transition: none; }
 .guide-canvas { width: 100% !important; height: 100% !important; }
 /* R3F gives its own wrapper pointer-events: auto; nothing in this layer may ever take a click */
 .guide-layer * { pointer-events: none !important; }
 
-/* The illustrated companion (lite): his still, peeking up from the corner (GuideProvider). */
+/* The illustrated companion (lite): his still, placed in the document at his space (PosterCompanion),
+   so it scrolls with the page. It glides between spaces only while shown; hidden, it moves at once. */
 .guide-poster {
-  position: fixed;
-  right: 6px;
-  bottom: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 10;
-  height: min(150px, 19svh);
   width: auto;
   pointer-events: none;
+  opacity: 0;
   visibility: hidden;
-  /* the top 62% of him shows (docking.ts PEEK.show) */
-  transform: translateY(38%);
-  transition: transform 650ms var(--ease), visibility 0s 650ms;
+  will-change: transform, opacity;
+  transition: opacity 700ms var(--ease), visibility 0s 700ms;
 }
-.guide-poster.is-loaded { visibility: visible; transition: transform 650ms var(--ease), visibility 0s; }
-.guide-poster.is-away { transform: translateY(calc(100% + 12px)); visibility: hidden; transition: transform 650ms var(--ease), visibility 0s 650ms; }
-@media (max-width: 699px) { .guide-poster { height: min(118px, 16svh); } }
+/* no empty space fits him: he peeks from a bottom corner of the window, fixed to it */
+.guide-poster.is-corner { position: fixed; }
+.guide-poster.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 700ms var(--ease), visibility 0s, transform 2800ms var(--ease), height 2800ms var(--ease);
+}
 @media (prefers-reduced-motion: reduce) {
-  /* no movement: he only fades in and out where he peeks */
-  .guide-poster, .guide-poster.is-away { transform: translateY(38%); }
-  .guide-poster.is-loaded { transition: opacity 200ms linear, visibility 0s !important; }
-  .guide-poster.is-away { opacity: 0; transition: opacity 200ms linear, visibility 0s 200ms !important; }
+  /* no movement: he only fades out, moves unseen, and fades back in */
+  .guide-poster { transition: opacity 250ms linear, visibility 0s 250ms; }
+  .guide-poster.is-shown { transition: opacity 250ms linear, visibility 0s; }
 }

@@ -4,8 +4,6 @@ html {
   background: var(--parchment);
   -webkit-text-size-adjust: 100%;
   scroll-padding-top: 5rem;
-  /* focus and anchor scrolling stop above the peeking companion (0 where his corner is clear) */
-  scroll-padding-bottom: var(--guide-room, 0px);
 }
 
 body {

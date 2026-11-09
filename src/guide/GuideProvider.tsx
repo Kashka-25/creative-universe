@@ -1,10 +1,11 @@
-// Coco, the visitor's companion. No story here: he sits in the home hero, meditating, and keeps the
-// visitor company in the corner on every page. The welcome itself lives on its own page (#/invitation).
+// Coco, the visitor's companion. No story here: he floats in the page's negative space, meditating,
+// on every page but About (space.ts companionOn), where he fades out until the visitor goes
+// elsewhere. The welcome itself lives on its own page (#/invitation).
 //
 // Devices that should not run 3D (reduced motion, data saver, low memory, no WebGL) and any 3D
 // failure get Cassidy's living painting in the hero instead, and so does a model that has not
-// arrived in time; in the corner they get his still (PosterCompanion), if there is one. Nothing
-// here ever blocks a click or stays over the page's content.
+// arrived in time; in the page's empty space they get his still (PosterCompanion), if there is one.
+// Nothing here ever blocks a click or sits over the page's content.
 
 import { createContext, lazy, Suspense, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -14,6 +15,7 @@ import { SceneBoundary } from '../scene/SceneBoundary';
 import { veil } from '../veil/veil';
 import { PosterCompanion } from './PosterCompanion';
 import { cancelAdultPrefetch } from './prefetch';
+import { companionOn } from './space';
 
 const HomeStage = lazy(() => import('./HomeStage'));
 
@@ -57,8 +59,8 @@ export function GuideProvider({ children }: { children: ReactNode }) {
   const [arriving] = useState(() => cameFromInvitation(location.state));
   const live3D = mode === 'full' && !failed && !stilled;
   // His layer is mounted at once on home (his hero is the first thing seen). Arriving directly on any
-  // other page, it waits until that page has been drawn and is idle, so he never competes with it.
-  // Once mounted he stays for the visit.
+  // other page, it waits until that page has been drawn and is idle, so he never competes with it;
+  // arriving on About, until the visitor goes elsewhere. Once mounted he stays for the visit.
   const [placed, setPlaced] = useState(() => location.pathname === '/');
   const staged = live3D && placed;
   // giving up on him: his model is freed when his stage unmounts, and the invitation's early
@@ -68,7 +70,7 @@ export function GuideProvider({ children }: { children: ReactNode }) {
   // Not mounted yet: once the page has loaded, after a paint, once it is idle (or IDLE_LOAD_MS at most), or at
   // once if the visitor goes home first.
   useEffect(() => {
-    if (placed || !live3D) return;
+    if (placed || !live3D || !companionOn(location.pathname)) return;
     if (location.pathname === '/') { setPlaced(true); return; }
     // after the page has loaded (its own images and fonts first), or IDLE_LOAD_MS at most
     let idle = 0, raf = 0, started = false;
@@ -147,6 +149,12 @@ export function GuideProvider({ children }: { children: ReactNode }) {
     return () => cancelAnimationFrame(raf);
   }, [staged, ready, fail]);
 
+  // On About he fades out (and back in when the visitor leaves). Once he has been away, his layer
+  // always fades: the cloud veil's instant reveal was only for his first appearance.
+  const away = !companionOn(location.pathname);
+  const [wasAway, setWasAway] = useState(false);
+  useEffect(() => { if (away) setWasAway(true); }, [away]);
+
   const onReady = useCallback(() => {
     // under a covering cloud he appears at once: the cloud clearing is his reveal
     setInstant(veil.blocking);
@@ -156,15 +164,15 @@ export function GuideProvider({ children }: { children: ReactNode }) {
   return (
     <GuideContext.Provider value={{ mode, live3D, ready, failed, instant }}>
       {staged && (
-        <div className={`guide-layer${ready ? ' is-ready' : ''}${instant ? ' is-instant' : ''}`} aria-hidden>
+        <div className={`guide-layer${ready ? ' is-ready' : ''}${instant && !wasAway && !away ? ' is-instant' : ''}${away ? ' is-away' : ''}`} aria-hidden>
           <SceneBoundary onError={fail} label="guide">
             <Suspense fallback={null}>
-              <HomeStage arriving={arriving} onReady={onReady} onContextLost={fail} />
+              <HomeStage arriving={arriving} away={away} onReady={onReady} onContextLost={fail} />
             </Suspense>
           </SceneBoundary>
         </div>
       )}
-      {!live3D && mode !== 'off' && <PosterCompanion onHome={location.pathname === '/'} />}
+      {!live3D && mode !== 'off' && <PosterCompanion away={away} />}
       {children}
     </GuideContext.Provider>
   );
