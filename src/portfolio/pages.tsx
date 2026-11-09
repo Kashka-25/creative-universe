@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import {
-  about, asset, neighbours, owner, realmById, realms, workBySlug, works, worksIn, type RealmId,
+  about, asset, neighbours, owner, pageAction, realmById, realms, workBySlug, works, worksIn, type RealmId,
 } from '../content';
+import { ActionButton, PreviewGallery } from './actions';
 import { Cover, HeroStage, RealmMedallion, StatusPill, WorkCard, realmCount, realmHref } from './components';
 import { CloudScroll, LeafDivider, Vine } from './ornaments';
 import { useDocumentTitle } from './useDocumentTitle';
@@ -188,6 +189,7 @@ export function WorkPage() {
             {work.gallery.map((g) => <img key={g.src} src={asset(g.src)} alt={g.alt} loading="lazy" />)}
           </div>
         )}
+        <PreviewGallery work={work} preview={work.preview} />
         {work.changes && work.changes.length > 0 && (
           <section className="work-page__changes" aria-labelledby="whats-new">
             <h2 id="whats-new" className="work-page__label">What's new</h2>
@@ -198,12 +200,8 @@ export function WorkPage() {
             </ul>
           </section>
         )}
-        {work.link && (
-          <p>
-            <a className="button button--primary" href={work.link} target="_blank" rel="noopener noreferrer">
-              Visit {work.title} <span aria-hidden>↗</span><span className="visually-hidden"> (opens in a new tab)</span>
-            </a>
-          </p>
+        {pageAction(work) && (
+          <p><ActionButton work={work} action={pageAction(work)} variant="page" /></p>
         )}
       </div>
 

@@ -24,6 +24,10 @@ export interface Cover { src: string; width: number | null; height: number | nul
 export interface Media { kind: 'audio' | 'video' | 'embed'; src: string; title?: string }
 export interface GalleryImage { src: string; alt: string }
 export interface ChangeNote { date: string; text: string }
+/** A work's one primary action. The url is always an http(s) address (checked at build time). */
+export interface WorkAction { kind: 'visit' | 'demo' | 'vision'; url: string }
+/** Screenshots and an optional short clip. Local files are paths inside public/. */
+export interface Preview { images: GalleryImage[]; clip?: { src: string; poster: string } }
 
 export interface Work {
   slug: string;
@@ -41,6 +45,10 @@ export interface Work {
   cover?: Cover;
   /** Change notes from YOUrigin's export, newest first, in Cassidy's words. */
   changes?: ChangeNote[];
+  /** The one button on the card and page ("Visit", "Try the demo", "See the vision"). */
+  action?: WorkAction;
+  /** Preview gallery shown on the work's page. */
+  preview?: Preview;
   // Optional fields for hand-written works (content/works/*.json)
   year?: string;
   role?: string;
@@ -78,3 +86,20 @@ export const statusLabel = (s?: string) => (s ? s.charAt(0).toUpperCase() + s.sl
 
 /** Public asset path that respects Vite's base. */
 export const asset = (p: string) => `${import.meta.env.BASE_URL}${p.replace(/^\//, '')}`;
+
+/** A preview file: web addresses as they are, public/ paths through asset(). */
+export const previewAsset = (src: string) => (/^https?:\/\//i.test(src) ? src : asset(src));
+
+/** Button words for each kind of action. */
+export const actionLabel: Record<WorkAction['kind'], string> = {
+  visit: 'Visit',
+  demo: 'Try the demo',
+  vision: 'See the vision',
+};
+
+/**
+ * The action a work's page shows: its own action, or else its plain starter-pack
+ * link as "Visit" (how pages have always looked). Cards show only work.action.
+ */
+export const pageAction = (work: Work): WorkAction | undefined =>
+  work.action ?? (work.link ? { kind: 'visit', url: work.link } : undefined);
