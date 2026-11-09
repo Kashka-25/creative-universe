@@ -238,31 +238,31 @@
       "title": "Atlantean Gardens",
       "category": "Worldbuilding & botanical design",
       "colour": "moss",
-      "status": "In development",
-      "description": "A botanical brand and imaginative world with characters, realms, strain collections and an interactive Atlas.",
+      "status": "Work in progress",
+      "description": "Work in progress: the Living Atlas of Atlantean Gardens. Wander seven painted realms, meet the Keepers and collect the strain cards, each tale drawn from the Atlantean Archives.",
       "portfolioDescription": "The idea, in development: the story of Atlantean Gardens, bringing love, creativity and joy back to the world of plant medicine, especially cannabis. A plant guide with a real folklore story woven through it, told through painted strain cards, the Atlas and its realms, and the five Keepers. The full immersive experience is being rebuilt.",
       "link": "https://kashka-25.github.io/Atlantean-Gardens/",
       "action": {
-        "kind": "idea",
-        "url": "https://kashka-25.github.io/Atlantean-Gardens/idea/"
+        "kind": "visit",
+        "url": "https://kashka-25.github.io/Atlantean-Gardens/living-atlas/"
       },
       "preview": {
         "images": [
           {
-            "src": "content/previews/atlantean-gardens-idea-top.webp",
-            "alt": "The Atlantean Gardens idea page opens over a painted map of a forested island city: a gold-ringed green tree emblem, the pale sea-foam trident wordmark \"Atlantean Gardens\", \"Atlantis Rising · Myth Made Medicine\", and \"Bringing love, creativity and joy back to the world of plant medicine, especially cannabis.\"",
+            "src": "content/previews/atlantean-gardens-living-atlas-1.webp",
+            "alt": "The Living Atlas of Atlantean Gardens: a painted map of seven realms around the Heart of Atlantis, each marked with a glowing light.",
             "width": 1440,
             "height": 900
           },
           {
-            "src": "content/previews/atlantean-gardens-idea-cards.webp",
-            "alt": "Chapter II, \"Each strain is a story. Each card is a character.\", above a fan of seven painted collector cards, each a chimp character with a strain name and card number.",
+            "src": "content/previews/atlantean-gardens-living-atlas-2.webp",
+            "alt": "The Hearthlands Realm open beside the map, showing its painting and ‘The tale’: verses from the Atlantean Archives about lantern-lit evenings and tending together.",
             "width": 1440,
             "height": 900
           },
           {
-            "src": "content/previews/atlantean-gardens-idea-keepers.webp",
-            "alt": "Chapter V, \"Tended by five Keepers\": painted cards for Kasper (the Spirit, wonder), Lila (the Heart, love), Coco (the Hands, stewardship), D'Nine (the Mind, creation) and Raptor (the Will, courage), each with their question, and \"Only together does the Garden truly bloom.\"",
+            "src": "content/previews/atlantean-gardens-living-atlas-3.webp",
+            "alt": "The Hall of Living Portraits: painted portraits of the five Keepers (Kasper, Lila, Coco, D’nine and Raptor) with their five pillars.",
             "width": 1440,
             "height": 900
           }
