@@ -68,7 +68,8 @@ export function imageSize(buf) {
 export const STARTER_FIELDS = ['title', 'category', 'colour', 'status', 'description', 'portfolioDescription', 'link'];
 
 /** Extra optional fields a hand-written work (content/works/*.json) may add. */
-export const EXTRA_FIELDS = ['year', 'role', 'tags', 'media', 'gallery', 'credits', 'body'];
+// alsoIn: other realms a work is also listed in, e.g. ["music"] (its page still sits in its own realm).
+export const EXTRA_FIELDS = ['year', 'role', 'tags', 'media', 'gallery', 'credits', 'body', 'alsoIn'];
 
 /** Realms a starter-pack project may name with its optional "realm" field (YOUrigin's export). */
 export const STARTER_REALMS = ['digital', 'ventures', 'music', 'books', 'art'];
@@ -272,6 +273,13 @@ export function placeWorks(works, placement, realmIds) {
     if (!realm) problems.push(`"${w.title}" (section "${w.collection ?? 'none'}") has no realm. Add it to content/placement.json.`);
     else if (!realmIds.includes(realm)) problems.push(`"${w.title}" is placed in unknown realm "${realm}". Known realms: ${realmIds.join(', ')}.`);
     else w.realm = realm;
+    if (w.alsoIn !== undefined) {
+      const extra = Array.isArray(w.alsoIn) ? w.alsoIn : [w.alsoIn];
+      const unknown = extra.filter((r) => !realmIds.includes(r));
+      if (unknown.length) problems.push(`"${w.title}" is also listed in unknown realm(s) ${unknown.map((r) => JSON.stringify(r)).join(', ')}. Known realms: ${realmIds.join(', ')}.`);
+      else w.alsoIn = [...new Set(extra)].filter((r) => r !== w.realm);
+      if (Array.isArray(w.alsoIn) && w.alsoIn.length === 0) delete w.alsoIn;
+    }
   }
   const seen = new Map();
   for (const w of works) {

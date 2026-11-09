@@ -36,6 +36,8 @@ export interface Work {
   slug: string;
   title: string;
   realm: RealmId;
+  /** Other realms that also list this work (its page and breadcrumbs stay in `realm`). */
+  alsoIn?: RealmId[];
   /** The section heading it had in the starter pack, e.g. "Client Work". */
   collection?: string;
   source: string;
@@ -74,7 +76,7 @@ export const realms = content.realms;
 export const works = content.works;
 
 export const realmById = (id: string) => realms.find((r) => r.id === id);
-export const worksIn = (id: RealmId) => works.filter((w) => w.realm === id);
+export const worksIn = (id: RealmId) => works.filter((w) => w.realm === id || w.alsoIn?.includes(id));
 export const workBySlug = (slug: string) => works.find((w) => w.slug === slug);
 
 /** Previous and next works in the same realm, for walking through a realm. */
