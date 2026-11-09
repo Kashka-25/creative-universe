@@ -651,7 +651,7 @@ function logoOf(pid) {
 }
 // The demo build sets FTD_CONFIG.backend = "demo": made-up people and projects, kept under their own key.
 const DEMO_CFG = window.FTD_CONFIG && window.FTD_CONFIG.backend === "demo" ? window.FTD_CONFIG : null;
-const LS_KEY = DEMO_CFG ? "freethedream-demo-v1" : "freethedream-basics-v1";
+const LS_KEY = DEMO_CFG ? "freethedream-demo-v2" : "freethedream-basics-v1";
 const lsLoad = () => { try { return JSON.parse(localStorage.getItem(LS_KEY) || "null"); } catch { return null; } };
 const lsSave = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); return true; } catch { return false; } };
 const nameOf = by => by === me ? "you" : by === "founding" ? "the founding team" : (names[by] || "Someone");
@@ -2122,7 +2122,7 @@ const TOUR = [
   { sel: "#b-guide", title: "Guidelines", text: "What can go on the map. Personal goals belong in YOU, and posts belong on the Kronk feed." }
 ];
 let tourStep = -1;
-const TOUR_SEEN = "freethedream-tour-seen";
+const TOUR_SEEN = DEMO_CFG ? "freethedream-demo-tour-seen" : "freethedream-tour-seen";
 function startTour() { tourStep = 0; document.getElementById("tour").hidden = false; showTourStep(); markTabs(); }
 function endTour() {
   tourStep = -1; document.getElementById("tour").hidden = true; markTabs();
@@ -2355,32 +2355,70 @@ function connectLocal() {
 }
 // Demo build: like the standalone copy (you are the admin, nothing leaves the browser), but it starts
 // with made-up people and projects so visitors see the whole process. Reset puts it back.
-const DEMO_NAMES = { ari: "Ari", sam: "Sam", jo: "Jo", kai: "Kai", noor: "Noor" };
+const DEMO_NAMES = { ari: "Ari", sam: "Sam", jo: "Jo", kai: "Kai", noor: "Noor", priya: "Priya", tomas: "Tomás", lena: "Lena", malik: "Malik", rosa: "Rosa" };
+// Everyone and everything here is made up. Ari, Sam, Jo and Kai are the same people as in the project-space preview.
 function demoSeed() {
-  const now = Date.now(), day = 86400000, at = d => now - d * day;
+  const now = Date.now(), day = 86400000, at = d => now - Math.round(d * day);
   const founding = ["kronk", "org", "you", "anth", "comm", "mayhem", "soul", "space", "emp", "fund"].map((k, i) => {
     const T = TEMPLATES[k];
-    return { id: k, tpl: k, name: T.name, what: "", side: T.side, el: ELS.includes(T.el) ? T.el : "air", links: [], by: "founding", at: at(60 - i), approvedAt: at(60 - i) };
+    return { id: k, tpl: k, name: T.name, what: "", side: T.side, el: ELS.includes(T.el) ? T.el : "air", links: [], by: "founding", at: at(90 - i), approvedAt: at(90 - i) };
   });
-  const library = { id: "d1", name: "Seed Library", what: "A shelf of local seeds anyone can borrow, grow and bring back at the end of the season.", community: "Anyone can borrow seeds and give some back. Growers swap tips at monthly meetups.", side: "inner", el: "earth", links: ["space"], seed: null, at: at(20) };
-  const choir = { id: "d1", name: "Night Choir", what: "An open choir that sings under the stars once a month. No auditions.", community: "Everyone sings. Songs are taught by ear on the night.", side: "bridge", el: "air", links: ["soul", "mayhem"], seed: null, at: at(14) };
-  const repair = { id: "d1", name: "Repair Café", what: "Bring something broken, fix it together with a volunteer, and learn how.", community: "Volunteers share skills; anyone can bring things to fix.", side: "outer", el: "fire", links: ["space"], seed: null, at: at(3) };
-  const garden = { id: "d1", name: "Rooftop Garden", what: "Turn an empty rooftop into a shared vegetable garden with a rota for watering.", community: "Neighbours share the work and the harvest.", side: "inner", el: "water", links: ["emp"], seed: null, at: at(1) };
-  const approved = founding.concat([
-    { ...library, by: "sam", approvedAt: at(18) },
-    { ...choir, by: "jo", approvedAt: at(12) }
-  ]);
+  const drop = (id, name, side, el, links, ago, what, community) => ({ id, name, what, community, side, el, links, seed: null, at: at(ago) });
+  const D = {
+    sam:   [drop("d1", "Seed Library", "inner", "earth", ["space"], 48, "A shelf of local seeds anyone can borrow, grow and bring back at the end of the season.", "Borrow a packet, save seeds from what you grow, and bring some back. Monthly swaps at the Space.")],
+    jo:    [drop("d1", "Night Choir", "bridge", "air", ["soul", "mayhem"], 41, "An open choir that sings outdoors once a month after dark. No auditions and no reading music.", "Everyone sings. Songs are taught by ear on the night, and anyone can bring one to teach.")],
+    tomas: [drop("d1", "Tool Share Shed", "outer", "earth", ["space", "sam~d1"], 37, "A lending shed of ladders, drills, saws and garden tools, so nobody has to buy one for a single job.", "Lend a tool you rarely use, borrow what you need, and take a turn opening the shed on Saturdays.")],
+    priya: [drop("d1", "Story Circle", "inner", "water", ["emp", "comm"], 30, "Older neighbours and young people meet every fortnight to tell and record the stories of the area.", "Come to listen, tell a story, or help record and transcribe them.")],
+    rosa:  [drop("d1", "Mural Walk", "outer", "fire", ["mayhem", "kronk", "jo~d1"], 26, "A walking route linking six new murals painted by local artists on walls that owners have offered.", "Offer a wall, paint a section, or lead a walk for visitors."),
+            drop("d2", "Sound Bath in the Park", "inner", "ether", ["emp", "jo~d1"], 4, "A free hour of gongs and singing bowls on the grass on the first Sunday of the month.", "Bring a blanket. Musicians who play bowls or gongs can join the circle.")],
+    malik: [drop("d1", "Community Fridge", "bridge", "water", ["sam~d1", "org"], 21, "A public fridge outside the corner shop where cafés and neighbours leave surplus food for anyone to take.", "Drop off food, take what you need, or join the cleaning and checking rota."),
+            drop("d2", "Learn the cello", "inner", "air", [], 9, "I've always wanted to learn the cello and would love a teacher.", "")],
+    kai:   [drop("d1", "Repair Café", "outer", "fire", ["space", "tomas~d1"], 6, "Bring something broken, fix it together with a volunteer, and learn how it works.", "Volunteers share skills, anyone can bring things to fix, and the Tool Share Shed lends the tools.")],
+    noor:  [drop("d1", "Rooftop Garden", "inner", "water", ["emp", "sam~d1"], 3, "Turn an empty rooftop into a shared vegetable garden with a watering rota.", "Neighbours share the work and the harvest. Seeds come from the Seed Library.")],
+    lena:  [drop("d1", "Bike Kitchen", "outer", "earth", ["tomas~d1", "kai~d1"], 2, "A weekly evening where people learn to fix their own bikes with shared stands and tools.", "Bring your bike, or come to teach. Old bikes are rebuilt and given away.")],
+    ari:   [drop("d1", "Language Exchange Café", "bridge", "air", ["comm", "priya~d1"], 1, "Pairs of neighbours swap an hour of their languages over tea: one half in each language.", "Come with a language to share. No teachers, just conversation.")]
+  };
+  const approvedKeys = { "sam~d1": 46, "jo~d1": 39, "tomas~d1": 35, "priya~d1": 28, "rosa~d1": 24, "malik~d1": 19 };
+  const approved = founding.slice();
+  for (const by in D) D[by].forEach(d => { const k = by + "~" + d.id; if (approvedKeys[k]) approved.push({ ...d, by, approvedAt: at(approvedKeys[k]) }); });
+  const ok = (ago, note = "") => ({ status: "approved", note, at: at(ago), by: "founding" });
+  const decisions = {};
+  for (const k in approvedKeys) decisions[k] = ok(approvedKeys[k]);
+  decisions["malik~d2"] = { status: "declined", note: "A lovely goal, but a personal one. It belongs in YOU, where you can plan your own path.", at: at(8), by: "founding" };
+  decisions["claim:lena:sam~d1"] = ok(33);
+  decisions["claim:noor:priya~d1"] = ok(15);
+  const ed = (ago, o) => ({ ...o, at: at(ago) });
+  const member = (by, extra = {}) => ({ drops: D[by] || [], claims: [], edits: {}, logos: {}, follows: [], ...extra });
   return {
     members: {
-      sam: { drops: [library], claims: [], edits: { "sam~d1": { verb: "Borrow a seed, grow it, bring some back", role: "Keeps food growing locally and puts gardeners in touch with each other.", involve: "Come to the first Saturday swap, or adopt a shelf for a season.", qs: ["Where could a second shelf go?"], at: at(10) } }, logos: {}, follows: ["noor~d1"] },
-      jo: { drops: [choir], claims: [], edits: {}, logos: {}, follows: ["kai~d1"] },
-      kai: { drops: [repair], claims: [], edits: {}, logos: {}, follows: ["noor~d1"] },
-      noor: { drops: [garden], claims: [], edits: {}, logos: {}, follows: ["kai~d1"] },
-      ari: { drops: [], claims: ["mayhem"], edits: {}, logos: {}, follows: ["kai~d1", "noor~d1"] }
+      sam: member("sam", { follows: ["noor~d1", "kai~d1"], edits: { "sam~d1": ed(12, {
+        verb: "Borrow a seed, grow it, bring some back",
+        role: "Keeps food growing locally and puts gardeners in touch with each other.",
+        involve: "Come to the first-Saturday swap at the Space, adopt a shelf for a season, or help label packets.",
+        reflect: "Forty-two packets went out this spring and nineteen came back with saved seed. Tomatoes and beans return best; lettuce hardly ever does.",
+        qs: ["Where could a second shelf go?", "Should we keep a list of who grows what?"] }) } }),
+      lena: member("lena", { claims: ["sam~d1"], follows: ["kai~d1", "rosa~d2"] }),
+      jo: member("jo", { follows: ["rosa~d2", "ari~d1"], edits: { "jo~d1": ed(10, {
+        verb: "Sing together under the night sky",
+        role: "A place where anyone can find their voice, and where poets and performers try new pieces.",
+        involve: "Turn up on the last Friday of the month. Bring a torch and something warm.",
+        qs: ["Could we sing at the Mural Walk opening?"] }) } }),
+      tomas: member("tomas", { follows: ["kai~d1", "lena~d1"], edits: { "tomas~d1": ed(9, {
+        verb: "Borrow it, use it, bring it back",
+        involve: "Lend a tool you rarely use, or take a Saturday shift opening the shed.",
+        qs: ["Do we need a deposit for the big tools?"] }) } }),
+      priya: member("priya", { follows: ["ari~d1"], edits: { "priya~d1": ed(7, {
+        verb: "The stories of the street, told by the people who lived them",
+        reflect: "Mrs Okafor's story about the 1987 flood made the whole room laugh and then go quiet. We now have eleven stories recorded." }) } }),
+      noor: member("noor", { claims: ["priya~d1"], follows: ["sam~d1", "kai~d1"] }),
+      rosa: member("rosa", { follows: ["noor~d1"] }),
+      malik: member("malik", { follows: ["noor~d1", "lena~d1"] }),
+      kai: member("kai", { claims: ["tomas~d1"], follows: ["lena~d1", "noor~d1"] }),
+      ari: member("ari", { claims: ["mayhem"], follows: ["kai~d1", "noor~d1", "rosa~d2"] })
     },
     approved,
-    decisions: { "sam~d1": { status: "approved", note: "", at: at(18), by: "founding" }, "jo~d1": { status: "approved", note: "", at: at(12), by: "founding" } },
-    stewards: { "sam~d1": ["sam"], "jo~d1": ["jo"] },
+    decisions,
+    stewards: { "sam~d1": ["sam", "lena"], "jo~d1": ["jo"], "tomas~d1": ["tomas"], "priya~d1": ["priya", "noor"], "rosa~d1": ["rosa"], "malik~d1": ["malik"] },
     adminEdits: {}, adminLogos: {}
   };
 }
@@ -2394,10 +2432,14 @@ function connectDemo(cfg) {
   bar.innerHTML = `<b>Demo · example data</b><span>The people and ideas are made up. You are the admin here, and nothing you do leaves this browser.</span>`;
   const reset = document.createElement("button");
   reset.type = "button"; reset.textContent = "Reset";
-  reset.onclick = () => { try { localStorage.removeItem(LS_KEY); } catch {} setHash(""); location.reload(); };
+  reset.onclick = () => { try { localStorage.removeItem(LS_KEY); localStorage.removeItem(TOUR_SEEN); } catch {} setHash(""); location.reload(); };
   const back = document.createElement("a");
   back.href = typeof cfg.back === "string" && cfg.back ? cfg.back : "../../#/"; back.textContent = "← Back to Creative Universe";
-  bar.append(reset, back);
+  // The project-space preview (Ari, Sam, Jo and Kai running Mayhem) has no button on the live map; the demo offers it here.
+  const space = document.createElement("button");
+  space.type = "button"; space.textContent = "Watch a project space";
+  space.onclick = () => { startDemo(); document.querySelector(".stage").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }); };
+  bar.append(space, reset, back);
   const wrap = document.querySelector(".wrap"); wrap.insertBefore(bar, wrap.firstChild);
   footer(); refresh(); applyHash();
 }

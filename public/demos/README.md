@@ -8,7 +8,7 @@ Each folder here, `public/demos/<project>/`, holds a **built copy** of a project
 
 ## FreeTheDream
 
-`freethedream/index.html` is `dist/demo.html` from free-the-dream-map (first copied from its PR #3, before that PR was merged).
+`freethedream/index.html` is `dist/demo.html` from free-the-dream-map, branch `demo-richer-seed`, commit `0120a2c` (its PR #4, copied before that PR was merged).
 
 To refresh it:
 
@@ -17,8 +17,8 @@ To refresh it:
 
 What it does:
 
-- It stores the demo map in the visitor's browser under the localStorage key `freethedream-demo-v1`. It also sets `freethedream-tour-seen` once the visitor has seen the tour.
-- Reset clears `freethedream-demo-v1` and reloads the demo.
-- The people and ideas are made up.
+- It writes only two localStorage keys in the visitor's browser: `freethedream-demo-v2` (the demo map) and `freethedream-demo-tour-seen` (set once the visitor has finished the tour).
+- Reset removes both keys and reloads the demo. (Checked in the browser on 9 Nov 2026: after the tour both keys were set, and after Reset localStorage was empty.)
+- The people and ideas are made up. "Watch a project space" plays a step-by-step preview with example people; nothing in it is saved.
 - It makes no network requests. Its links to YOU and Kronk open only when the visitor clicks them.
 - "← Back to Creative Universe" goes to `../../#/`, so the action url keeps its trailing slash: `demos/freethedream/`.
