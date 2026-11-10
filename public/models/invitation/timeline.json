@@ -3,40 +3,40 @@
   "fps": 60,
   "markers": {
     "floatIn": 0,
-    "arrive": 540,
-    "welcome": 583,
-    "wake": 608,
-    "gaze": 731,
-    "eyesClose": 815,
-    "bow": 848,
-    "glow": 1057,
-    "expand": 1085,
-    "engulf": 1123,
-    "luminous": 1159,
-    "dissipate": 1213,
-    "complete": 1267
+    "arrive": 270,
+    "welcome": 313,
+    "wake": 338,
+    "gaze": 461,
+    "eyesClose": 545,
+    "bow": 578,
+    "glow": 787,
+    "expand": 815,
+    "engulf": 853,
+    "luminous": 889,
+    "dissipate": 943,
+    "complete": 997
   },
   "clips": {
     "invite": {
       "file": "models/invitation/coco-invite.glb",
       "startFrame": 0,
-      "endFrame": 540,
-      "note": "his ride in from stage left (the rig alone; it binds to coco-sage.glb by bone name). It ends on breathe frame 0, pose and velocity, where the site hands over to 'breathe' and 'float'."
+      "endFrame": 270,
+      "note": "his descent from above the window (the rig alone; it binds to coco-sage.glb by bone name). It ends on breathe frame 0, pose and velocity, where the site hands over to 'breathe' and 'float'."
     },
     "transform": {
       "file": "models/invitation/magic-cloud.glb",
-      "startFrame": 1057,
-      "endFrame": 1297,
+      "startFrame": 787,
+      "endFrame": 1027,
       "note": "the magic cloud (blender/scripts/build_magic_cloud.py); its own time 0 is master frame startFrame"
     },
     "ride": {
       "file": "models/clouds/ride-cloud.glb",
       "startFrame": 0,
-      "endFrame": 1167,
+      "endFrame": 897,
       "note": "the cloud he rides in on (blender/scripts/build_ride_cloud.py): it follows his root bone, and from 'glow' it swells into the magic cloud and thins away inside it before he is hidden."
     }
   },
-  "coverFrame": 1195,
+  "coverFrame": 925,
   "adultBox": [
     [
       -0.69,
@@ -51,8 +51,8 @@
   ],
   "cloud": {
     "$comment": "The magic cloud (blender/scripts/build_magic_cloud.py), in the same frame as Adult Coco (glTF axes, metres). He is fully hidden from hiddenFrom to hiddenTo, coverFrame included (coverage masks with the site's camera, blender/scripts/check_cloud_cover.py). ctl_glow and ctl_fade carry glow and opacity as scale.x. adultBox: Adult Coco seated at his place, sun and bolt included.",
-    "hiddenFrom": 1150,
-    "hiddenTo": 1224,
+    "hiddenFrom": 880,
+    "hiddenTo": 954,
     "centre": [
       -0.035,
       -0.07,
