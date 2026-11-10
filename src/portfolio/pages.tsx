@@ -251,6 +251,14 @@ export function AboutPage() {
         {about.portrait && (
           <figure className="about-page__portrait">
             <img src={asset(about.portrait)} alt={about.portraitAlt} />
+            {about.portraitCredit && (
+              <figcaption className="about-page__credit">
+                {about.portraitCredit.lead}{' '}
+                <a href={about.portraitCredit.href} target="_blank" rel="noopener noreferrer">
+                  {about.portraitCredit.label}<span className="visually-hidden"> on Instagram (opens in a new tab)</span>
+                </a>
+              </figcaption>
+            )}
           </figure>
         )}
         <div className="about-page__words">
