@@ -1,23 +1,36 @@
-"""Scattered clouds: six small stills of Coco's own swirl cloud, for the sections of the site's pages.
+"""Scattered clouds: six small clouds of Coco's own swirl cloud, for the sections of the site's pages, each a still
+and a seamless spinning loop.
 
     "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" --background --factory-startup \
-        --python blender/scripts/render_section_clouds.py [-- --out <dir>] [--only 1,3]
+        --python blender/scripts/render_section_clouds.py [-- --out <dir>] [--only 1,3] [--loops | --loops-only]
+        [--frames <dir>] [--no-encode] [--python-exe <python with Pillow>]
 
 Run from the repository root. Builds nothing in any .blend and opens none: it starts from an empty scene, makes
 the magic cloud's own curl and wisp meshes and colour ramp (blender/scripts/build_magic_cloud.py: curl_bun, wisp,
 ramp_srgb, the colours sampled from the cloud in Young Coco's hands), arranges them into small clusters and renders
 each one, front three-quarter, in light like the site's invitation stage (warm sky, warm key from the upper right,
-cool fill from the left, a soft turquoise glow), on a transparent background. Nothing is animated: the site floats
-them with CSS.
+cool fill from the left, a soft turquoise glow), on a transparent background. The site floats them with CSS.
+
+The loops (--loops: the stills and the loops; --loops-only: the loops alone, the stills left as they are) spin
+each curl the way the ride cloud's curls turn in its 'rest' loop (build_ride_cloud.py curl_life): one slow turn
+about its own face every LOOP_S seconds, half of them one way and half the other (their chirality), in the same
+light and from the same camera as the still, so the loop's first frame is the still. The wisp keeps still. The
+frames go to a temporary folder (LOOP_S x LOOP_FPS of them, plus one more, the same as frame 0, for the seam check)
+and are handed to encode_cloud_loops.py (run with the system's Python, which needs Pillow), which crops them as the
+still is cropped, writes each animated AVIF and adds it to clouds.json.
 
 Writes
-  public/models/clouds/cloud-1.webp .. cloud-6.webp   ~440 px on the long side, WebP quality 82, alpha
-  public/models/clouds/clouds.json                    [{file, width, height, kind}], kind: cluster | single | wisp
+  public/models/clouds/cloud-1.webp .. cloud-6.webp            ~440 px on the long side, WebP quality 82, alpha
+  public/models/clouds/cloud-1-spin.avif .. cloud-6-spin.avif  the loops (encode_cloud_loops.py)
+  public/models/clouds/clouds.json      [{file, width, height, kind, anim?}], kind: cluster | single | wisp,
+                                        anim: {file, width, height, fps, frames}
 """
 
 import json
 import math
 import os
+import shutil
+import subprocess
 import sys
 import tempfile
 
@@ -32,11 +45,20 @@ import build_magic_cloud as mc                       # noqa: E402  (its curl, wi
 ARGV = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 OUT = ARGV[ARGV.index("--out") + 1] if "--out" in ARGV else os.path.join(ROOT, "public", "models", "clouds")
 ONLY = [int(x) for x in ARGV[ARGV.index("--only") + 1].split(",")] if "--only" in ARGV else None
+LOOPS = "--loops" in ARGV or "--loops-only" in ARGV
+STILLS = "--loops-only" not in ARGV
+FRAMES = ARGV[ARGV.index("--frames") + 1] if "--frames" in ARGV else None       # where the loop frames go
+ENCODE = "--no-encode" not in ARGV                                              # leave the frames for later
+PYTHON = ARGV[ARGV.index("--python-exe") + 1] if "--python-exe" in ARGV else (shutil.which("python") or "python")
 LONG_SIDE = 440                                      # px, the long side of each still
 QUALITY = 82
 RENDER = 1100                                        # px, the square it is rendered at before cropping and scaling
 GLOW = "#96ebfb"                                     # the site's cloud glow colour (src/invitation/cloudLook.ts)
 GLOW_STRENGTH = 0.32                                 # a soft inner light, as the magic cloud has while it settles
+LOOP_S = 20.0                                        # one turn of every curl per loop (build_ride_cloud.py LOOP_S)
+LOOP_FPS = 12                                        # the loops' frame rate: 1.5 deg of turn a frame
+LOOP_RENDER = 720                                    # px, the square each loop frame is rendered at
+LOOP_SAMPLES = 32
 
 # Each cloud: curls (x, z position in its own plane, size, chirality (spiral turn), roll, yaw/pitch tweak in
 # degrees, depth y) and an optional wisp tail: its thin end tucked behind the cluster at 'start', it sweeps out
@@ -158,6 +180,41 @@ def scene_setup():
     return sc, cam
 
 
+def curl_quat(yaw, pitch, roll):
+    """A curl facing the visitor (-Y), turned a little outwards and up, rolled `roll` degrees about its own face."""
+    return Euler((math.radians(pitch), 0.0, math.radians(yaw)), "XYZ").to_quaternion() @ Quaternion((0, 1, 0), math.radians(roll))
+
+
+def turn_curls(spec, obs, tau):
+    """Every curl's turn at tau seconds, as the ride cloud's 'rest' turns its curls: its chirality x one full turn
+    per LOOP_S about its own face (periodic, so the frame at LOOP_S is frame 0 again)."""
+    for (x, z, s, chir, roll, (yaw, pitch), depth), ob in zip(spec["curls"], obs):
+        ob.rotation_quaternion = curl_quat(yaw, pitch, roll + chir * 360.0 * tau / LOOP_S)
+
+
+def render_loop(sc, spec, obs, folder):
+    """The loop's frames 0 .. LOOP_S x LOOP_FPS as PNGs (the last is frame 0 again, for the seam check only).
+    Returns the loop's frame count."""
+    os.makedirs(folder, exist_ok=True)
+    for f in os.listdir(folder):
+        os.remove(os.path.join(folder, f))
+    r, ee = sc.render, getattr(sc, "eevee", None)
+    keep = (r.resolution_x, getattr(ee, "taa_render_samples", None))
+    r.resolution_x = r.resolution_y = LOOP_RENDER
+    if keep[1] is not None:
+        ee.taa_render_samples = LOOP_SAMPLES
+    n = int(round(LOOP_S * LOOP_FPS))
+    for k in range(n + 1):
+        turn_curls(spec, obs, k / LOOP_FPS)
+        r.filepath = os.path.join(folder, f"f{k:04d}.png")
+        bpy.ops.render.render(write_still=True)
+    turn_curls(spec, obs, 0.0)
+    r.resolution_x = r.resolution_y = keep[0]
+    if keep[1] is not None:
+        ee.taa_render_samples = keep[1]
+    return n
+
+
 def build_cloud(spec, meshes, mat):
     """The curls and the wisp of one cloud, as objects in the scene; returns them."""
     obs = []
@@ -166,9 +223,7 @@ def build_cloud(spec, meshes, mat):
         bpy.context.scene.collection.objects.link(ob)
         ob.location = (x, depth, z)
         ob.rotation_mode = "QUATERNION"
-        # face the visitor (-Y), turned a little outwards and up, rolled about its own face
-        q = Euler((math.radians(pitch), 0.0, math.radians(yaw)), "XYZ").to_quaternion() @ Quaternion((0, 1, 0), math.radians(roll))
-        ob.rotation_quaternion = q
+        ob.rotation_quaternion = curl_quat(yaw, pitch, roll)
         ob.scale = (s * chir, s, s)                  # a negative X scale turns its spiral the other way
         obs.append(ob)
     w = spec.get("wisp")
@@ -251,7 +306,16 @@ def main():
     mat = material()
     meshes = {"curl": mc.curl_bun("curl", +1), "wisp": mc.wisp("wisp", thick=0.13, r0=0.25)}
     tmp = os.path.join(tempfile.gettempdir(), "section_cloud.png")
+    frames = FRAMES or os.path.join(tempfile.gettempdir(), "section_cloud_loops")
+    listed = os.path.join(OUT, "clouds.json")
+    # the loops already listed, kept when only the stills are rendered again
+    try:
+        with open(listed, encoding="utf-8") as fh:
+            anims = {c["file"]: c["anim"] for c in json.load(fh) if c.get("anim")}
+    except (OSError, ValueError, KeyError, TypeError):
+        anims = {}
     index = []
+    looped = []
     for n, spec in enumerate(CLOUDS, 1):
         name = f"cloud-{n}.webp"
         if ONLY and n not in ONLY:
@@ -260,17 +324,32 @@ def main():
             bpy.data.objects.remove(ob)
         obs = build_cloud(spec, meshes, mat)
         frame_camera(cam, obs)
-        sc.render.filepath = tmp
-        bpy.ops.render.render(write_still=True)
-        w, h = crop_and_save(tmp, os.path.join(OUT, name))
-        size = os.path.getsize(os.path.join(OUT, name))
-        log(name, spec["kind"], f"{w}x{h}", f"{size / 1024:.1f} KB")
-        index.append({"file": name, "width": w, "height": h, "kind": spec["kind"]})
-    if not ONLY:
-        with open(os.path.join(OUT, "clouds.json"), "w", encoding="utf-8") as fh:
+        if STILLS:
+            sc.render.filepath = tmp
+            bpy.ops.render.render(write_still=True)
+            w, h = crop_and_save(tmp, os.path.join(OUT, name))
+            size = os.path.getsize(os.path.join(OUT, name))
+            log(name, spec["kind"], f"{w}x{h}", f"{size / 1024:.1f} KB")
+            entry = {"file": name, "width": w, "height": h, "kind": spec["kind"]}
+            if name in anims:
+                entry["anim"] = anims[name]
+            index.append(entry)
+        if LOOPS:
+            count = render_loop(sc, spec, obs, os.path.join(frames, f"cloud-{n}"))
+            log(name, f"loop: {count} frames at {LOOP_FPS} fps rendered")
+            looped.append(n)
+    if STILLS and not ONLY:
+        with open(listed, "w", encoding="utf-8") as fh:
             json.dump(index, fh, indent=2)
-        log("wrote", os.path.join(OUT, "clouds.json"))
-    os.remove(tmp)
+        log("wrote", listed)
+    if STILLS:
+        os.remove(tmp)
+    if looped and ENCODE:
+        enc = os.path.join(os.path.dirname(os.path.abspath(__file__)), "encode_cloud_loops.py")
+        cmd = [PYTHON, enc, frames, OUT, "--fps", str(LOOP_FPS), "--only", ",".join(map(str, looped))]
+        log("encoding:", " ".join(cmd))
+        if subprocess.run(cmd).returncode != 0:
+            raise SystemExit(f"encode_cloud_loops.py failed; the frames are in {frames}")
 
 
 if __name__ == "__main__":

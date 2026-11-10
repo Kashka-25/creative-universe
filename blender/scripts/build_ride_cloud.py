@@ -12,9 +12,9 @@ Writes
                                                through a Child Of constraint, so the scene shows him riding it)
   public/models/clouds/ride-cloud.glb        the cloud, at rest under Adult Coco's seat (the same frame as his
                                                model, glTF axes), and three clips:
-      ride    the welcome, on the 60 fps master timeline (frame 0 = 'floatIn'): it carries him in from stage left
-              (its curls trail a touch and its wisp streams out while he travels, and both ease home as he
-              settles), idles while he breathes, then from 'glow' brightens with the magic cloud, swells and
+      ride    the welcome, on the 60 fps master timeline (frame 0 = 'floatIn'): it carries him down from above
+              the window (its outer curls billow up a touch and its wisp streams out while he sinks, and both
+              ease home as he settles), idles while he breathes, then from 'glow' brightens with the magic cloud, swells and
               rises into the base of the magic cloud while it engulfs him, and thins away inside it before he is
               hidden (it becomes part of the magic cloud: no pop)
       rest    a seamless 20 s loop: the cloud idling under him while he rests on a page
@@ -70,7 +70,7 @@ CURLS = [
     (-0.83, -1.14, 0.12, 0.17, +1, 40, -26, 10),
     (0.72, -1.14, 0.12, 0.18, -1, 200, 26, 10),
 ]
-# The wisp tail, trailing to his right (the visitor's left: he rides in towards the visitor's right): its thin end
+# The wisp tail, curling out to his right (the visitor's left): its thin end
 # tucked behind the left-hand curls, it sweeps out and rolls up into its curl (as on the section clouds).
 WISP = dict(start=(-0.80, -1.26), r=0.26, tilt=12, depth=0.16)
 
@@ -79,7 +79,7 @@ SPIN = 2 * math.pi / LOOP_S  # rad/s
 BOB_M = 0.010               # each curl's own bob (m)
 BREATH = 0.025              # each curl's own swell (share of its size)
 REST_GLOW = 0.20            # the cloud's soft inner light at rest (x 1.6 on the site = 0.32: the section clouds')
-TRAIL_M = 0.05              # how far the outer curls trail behind while he travels at his fastest (m)
+TRAIL_M = 0.05              # how far the outer curls billow up (trail behind) while he sinks at his fastest (m)
 STREAM = 0.45               # the wisp reaches this much further out at his fastest
 
 FLY_S = 2.0                 # 'flyin'
@@ -148,9 +148,9 @@ def tracks(tau, speed, merge=None):
     for i, (x, z, y, s, chir, roll0, yaw, pitch) in enumerate(CURLS):
         roll, dx, dz, sw = curl_life(i, tau)
         q0 = curl_rest_quat(x, z, y, s, chir, roll0, yaw, pitch)
-        # trailing while he travels: the outer curls lag a little behind (towards the visitor's left)
-        trail = -TRAIL_M * speed * (0.4 + 0.6 * min(1.0, abs(x - (-0.05)) / 0.8))
-        loc = np.stack([x + dx + trail, np.full(n, y), z + dz], 1)
+        # trailing while he sinks: the outer curls lag a little behind (up), like the rim of a parachute
+        trail = TRAIL_M * speed * (0.4 + 0.6 * min(1.0, abs(x - (-0.05)) / 0.8))
+        loc = np.stack([x + dx, np.full(n, y), z + dz + trail], 1)
         size = s * (1 + sw)
         extra_spin = np.zeros(n)
         if merge is not None:
@@ -176,8 +176,8 @@ def tracks(tau, speed, merge=None):
     r = WISP["r"] * (1 + reach + STREAM * speed)
     if merge is not None:
         r = r * (1 + 0.3 * merge["swell"]) * (1 - 0.8 * merge["shrink"])
-    loc = np.stack([np.full(n, WISP["start"][0]) - 0.06 * speed, np.full(n, WISP["depth"]),
-                    WISP["start"][1] + r], 1)
+    loc = np.stack([np.full(n, WISP["start"][0]), np.full(n, WISP["depth"]),
+                    WISP["start"][1] + r + 0.06 * speed], 1)
     rot, prev = [], None
     for k in range(n):
         q = (Quaternion((1, 0, 0), math.radians(90 + WISP["tilt"])) @ Quaternion((0, 0, 1), math.radians(90))

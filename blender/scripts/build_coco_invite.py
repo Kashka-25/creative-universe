@@ -26,16 +26,17 @@ Writes
   + the magic cloud (stage 2, blender/scripts/build_magic_cloud.py): its collection in invitation.blend,
     public/models/invitation/magic-cloud.glb and its keys in timeline.json
 
-The take: he rides in on his swirl cloud (build_ride_cloud.py) from stage left (the visitor's left), seated in
-meditation with his eyes closed (they are sculpted closed), gliding a little down as he comes, leaning softly into
-the ride; the ride slows all the way into rest (no overshoot: he never passes his place) and he settles at his
-place under the heading, then breathes and floats there. A moment after the heading he wakes ('wake'): coco-sage.glb's
+The take: he floats down on his swirl cloud (build_ride_cloud.py) from above the top of the window, seated in
+meditation with his eyes closed (they are sculpted closed). The cloud's underside shows within a few tenths of a
+second (no empty sky), he sinks gently with one slow sway from side to side, leaning softly into it and tipping
+back a touch while he sinks, and the descent slows all the way into rest (no overshoot: he never sinks below his
+place) and he settles at his place under the heading, then breathes and floats there. A moment after the heading he wakes ('wake'): coco-sage.glb's
 own 'awaken' (coco_sage_life.py), layered by the site on his breathing: he slowly opens his eyes, looks at the visitor
 ('gaze'), closes them again ('eyesClose') and bows his head in honour ('bow'); the glow comes the beat's length later
 than it did before.
-  - The ride and the glide are smooth functions of time (zero velocity, acceleration and jerk at both ends: he
-    starts from rest well off screen and comes to rest exactly at his place). The lean follows his speed and the
-    small tip back follows his glide down, so both fade out with the motion.
+  - The descent and the sway are smooth functions of time (zero velocity and acceleration at both ends: he
+    starts from rest just above the window and comes to rest exactly at his place). The lean follows his sway and
+    the small tip back follows his sinking, so both fade out with the motion.
   - It is carried by the root bone (pose_at's root channels, as his 'float' loop is), so everything moves
     as one: his cloud seat, the leg swirls, the held cloud, the sun and bolt, the swirl by his hat, and on the site
     the ride cloud, which follows that bone.
@@ -73,16 +74,17 @@ FPS = 60
 CLIP = "invite"
 
 # The take (seconds, metres, degrees). Blender axes: +X his left (the viewer's right), +Z up.
-ARRIVE_S = 9.0          # the ride: from rest off screen at stage left to rest at his place
-RIDE = 6.0              # he starts this far to his right (the visitor's left): off screen at every window shape up
-                        # to 16:9 (with his ride cloud: its leading edge reaches 0.9 m past his middle); a wider one
-                        # starts him under the site's short fade-in
-GLIDE = 0.18            # ... and this far above his place: he glides gently down onto it as he comes
-GLIDE_POWER = 1.4       # (lift = GLIDE * remaining ** GLIDE_POWER: the glide down fades out a little sooner)
-RAMP = 0.15             # share of the take spent gathering speed (well off screen)
-TAIL = 2.5              # the speed fades as (1 - u) ** TAIL: a long, soft slowing into rest (zero jerk at the end)
-LEAN_DEG = 2.0          # lean into the ride at its fastest
-TIP_DEG = 0.6           # tip back while he glides down, at his fastest (it fades with his speed)
+ARRIVE_S = 4.5          # the descent: from rest just above the window to rest at his place
+DROP = 3.9              # he starts this far above his place: the bottom of his ride cloud just above the top of
+                        # the window on a laptop (1280x800) and a phone (390x844), so it shows within ~0.3 s; on a
+                        # taller stage he is further up (a little later), on a squat one the site fades him in
+SWAY = 0.10             # one slow sway from side to side as he sinks (sin(2 pi * remaining): the first half while
+                        # he comes in, the second, to his left, as he settles), fading out with the descent
+RAMP = 0.12             # share of the take spent gathering speed (0.54 s: it starts above the window)
+TAIL = 2.0              # the speed fades as (1 - u) ** TAIL: a long, soft slowing into rest (zero velocity and
+                        # acceleration at the end: C2 into 'breathe')
+LEAN_DEG = 1.5          # lean into the sway at its fastest
+TIP_DEG = 1.2           # tip back while he sinks, at his fastest (it fades with his speed)
 WELCOME_AFTER = 43      # frames after he arrives: the heading's cue (the same cue as the earlier take)
 WAKE_AFTER = 68         # frames after he arrives: his awakening ('awaken' on coco-sage.glb), a moment after the heading
 GLOW_AFTER = 157        # frames after he arrives: the magic cloud's glow, unless "Come on in" comes first (before the
@@ -112,9 +114,9 @@ def remaining(u):
 
 
 def ride_offsets(t):
-    """sway (m, < 0: towards the visitor's left) and lift (m) at t seconds (arrays welcome)."""
+    """sway (m, > 0: towards his left, the visitor's right) and lift (m) at t seconds (arrays welcome)."""
     r = remaining(np.asarray(t, np.float64) / ARRIVE_S)
-    return -RIDE * r, GLIDE * r ** GLIDE_POWER
+    return SWAY * np.sin(2 * math.pi * r), DROP * r
 
 
 def descent(t):
@@ -123,10 +125,10 @@ def descent(t):
     sway, lift = ride_offsets(t)
     s1, l1 = ride_offsets(t + h)
     s0, l0 = ride_offsets(t - h)
-    vx = (s1 - s0) / (2 * h)                                           # sideways speed (> 0: towards his place)
-    vz = (l1 - l0) / (2 * h)                                           # vertical speed (< 0: gliding down)
-    lean = LEAN_DEG * vx / RIDE_PEAK_SPEED                            # leans into the ride (as 'float' does)
-    tip = -TIP_DEG * (-vz) / GLIDE_PEAK_SPEED                          # tips back a touch while he glides down
+    vx = (s1 - s0) / (2 * h)                                           # sideways speed (> 0: towards his left)
+    vz = (l1 - l0) / (2 * h)                                           # vertical speed (< 0: sinking)
+    lean = LEAN_DEG * vx / SWAY_PEAK_SPEED                            # leans into the sway (as 'float' does)
+    tip = -TIP_DEG * (-vz) / DROP_PEAK_SPEED                           # tips back a touch while he sinks
     if t <= 0 or t >= ARRIVE_S:
         lean, tip = 0.0, 0.0
     return float(lift), float(sway), float(lean), float(tip)
@@ -138,15 +140,16 @@ def _peaks():
     return float(np.abs(np.gradient(sw, t)).max()), float(np.abs(np.gradient(z, t)).max())
 
 
-RIDE_PEAK_SPEED, GLIDE_PEAK_SPEED = _peaks()
+SWAY_PEAK_SPEED, DROP_PEAK_SPEED = _peaks()
 
 
 def ride_speed(frames):
-    """His travel speed at master frames (0..1 of his fastest): his ride cloud trails and streams with it."""
+    """His sinking speed at master frames (0..1 of his fastest): his ride cloud's curls billow up and its wisp
+    streams with it."""
     t = np.asarray(frames, np.float64) / FPS
     h = 1e-3
-    v = (ride_offsets(t + h)[0] - ride_offsets(t - h)[0]) / (2 * h)
-    return np.clip(np.abs(v) / RIDE_PEAK_SPEED, 0.0, 1.0) * ((t > 0) & (t < ARRIVE_S))
+    v = (ride_offsets(t + h)[1] - ride_offsets(t - h)[1]) / (2 * h)
+    return np.clip(np.abs(v) / DROP_PEAK_SPEED, 0.0, 1.0) * ((t > 0) & (t < ARRIVE_S))
 
 
 def channels(f60, N):
@@ -268,7 +271,7 @@ def write_timeline(N, marks):
         "markers": dict(marks),
         "clips": {
             CLIP: {"file": "models/invitation/coco-invite.glb", "startFrame": 0, "endFrame": N,
-                   "note": "his ride in from stage left (the rig alone; it binds to coco-sage.glb by bone name). It ends on "
+                   "note": "his descent from above the window (the rig alone; it binds to coco-sage.glb by bone name). It ends on "
                            "breathe frame 0, pose and velocity, where the site hands over to 'breathe' and 'float'."},
         },
     }
