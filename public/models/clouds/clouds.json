@@ -3,36 +3,78 @@
     "file": "cloud-1.webp",
     "width": 440,
     "height": 262,
-    "kind": "cluster"
+    "kind": "cluster",
+    "anim": {
+      "file": "cloud-1-spin.avif",
+      "width": 360,
+      "height": 214,
+      "fps": 12,
+      "frames": 240
+    }
   },
   {
     "file": "cloud-2.webp",
     "width": 440,
     "height": 288,
-    "kind": "wisp"
+    "kind": "wisp",
+    "anim": {
+      "file": "cloud-2-spin.avif",
+      "width": 360,
+      "height": 236,
+      "fps": 12,
+      "frames": 240
+    }
   },
   {
     "file": "cloud-3.webp",
     "width": 421,
     "height": 440,
-    "kind": "single"
+    "kind": "single",
+    "anim": {
+      "file": "cloud-3-spin.avif",
+      "width": 344,
+      "height": 360,
+      "fps": 12,
+      "frames": 240
+    }
   },
   {
     "file": "cloud-4.webp",
     "width": 440,
     "height": 336,
-    "kind": "wisp"
+    "kind": "wisp",
+    "anim": {
+      "file": "cloud-4-spin.avif",
+      "width": 360,
+      "height": 275,
+      "fps": 12,
+      "frames": 240
+    }
   },
   {
     "file": "cloud-5.webp",
     "width": 440,
     "height": 351,
-    "kind": "cluster"
+    "kind": "cluster",
+    "anim": {
+      "file": "cloud-5-spin.avif",
+      "width": 360,
+      "height": 287,
+      "fps": 12,
+      "frames": 240
+    }
   },
   {
     "file": "cloud-6.webp",
     "width": 440,
     "height": 309,
-    "kind": "cluster"
+    "kind": "cluster",
+    "anim": {
+      "file": "cloud-6-spin.avif",
+      "width": 360,
+      "height": 253,
+      "fps": 12,
+      "frames": 240
+    }
   }
 ]
