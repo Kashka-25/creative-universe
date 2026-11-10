@@ -1,4 +1,4 @@
-// The invitation's 3D take: Adult Coco rides in from stage left on his swirl cloud, meditating with
+// The invitation's 3D take: Adult Coco floats down from above the window on his swirl cloud, meditating with
 // his eyes closed, settles under the heading, and breathes and floats there; the magic cloud then
 // glows from the cloud in his hands, grows and engulfs him, and his ride cloud swells into it and
 // thins away inside it. Every movement is Blender's: his model is home's own (coco-sage.glb), his
@@ -42,7 +42,7 @@ import { applyRideLook, createRootFollow, prepareRide, type RideParts } from '..
 import {
   clipLocalTime, cloudSpan, markersCrossed, takeStartFrame, waitLimitFrame, type ClipSpan, type MarkerName, type Timeline,
 } from './timeline';
-import { TAKE_RUNS, type InvitationState } from './invitationMachine';
+import { JUMP_SECONDS, TAKE_RUNS, type InvitationState } from './invitationMachine';
 import { awakenStart, AWAKEN_RELEASE_SECONDS } from './awaken';
 import { freshPace, HOLD_CLIP, HOLD_FADE_SECONDS, slowsForWait, stepPace } from './pace';
 import { CLOUD_DEPTH_ORDER, CLOUD_ORDER, magicCloudDepthLook, magicCloudLook } from './cloudLook';
@@ -53,8 +53,6 @@ const FOV = 30;
 /** He fills about this much of the stage's height (and never more than this much of its width). */
 const HEIGHT_SHARE = 0.8;
 const WIDTH_SHARE = 0.9;
-/** "Come on in": the eased crossfade from wherever he is to the glow. */
-const JUMP_SECONDS = 0.9;
 /** If the first frame is not fully off-screen at this aspect, the take starts under a short fade. */
 const FADE_IN_SECONDS = 0.6;
 /** A magic cloud with no authored fade (no ctl_fade) still eases in over this long, never pops. */

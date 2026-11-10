@@ -1,14 +1,21 @@
 // Coco's swirl clouds, scattered through the pages' sections: where each one sits, how large, and
 // how it drifts. Pure and seeded by the section (tested in node): the same section laid out the same
 // way always shows its clouds in the same places, visit after visit. The stills are Blender renders
-// listed in public/models/clouds/clouds.json; any that is missing is simply not shown.
+// listed in public/models/clouds/clouds.json; any that is missing is simply not shown. Each may have a
+// spinning loop of the same shape (anim), shown in its place unless the visitor prefers reduced motion.
 //
 // Clouds only ever sit in empty room: SkyClouds measures the section's content (text, headings,
 // images, cards, controls) after layout, and placeClouds keeps each cloud's whole box, across its
 // whole drift, clear of all of it by a little air. Where a section has no room for a cloud at the
 // smallest size, that cloud is simply not shown.
 
-export interface CloudFile { file: string; width: number; height: number; kind?: string }
+/**
+ * A cloud's spinning loop (an animated AVIF rendered from Blender, render_section_clouds.py --loops): its curls
+ * turn about their faces as the ride cloud's do at rest. The same shape as its still, so it fills the same box.
+ */
+export interface CloudAnim { file: string; width: number; height: number; fps?: number; frames?: number }
+
+export interface CloudFile { file: string; width: number; height: number; kind?: string; anim?: CloudAnim }
 
 export interface Rect { left: number; top: number; right: number; bottom: number }
 
@@ -159,12 +166,21 @@ export function placeClouds(
 
 const grow = (r: Rect, by: number): Rect => ({ left: r.left - by, top: r.top - by, right: r.right + by, bottom: r.bottom + by });
 
-/** clouds.json's entries that can be shown (anything else is dropped). */
+const isPicture = (c: unknown): c is { file: string; width: number; height: number } =>
+  !!c && typeof c === 'object' && typeof (c as CloudFile).file === 'string' && (c as CloudFile).file.length > 0
+  && (c as CloudFile).width > 0 && (c as CloudFile).height > 0;
+
+/**
+ * clouds.json's entries that can be shown (anything else is dropped). A loop that is unusable (no file, no size,
+ * or a different shape from its still, which would not fill the still's box) is dropped and the still is kept.
+ */
 export function readCloudList(json: unknown): CloudFile[] {
   if (!Array.isArray(json)) return [];
-  return json.filter((c): c is CloudFile =>
-    !!c && typeof c === 'object' && typeof (c as CloudFile).file === 'string' && (c as CloudFile).file.length > 0
-    && (c as CloudFile).width > 0 && (c as CloudFile).height > 0);
+  return json.filter(isPicture).map((c) => {
+    const { anim, ...still } = c as CloudFile;
+    const same = isPicture(anim) && Math.abs(anim.height / anim.width - still.height / still.width) < 0.02;
+    return same ? { ...still, anim } : still;
+  });
 }
 
 /** A still's path under public/: as listed, or beside clouds.json when it is a bare file name. */

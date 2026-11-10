@@ -36,6 +36,14 @@ describe('riding his cloud: the drift', () => {
     for (let i = 2; i < vs.length; i++) expect(Math.abs(vs[i] - vs[i - 1])).toBeLessThan(RIDE.vmax * 0.11);
   });
 
+  it('eases off from rest and settles with no jolt: his acceleration never jumps (Cassidy: "smoother")', () => {
+    const { vs } = run(from, far, 60, 8);
+    const acc = vs.slice(1).map((v, i) => (v - vs[i]) * 60);
+    // the first frame barely moves him; from there his acceleration changes only a little each frame
+    expect(Math.abs(acc[0])).toBeLessThan(RIDE.vmax * 0.6);
+    for (let i = 1; i < acc.length; i++) expect(Math.abs(acc[i] - acc[i - 1])).toBeLessThan(RIDE.vmax * 0.3);   // (one spring alone: a jump of some 3000 px/s²)
+  });
+
   it('is the same at any frame rate', () => {
     const a = run(from, far, 60, 2).r, b = run(from, far, 30, 2).r, c = run(from, far, 144, 2).r;
     expect(Math.abs(a.x - b.x)).toBeLessThan(0.5);

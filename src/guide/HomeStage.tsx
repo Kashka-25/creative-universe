@@ -51,10 +51,10 @@ import { veil } from '../veil/veil';
 import { attention, listen } from './attention';
 import { createIdleScheduler, DRIFTS, REACTIONS, type IdleScheduler } from './idle';
 import { applyRideLook, createRootFollow, ctlValue, prepareRide, type RideParts } from '../characters/rideCloud';
-import { cornerSpot, EDGE_MARGIN, flightAt, flightBank, flightTimeout, heroMode, heroSpot } from './companion';
+import { CORNER_REST, cornerSpot, EDGE_MARGIN, flightAt, flightBank, flightTimeout, heroMode, heroSpot } from './companion';
 import { cornerFree, createLayoutCache, stopAnchors, type LayoutCache } from './negativeSpace';
-import { aimStep, createAim, createRider, followStep, moveKind, overlapArea, placeRider, RIDE as RIDING, sweep, type Rider } from './ride';
-import { createStopHold, holdStop, restSpot, stopFor, tourOn, type StopName } from './tour';
+import { aimStep, createAim, createRider, followStep, moveKind, overlapArea, placeRider, RIDE as RIDING, shiftRider, sweep, type Rider } from './ride';
+import { createStopHold, holdStop, isHome, restSpot, stopFor, tourOn, type StopName } from './tour';
 import { findSpace, pathClear, ROAM, spaceSizes, spotBox, stillClear, SWAY, visibleShare, type Spot } from './space';
 import { ADULT_URL, RIDE_CLOUD_URL } from './paths';
 
@@ -375,8 +375,19 @@ function Adult({ arriving, away, onReady }: AdultProps) {
     /** Seated on his ride cloud his framed box is this much taller than his own. */
     const rideGrow = r ? shapeH(tmp.box.copy(frame).union(r.box)) / shapeH(frame) : 1;
     /** His corner peek (window px), riding or not. */
+    // (his corner rest, home included: he and his magic cloud wholly in view, Cassidy 10 Nov 2026)
     const cornerAt = (side: 'right' | 'left', riding = P.riding) =>
-      cornerSpot(vwC, vhC, riding ? companionAspect : aspect, side, riding ? rideGrow : 1);
+      cornerSpot(vwC, vhC, riding ? companionAspect : aspect, side, riding ? rideGrow : 1, CORNER_REST.show);
+    /** A place framed on him alone, framed on him and his cloud: he stays exactly where he is. */
+    const toRiding = (sp: Spot): Spot => {
+      if (!r) return sp;
+      const U = tmp.box2.copy(frame).union(r.box);
+      const h = sp.h * (shapeH(U) / shapeH(frame));
+      const sc = h / shapeH(U);
+      frame.getCenter(tmp.cB);
+      U.getCenter(tmp.cU);
+      return { cx: sp.cx - (tmp.cB.x - tmp.cU.x) * sc, cy: sp.cy + (tmp.cB.y - tmp.cU.y) * sc, h };
+    };
     /** Ends any flight; the ride cloud idles. */
     const endFlight = () => {
       P.flight = null;
@@ -444,11 +455,12 @@ function Adult({ arriving, away, onReady }: AdultProps) {
 
     // ── the home journey on a laptop or desktop (tour.ts): one Coco, the hero's own ──
     const tourHere = tourOn(page, vw0) && !P.away;
-    if (tourHere && readySent.current && Number.isNaN(P.rideWanted)) { P.rideWanted = wall; loadRide(); }
+    // his ride cloud is under him everywhere he is drawn (Cassidy, 10 Nov 2026): fetched once he is ready
+    if (!P.away && readySent.current && Number.isNaN(P.rideWanted)) { P.rideWanted = wall; loadRide(); }
     let tourAt: Spot | null = null;
     if (P.mode === 'tour' && !(tourHere && rideOk)) {
       // leaving the journey (another page, a narrow window): he carries on riding from where he is
-      if (P.rider && P.tourFrame === 'win') { P.rider.y += sy; P.rider.vy += P.vs; }
+      if (P.rider && P.tourFrame === 'win') shiftRider(P.rider, sy, P.vs);
       P.tourFrame = 'doc';
       P.mode = 'companion';
       P.corner = null;
@@ -461,15 +473,6 @@ function Adult({ arriving, away, onReady }: AdultProps) {
       const dt1 = Math.max(dt, 1e-3);
       if (!Number.isNaN(P.lastSy)) P.vs += ((sy - P.lastSy) / dt1 - P.vs) * (1 - Math.exp(-dt1 * 12));
       P.lastSy = sy;
-      /** A place framed on him alone, framed on him and his cloud: he stays exactly where he is. */
-      const toRiding = (sp: Spot): Spot => {
-        const U = tmp.box2.copy(frame).union(r.box);
-        const h = sp.h * (shapeH(U) / shapeH(frame));
-        const sc = h / shapeH(U);
-        frame.getCenter(tmp.cB);
-        U.getCenter(tmp.cU);
-        return { cx: sp.cx - (tmp.cB.x - tmp.cU.x) * sc, cy: sp.cy + (tmp.cB.y - tmp.cU.y) * sc, h };
-      };
       if (P.mode !== 'tour') {
         // the journey starts where he is (in the hero, or riding, or peeking) or, unseen, at his first stop
         if (P.flight) endFlight();
@@ -522,7 +525,7 @@ function Adult({ arriving, away, onReady }: AdultProps) {
       }
       // his drift moves between the page and the window without a jump in place or speed
       if (frameWanted !== P.tourFrame && P.rider) {
-        if (frameWanted === 'win') { P.rider.y -= sy; P.rider.vy -= P.vs; } else { P.rider.y += sy; P.rider.vy += P.vs; }
+        if (frameWanted === 'win') shiftRider(P.rider, -sy, -P.vs); else shiftRider(P.rider, sy, P.vs);
         P.tourFrame = frameWanted;
       }
       const rider = P.rider!;
@@ -539,23 +542,25 @@ function Adult({ arriving, away, onReady }: AdultProps) {
       if (P.tourFrame === 'doc') {
         const off = rider.h * 0.6;
         const wy = rider.y - sy;
-        if (wy < -off) { rider.y = sy - off; rider.vy = Math.max(rider.vy, 0); }
-        else if (wy > vh0 + off) { rider.y = sy + vh0 + off; rider.vy = Math.min(rider.vy, 0); }
+        if (wy < -off) { shiftRider(rider, sy - off - rider.y); rider.vy = Math.max(rider.vy, 0); rider.gvy = Math.max(rider.gvy, 0); }
+        else if (wy > vh0 + off) { shiftRider(rider, sy + vh0 + off - rider.y); rider.vy = Math.min(rider.vy, 0); rider.gvy = Math.min(rider.gvy, 0); }
       }
       followStep(rider, target, dt);
       tourAt = P.tourFrame === 'doc' ? win({ cx: rider.x, cy: rider.y, h: rider.h }) : { cx: rider.x, cy: rider.y, h: rider.h };
       P.bank = (rider.bank * Math.PI) / 180;
-      // his cloud: none at rest in the hero, there in flight and at every other stop (eased)
-      const atHero = stop === 'hero' && Math.hypot(rider.x - target.cx, rider.y - target.cy) < target.h * 0.03 && Math.abs(rider.h - target.h) < target.h * 0.03;
-      P.cushion += ((atHero ? 0 : 1) - P.cushion) * (1 - Math.exp(-dt * 3));
+      // his cloud: under him at every stop, the hero's included (eased in if it was not)
+      P.cushion += (1 - P.cushion) * (1 - Math.exp(-dt * 3));
     } else if (wantHero && hero) {
+      // the hero's Coco sits on his ride cloud too, once it is here (it eases in under him)
       if (P.mode !== 'hero') {
         // back to the hero: the companion (if shown) fades out quietly first, then the hero's Coco fades in
         if (P.flight) endFlight();
         if (P.init && P.shown && P.seen && !gone()) { if (P.fade === 1) fade(0); }
-        else { P.mode = 'hero'; P.riding = false; P.rider = null; P.corner = null; appearAt(doc(hero)); }
+        else { P.mode = 'hero'; P.riding = rideOk; P.cushion = rideOk ? 1 : 0; P.rider = null; P.corner = null; appearAt(doc(P.riding ? toRiding(hero) : hero)); }
       } else {
-        P.spot = doc(hero);
+        if (rideOk && !P.riding) { P.riding = true; P.cushion = 0; r?.player.play(REST); }
+        P.cushion += ((P.riding ? 1 : 0) - P.cushion) * (1 - Math.exp(-dt * 3));
+        P.spot = doc(P.riding ? toRiding(hero) : hero);
         if (!P.shown) appearAt(P.spot);
       }
     } else if (!P.away) {
@@ -599,7 +604,9 @@ function Adult({ arriving, away, onReady }: AdultProps) {
         // view (it stays in view longest); otherwise the nearest to him
         const ahead = Math.abs(P.vs) > 40 ? (P.vs > 0 ? m.view.bottom - (m.view.bottom - m.view.top) * 0.2 : m.view.top + (m.view.bottom - m.view.top) * 0.2) : null;
         const nearPt = here && P.shown && !P.corner ? { cx: here.cx, cy: ahead ?? here.cy } : ahead !== null ? { cx: vw0 / 2, cy: ahead } : null;
-        const best = findSpace(m.view, swept, opts, { near: nearPt });
+        // away from home he rests in the bottom-right corner (Cassidy, 10 Nov 2026): no other space
+        const cornerOnly = !isHome(page);
+        const best = cornerOnly ? null : findSpace(m.view, swept, opts, { near: nearPt });
         const sides: ('right' | 'left')[] = P.corner === 'left' ? ['left', 'right'] : ['right', 'left'];
         const freeCorner = () => {
           for (const side of sides) { const c = cornerAt(side, riding); if (cornerFree(c, a)) return { spot: c, side }; }
@@ -651,6 +658,16 @@ function Adult({ arriving, away, onReady }: AdultProps) {
             if (Number.isNaN(P.openSince)) P.openSince = wall;
             if (wall - P.openSince >= OPEN_S) { P.openSince = NaN; hideQuietly(); }
           } else P.openSince = NaN;
+        } else if (here && cornerOnly) {
+          // riding in from home: on his cloud to the corner (a fade under reduced motion, or with no clear corner)
+          const c = freeCorner();
+          if (c && r && riding && !reduced) {
+            P.flight = { from: here, to: c.spot, t: 0, wall0: wall, corner: c.side };
+            P.rider = null;
+            P.spot = null;
+            r.player.play(FLY, { loop: false, time: 0 });
+            r.player.refresh();
+          } else hideQuietly();
         } else if (here) {
           // riding: keep his aim while it is clear and in view, or take a clearly better one; a way
           // across content means waiting where he is (if that is clear) or a quick hop
@@ -747,11 +764,11 @@ function Adult({ arriving, away, onReady }: AdultProps) {
 
     // his ride cloud: on his root bone, Blender's glow; shown while he rides it
     if (r) {
-      r.gltf.scene.visible = P.riding && r.warm && P.seen && (P.mode === 'companion' || (P.mode === 'tour' && P.cushion > 0.01));
+      r.gltf.scene.visible = P.riding && r.warm && P.seen && (P.mode === 'companion' || P.cushion > 0.01);
       if (r.gltf.scene.visible || P.flight) {
         r.player.update(dt);
         r.follow.follow();
-        applyRideLook(r.parts, P.mode === 'tour' ? P.cushion : 1);
+        applyRideLook(r.parts, P.mode === 'companion' ? 1 : P.cushion);
       }
     }
 

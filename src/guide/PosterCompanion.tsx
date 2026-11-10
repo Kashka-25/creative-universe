@@ -12,9 +12,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { asset } from '../content';
 import { prefersReducedMotion } from '../intro/capability';
-import { cornerSpot, createDwell, dwelled, heroMode, heroSpot, STILL_S, touch } from './companion';
+import { CORNER_REST, cornerSpot, createDwell, dwelled, heroMode, heroSpot, STILL_S, touch } from './companion';
 import { cornerFree, lookAround, measurePage, stopAnchors, wayClear } from './negativeSpace';
-import { restSpot, stopFor, tourOn, type StopName } from './tour';
+import { isHome, restSpot, stopFor, tourOn, type StopName } from './tour';
 
 /** On the home journey his still is as small as the riding Coco (HomeStage COMPANION_SCALE). */
 const TOUR_SCALE = 0.65;
@@ -68,7 +68,10 @@ export function PosterCompanion({ away }: { away: boolean }) {
       // the home journey on a laptop or desktop (tour.ts): his still appears at each stop, with a fade
       const tour = tourOn(window.location.hash, W);
       let tourNext: Spot | null | undefined;
-      if (tour) {
+      // away from home he rests in the bottom-right corner (Cassidy, 10 Nov 2026)
+      const cornerOnly = !isHome(window.location.hash);
+      if (cornerOnly) tourNext = null;
+      else if (tour) {
         const m = measurePage(W, H);
         tourStop = stopFor(tourStop, heroShare, stopAnchors(), m.view);
         hero = tourStop === 'hero';
@@ -98,7 +101,7 @@ export function PosterCompanion({ away }: { away: boolean }) {
       let peek: Spot | null = null;
       if (!next) {
         for (const c of (side === 'left' ? ['left', 'right'] : ['right', 'left']) as ('right' | 'left')[]) {
-          const at = cornerSpot(document.documentElement.clientWidth || W, H, aspect, c);
+          const at = cornerSpot(document.documentElement.clientWidth || W, H, aspect, c, 1, CORNER_REST.show);
           if (cornerFree(at, aspect)) { nextSide = c; peek = at; break; }
         }
       }

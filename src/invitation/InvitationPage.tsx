@@ -1,6 +1,6 @@
 // The invitation: its own page (#/invitation), outside the portfolio's Layout.
 //
-// Adult Coco's Blender take plays once: he rides in from stage left on his swirl cloud, meditating, settles and breathes;
+// Adult Coco's Blender take plays once: he floats down from above the window on his swirl cloud, meditating, settles and breathes;
 // then the magic cloud glows from the cloud in his hands, engulfs him and carries the visitor home
 // under the cloud veil, where he sits meditating. "Come on in" is always there: during the take it
 // jumps straight to the glow, so the transformation and the trip home start at once. Escape goes home at once. The realms stay one click away in the header, and the
@@ -25,7 +25,7 @@ import { forcedIntro, invitationStart } from './entry';
 import { IllustratedInvitation } from './IllustratedInvitation';
 import { takePosterFocus } from './InvitationPoster';
 import {
-  createInvitationMachine, createNarrator, HEADING_MARKERS, invitationVisual, NARRATION, TAKE_RUNS, type InvitationEvent, type InvitationState,
+  createInvitationMachine, createNarrator, HEADING_MARKERS, headingWaitAfterJump, invitationVisual, NARRATION, TAKE_RUNS, type InvitationEvent, type InvitationState,
   type Visual,
 } from './invitationMachine';
 import { createHeaderWatch, createWaitWatch, usingHeader } from './headerHold';
@@ -64,6 +64,10 @@ function Invitation({ mode }: { mode: 'full' | 'lite' }) {
   const location = useLocation();
   const [state, setState] = useState<InvitationState>('boot');
   const [marker, setMarker] = useState<MarkerName | null>(null);
+  /** The last marker the clock passed (for the machine's subscriber, which outlives renders). */
+  const markerRef = useRef<MarkerName | null>(null);
+  /** The heading waits while a "Come on in" eases him down from his descent (headingWaitAfterJump). */
+  const [headingHeld, setHeadingHeld] = useState(false);
   const [narration, setNarration] = useState('');
   const [timeline, setTimeline] = useState<Timeline | null>(null);
   const [jump, setJump] = useState(0);
@@ -144,6 +148,7 @@ function Invitation({ mode }: { mode: 'full' | 'lite' }) {
     machine.current = m;
     scheduler.current = sched;
     let prefetched = false;
+    let heldTimer: ReturnType<typeof setTimeout> | undefined;
 
     const unsub = m.subscribe((s, t) => {
       setState(s);
@@ -166,6 +171,13 @@ function Invitation({ mode }: { mode: 'full' | 'lite' }) {
       // glow, so the take and the machine stay together
       if (s === 'transforming' && (t?.event.type === 'COME_IN' || t?.event.type === 'after')) {
         narrator.current?.skip();      // lines held back for the beats it leaves behind are never spoken late
+        // during his descent he is still up where the heading sits: it waits until he is down
+        const wait = headingWaitAfterJump(timelineRef.current, markerRef.current);
+        if (wait > 0) {
+          setHeadingHeld(true);
+          clearTimeout(heldTimer);
+          heldTimer = setTimeout(() => setHeadingHeld(false), wait * 1000);
+        }
         setJump((j) => j + 1);
       }
       // the trip waits for the visitor: a line held back to be spoken with the trip is spoken now,
@@ -206,6 +218,7 @@ function Invitation({ mode }: { mode: 'full' | 'lite' }) {
     m.send({ type: mode === 'full' ? 'START' : 'LITE' });
     return () => {
       unsub();
+      clearTimeout(heldTimer);
       m.stop();
       machine.current = null;
       scheduler.current = null;
@@ -294,6 +307,7 @@ function Invitation({ mode }: { mode: 'full' | 'lite' }) {
     // trip home is announced by the veil instead (the page goes inert under it).
     // Beats Blender puts close together are spoken as one line (see createNarrator).
     const line = narrator.current?.(name) ?? null;
+    markerRef.current = name;
     startTransition(() => {
       setMarker(name);
       if (line) setNarration(line);
@@ -312,9 +326,9 @@ function Invitation({ mode }: { mode: 'full' | 'lite' }) {
   shown.current = visual;
   const illustrated = visual === 'illustrated';
   // by frame: Blender decides the order of the beats
-  const headingShown = illustrated
-    || (marker !== null && timeline !== null && (timeline.markers[marker] ?? -Infinity) >= firstFrameOf(timeline, HEADING_MARKERS))
-    || state === 'transforming' || state === 'waiting' || state === 'carrying' || state === 'done';
+  const headingShown = illustrated || (!headingHeld && (
+    (marker !== null && timeline !== null && (timeline.markers[marker] ?? -Infinity) >= firstFrameOf(timeline, HEADING_MARKERS))
+    || state === 'transforming' || state === 'waiting' || state === 'carrying' || state === 'done'));
 
   return (
     <div className={`invitation is-${state}`}>

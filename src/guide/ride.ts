@@ -5,9 +5,13 @@
 // - He is held in the WINDOW (he travels with the visitor), drifting towards his aim: the best empty
 //   space on the screen now (space.ts findSpace), recomputed a few times a second from the cached
 //   layout (negativeSpace.ts createLayoutCache).
-// - The drift is a critically damped spring (no overshoot), its pull limited so his speed never passes
-//   RIDE.vmax: the spring follows a point at most `reach` px from him (chasing it, his speed eases up
-//   to vmax and never past it), so the limit is reached and left smoothly (no kink in his speed). Sub-stepped, so it is the same at any frame rate.
+// - The drift is two critically damped springs in a row (Cassidy, 10 Nov 2026: "smoother and
+//   responsive"). An unseen guide chases his aim, its pull limited so its speed never passes RIDE.vmax
+//   (it follows a point at most `reach` px from it, so the limit is reached and left smoothly); he
+//   follows the guide closely with a stiffer spring. Neither overshoots, so he never does, and his speed
+//   never passes the guide's; but his acceleration is now continuous too: he eases off from rest with
+//   no jolt and settles with none (one spring alone jumps to full pull the moment his aim changes).
+//   Sub-stepped, so it is the same at any frame rate.
 // - He banks gently into his way of travel (a spring towards a lean proportional to his speed).
 // - Hysteresis (aimStep): he keeps his aim while it stays clear and in view; a clearly larger space
 //   must hold a while before he goes for it, so he never dithers between two spots.
@@ -20,10 +24,12 @@ import { springStep } from './glide';
 import type { Rect, Spot } from './space';
 
 export const RIDE = {
-  /** The drift's stiffness (rad/s): a soft, floating settle of about 1.5 s. */
-  omega: 3.2,
+  /** The guide's stiffness (rad/s): a soft, floating settle of about 1.3 s ... */
+  omega: 4,
+  /** ... and how closely he follows the guide (rad/s; his lag behind it is about 2 / followOmega s). */
+  followOmega: 9,
   /** His fastest drift (px/s). */
-  vmax: 520,
+  vmax: 600,
   /** His lean at full speed (degrees), and how quickly the lean follows (rad/s). */
   bankDeg: 4,
   bankOmega: 5,
@@ -44,15 +50,27 @@ export const RIDE = {
 export interface Rider {
   x: number; y: number; h: number;
   vx: number; vy: number; vh: number;
+  /** The unseen guide he follows (where it is, and its speed). */
+  gx: number; gy: number; gh: number;
+  gvx: number; gvy: number; gvh: number;
   /** His lean (degrees, + towards the right) and its speed. */
   bank: number; vbank: number;
 }
 
-export const createRider = (s: Spot): Rider => ({ x: s.cx, y: s.cy, h: s.h, vx: 0, vy: 0, vh: 0, bank: 0, vbank: 0 });
+export const createRider = (s: Spot): Rider => ({
+  x: s.cx, y: s.cy, h: s.h, vx: 0, vy: 0, vh: 0, gx: s.cx, gy: s.cy, gh: s.h, gvx: 0, gvy: 0, gvh: 0, bank: 0, vbank: 0,
+});
 
 /** Puts him at `s` at rest (a fade-in, the end of his entrance). */
 export function placeRider(r: Rider, s: Spot) {
-  r.x = s.cx; r.y = s.cy; r.h = s.h; r.vx = 0; r.vy = 0; r.vh = 0;
+  r.x = r.gx = s.cx; r.y = r.gy = s.cy; r.h = r.gh = s.h;
+  r.vx = r.vy = r.vh = r.gvx = r.gvy = r.gvh = 0;
+}
+
+/** Moves him and his guide together by `dy` px, their speeds by `dvy` (a change of frame: page and window). */
+export function shiftRider(r: Rider, dy: number, dvy = 0) {
+  r.y += dy; r.gy += dy;
+  r.vy += dvy; r.gvy += dvy;
 }
 
 /** One frame of his drift towards `aim` (window px), `dt` seconds long. */
@@ -64,13 +82,17 @@ export function followStep(r: Rider, aim: Spot, dt: number, o = RIDE) {
   while (left > 1e-9) {
     const h = Math.min(left, o.maxStep);
     left -= h;
-    // the point the spring follows: his aim, or at most `reach` px towards it
-    const dx = aim.cx - r.x, dy = aim.cy - r.y;
+    // the guide: towards his aim, following a point at most `reach` px towards it
+    const dx = aim.cx - r.gx, dy = aim.cy - r.gy;
     const d = Math.hypot(dx, dy);
     const k = d > reach ? reach / d : 1;
-    [r.x, r.vx] = springStep(r.x, r.vx, r.x + dx * k, o.omega, h);
-    [r.y, r.vy] = springStep(r.y, r.vy, r.y + dy * k, o.omega, h);
-    [r.h, r.vh] = springStep(r.h, r.vh, aim.h, o.omega, h);
+    [r.gx, r.gvx] = springStep(r.gx, r.gvx, r.gx + dx * k, o.omega, h);
+    [r.gy, r.gvy] = springStep(r.gy, r.gvy, r.gy + dy * k, o.omega, h);
+    [r.gh, r.gvh] = springStep(r.gh, r.gvh, aim.h, o.omega, h);
+    // he follows the guide
+    [r.x, r.vx] = springStep(r.x, r.vx, r.gx, o.followOmega, h);
+    [r.y, r.vy] = springStep(r.y, r.vy, r.gy, o.followOmega, h);
+    [r.h, r.vh] = springStep(r.h, r.vh, r.gh, o.followOmega, h);
     const lean = Math.max(-1, Math.min(1, r.vx / o.vmax)) * o.bankDeg;
     [r.bank, r.vbank] = springStep(r.bank, r.vbank, lean, o.bankOmega, h);
   }

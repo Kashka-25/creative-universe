@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
-  controlInCorner, cornerBox, cornerSpot, createDwell, dwelled, DWELL_S, EDGE_MARGIN, PEEK, flightAt, flightBank, flightTimeout, HERO, heroMode, heroSpot, planMove, touch,
+  controlInCorner, CORNER_REST, cornerBox, cornerSpot, createDwell, dwelled, DWELL_S, EDGE_MARGIN, PEEK, flightAt, flightBank, flightTimeout, HERO, heroMode, heroSpot, planMove, touch,
   type PlanInput,
 } from '../src/guide/companion';
 import { companionOn, type Rect, type Spot } from '../src/guide/space';
@@ -149,6 +149,12 @@ describe('keep him with me: the corner peek when no space fits him', () => {
     const left = cornerSpot(768, 1024, 0.75, 'left');
     expect(left.cx - (left.h * 0.75) / 2).toBeGreaterThanOrEqual(0);
     expect(cornerSpot(390, 844, 0.75, 'right', 1.2).h).toBeCloseTo(118 * 1.2);   // room for his ride cloud
+    // his corner rest away from home: the same size, but he and his cloud sit (almost) wholly in view
+    const rest = cornerSpot(390, 844, 0.75, 'right', 1.3, CORNER_REST.show);
+    const peek = cornerSpot(390, 844, 0.75, 'right', 1.3);
+    expect(rest.h).toBe(peek.h);
+    expect(rest.cy).toBeLessThan(peek.cy);
+    expect(rest.cy + rest.h / 2).toBeLessThanOrEqual(844 + rest.h * 0.05);
   });
 
   it("keeps clear of a control under the corner (a keyboard-focused or fixed one), never of the page's own focus targets", () => {

@@ -165,6 +165,23 @@ export const NARRATION: Partial<Record<MarkerName, string>> = {
 /** The heading fades in a moment after he has settled in front of the visitor. */
 export const HEADING_MARKERS: MarkerName[] = ['welcome'];
 
+/** "Come on in": the stage's eased crossfade from wherever he is to the glow (InvitationStage). */
+export const JUMP_SECONDS = 0.9;
+
+/**
+ * How long the heading waits after "Come on in" (seconds). He floats down from above the window,
+ * so a click during his descent finds him up where the heading sits: the heading then waits for
+ * the crossfade that eases him down to his place, so it never comes in over him. Once he has
+ * arrived (or with no timeline) it comes at once. `marker` is the last marker the clock passed.
+ */
+export function headingWaitAfterJump(t: Timeline | null, marker: MarkerName | null): number {
+  if (!t) return 0;
+  const arrive = t.markers.arrive ?? t.clips.invite?.endFrame;
+  if (arrive === undefined) return 0;
+  const at = marker === null ? -Infinity : t.markers[marker] ?? -Infinity;
+  return at < arrive ? JUMP_SECONDS : 0;
+}
+
 /**
  * Beats closer together than this (authored time) are spoken as one line: a polite live region
  * cannot speak two lines a fraction of a second apart (one is dropped, or spoken late).

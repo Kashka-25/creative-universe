@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { createStopHold, holdStop, restSpot, stopFor, TOUR, tourOn, type Anchor } from '../src/guide/tour';
+import { createStopHold, holdStop, isHome, restSpot, stopFor, TOUR, tourOn, type Anchor } from '../src/guide/tour';
 import { spotBox, type Rect } from '../src/guide/space';
 
 const view: Rect = { left: 0, top: 64, right: 1280, bottom: 800 };
@@ -114,7 +114,8 @@ describe('the home journey: one Coco, and reduced motion', () => {
     const home = readFileSync(new URL('../src/guide/HomeStage.tsx', import.meta.url), 'utf8');
     expect(home).toMatch(/const tourHere = tourOn\(page, vw0\) && !P\.away;/);
     expect(home).toMatch(/if \(stop === 'hero' && hero\) target = doc\(toRiding\(hero\)\);/);
-    expect(home).toMatch(/P\.cushion \+= \(\(atHero \? 0 : 1\) - P\.cushion\)/);
+    // his cloud is under him at every stop, the hero's included (Cassidy, 10 Nov 2026)
+    expect(home).toContain('P.cushion += (1 - P.cushion)');
     const pages = readFileSync(new URL('../src/portfolio/pages.tsx', import.meta.url), 'utf8');
     for (const n of ['realms', 'works', 'bottom']) expect(pages).toMatch(new RegExp(`data-coco-stop="${n}"`));
   });
@@ -125,5 +126,12 @@ describe('the home journey: one Coco, and reduced motion', () => {
     expect(poster).toMatch(/hero = tourStop === 'hero';/);
     expect(poster).toMatch(/if \(!dwelled\(dwell, now \/ 1000, STILL_S\)\) return;/);
     expect(poster).toMatch(/if \(!was \|\| still \|\|/);
+  });
+});
+
+describe('home (Cassidy, 10 Nov 2026: he flies across home; on every other page he rests in the corner)', () => {
+  it('knows home from every other page', () => {
+    for (const h of ['', '#', '#/', '/']) expect(isHome(h)).toBe(true);
+    for (const h of ['#/realm/music', '#/work/you', '#/about', '#/invitation']) expect(isHome(h)).toBe(false);
   });
 });

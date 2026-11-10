@@ -16,7 +16,7 @@ import {
 } from '../src/invitation/headerHold';
 import { freshPace, guardStep, slowsForWait, stepPace, WAIT_PACE, type PaceState } from '../src/invitation/pace';
 import { CLOUD_DEPTH_ORDER, CLOUD_ORDER, magicCloudDepthLook, magicCloudLook } from '../src/invitation/cloudLook';
-import { HEADING_MARKERS } from '../src/invitation/invitationMachine';
+import { HEADING_MARKERS, headingWaitAfterJump, JUMP_SECONDS } from '../src/invitation/invitationMachine';
 import { createPausableScheduler } from '../src/intro/machine';
 import { fakeClock } from './helpers/fakeClock';
 
@@ -155,7 +155,14 @@ describe('the timeline from Blender', () => {
     expect(raw).not.toHaveProperty('young');
     expect(t.clips.invite.file).toBe('models/invitation/coco-invite.glb');
     for (const clip of Object.values(t.clips)) expect(existsSync(new URL(`../public/${clip.file}`, import.meta.url)), clip.file).toBe(true);
-    // the heading comes in on the same cue as before: 43 frames after he arrives
+    // a short entrance: he floats down from above the window and is at his place within 5 s
+    // (Cassidy, 10 Nov 2026: the empty opening was too long), and the heading comes in on the same
+    // cue as before: 43 frames after he arrives
+    expect(t.markers.floatIn).toBe(0);
+    expect(t.clips.invite.startFrame).toBe(0);
+    expect(t.markers.arrive! / t.fps).toBeGreaterThanOrEqual(4);
+    expect(t.markers.arrive! / t.fps).toBeLessThanOrEqual(5);
+    expect(t.clips.invite.endFrame).toBe(t.markers.arrive);
     expect(t.markers.welcome! - t.markers.arrive!).toBe(43);
     // he is fully hidden while the veil covers the screen
     const cloud = raw.cloud as { hiddenFrom: number; hiddenTo: number };
@@ -207,6 +214,23 @@ describe('the timeline from Blender', () => {
     expect(firstFrameOf(TL, HEADING_MARKERS)).toBe(160);
     const neither = parseTimeline({ fps: 60, markers: { glow: 280, luminous: 400 } })!;
     expect(firstFrameOf(neither, HEADING_MARKERS)).toBe(280);                                          // else with the glow
+  });
+
+  it('"Come on in" during his descent: the heading waits for the crossfade that brings him down to his place', () => {
+    // he floats down from above the window, so before 'arrive' he is still up where the heading sits
+    expect(headingWaitAfterJump(TL, null)).toBe(JUMP_SECONDS);                      // before the first marker
+    expect(headingWaitAfterJump(TL, 'floatIn')).toBe(JUMP_SECONDS);                 // on his way down
+    expect(headingWaitAfterJump(TL, 'arrive')).toBe(0);                             // at his place: at once
+    expect(headingWaitAfterJump(TL, 'welcome')).toBe(0);
+    expect(headingWaitAfterJump(null, null)).toBe(0);                               // no timeline: nothing to wait for
+    const noArrive = parseTimeline({ fps: 60, markers: { glow: 280, luminous: 400 } })!;
+    expect(headingWaitAfterJump(noArrive, null)).toBe(0);
+    // the page holds the heading back by it; the stage eases him by the same crossfade
+    const page = readFileSync(new URL('../src/invitation/InvitationPage.tsx', import.meta.url), 'utf8');
+    expect(page).toMatch(/headingWaitAfterJump\(timelineRef\.current, markerRef\.current\)/);
+    expect(page).toMatch(/const headingShown = illustrated \|\| \(!headingHeld && /);
+    const stage = readFileSync(new URL('../src/invitation/InvitationStage.tsx', import.meta.url), 'utf8');
+    expect(stage).toMatch(/playAt\(p\.coco, glow, JUMP_SECONDS\)/);
   });
 
   it('starts the magic cloud at the glow when the timeline does not place it (never at the first frame)', () => {

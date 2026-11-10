@@ -43,8 +43,10 @@ export const TOUR = {
   bottomGrow: 1 / 0.65,
 };
 
+/** Home (the world page), by the address's hash. */
+export const isHome = (path: string) => path === '' || path === '/' || path === '#/' || path === '#';
 /** The tour runs on home at laptop and desktop widths. */
-export const tourOn = (path: string, width: number) => (path === '' || path === '/' || path === '#/' || path === '#') && width >= TOUR.minWidth;
+export const tourOn = (path: string, width: number) => isHome(path) && width >= TOUR.minWidth;
 
 /**
  * The stop for what is in view now: the hero while its Coco's place is in view (the hero's own

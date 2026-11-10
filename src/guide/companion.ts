@@ -118,16 +118,18 @@ export function planMove(i: PlanInput): Plan {
 
 /** The share of his framed box shown above the window's bottom edge as he peeks from the corner. */
 export const PEEK = { show: 0.62, edge: 6 };
+/** His corner rest on every page, home included (Cassidy, 10 Nov 2026): he and his cloud almost wholly in view. */
+export const CORNER_REST = { show: 0.96 };
 
 /**
  * His place peeking from a bottom corner of a `W` x `H` window (px): smaller on a phone, a little
  * larger on a tablet or laptop, as before ("Keep him with me"); `grow` makes room for his ride cloud
  * (his framed box is that much taller, the cloud mostly below the edge).
  */
-export function cornerSpot(W: number, H: number, aspect: number, side: 'right' | 'left' = 'right', grow = 1): Spot {
+export function cornerSpot(W: number, H: number, aspect: number, side: 'right' | 'left' = 'right', grow = 1, show = PEEK.show): Spot {
   const h = (W < 700 ? Math.min(118, H * 0.16) : Math.min(150, H * 0.19)) * grow;
   const hw = (h * aspect) / 2;
-  return { cx: side === 'right' ? W - hw - PEEK.edge : hw + PEEK.edge, cy: H - h * PEEK.show + h / 2, h };
+  return { cx: side === 'right' ? W - hw - PEEK.edge : hw + PEEK.edge, cy: H - h * show + h / 2, h };
 }
 
 /** The part of the window his corner peek covers (px). */

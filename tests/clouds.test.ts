@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { cloudEnvelope, cloudPath, cloudSizes, hashSeed, overlaps, placeClouds, readCloudList, type Rect } from '../src/portfolio/cloudPlacement';
 
@@ -109,8 +109,31 @@ describe("Coco's swirl clouds in the sections", () => {
     expect(readCloudList({ file: 'x' })).toEqual([]);
     expect(readCloudList([{ file: 'cloud-1.webp', width: 800, height: 500, kind: 'swirl' }, { file: '', width: 1, height: 1 }, { width: 2 }]))
       .toEqual([{ file: 'cloud-1.webp', width: 800, height: 500, kind: 'swirl' }]);
+    // a loop of the same shape is kept; one without a file or size, or of another shape, is dropped (the still stays)
+    const anim = { file: 'cloud-1-spin.avif', width: 300, height: 188, fps: 12, frames: 240 };
+    expect(readCloudList([{ file: 'cloud-1.webp', width: 800, height: 500, anim }])).toEqual([{ file: 'cloud-1.webp', width: 800, height: 500, anim }]);
+    for (const bad of [{ width: 300, height: 188 }, { file: '', width: 300, height: 188 }, { file: 'x.webp', width: 0, height: 1 }, { file: 'x.webp', width: 300, height: 300 }, 'x.webp', null]) {
+      expect(readCloudList([{ file: 'cloud-1.webp', width: 800, height: 500, anim: bad }])).toEqual([{ file: 'cloud-1.webp', width: 800, height: 500 }]);
+    }
     expect(cloudPath('cloud-2.webp')).toBe('models/clouds/cloud-2.webp');
     expect(cloudPath('/models/clouds/cloud-2.webp')).toBe('models/clouds/cloud-2.webp');
+  });
+
+  it('each spin in a light, seamless loop of the same shape as its still', () => {
+    const dir = new URL('../public/models/clouds/', import.meta.url);
+    const list = readCloudList(JSON.parse(readFileSync(new URL('clouds.json', dir), 'utf8')));
+    expect(list.length).toBe(6);
+    for (const c of list) {
+      expect(c.anim, c.file).toBeDefined();
+      const a = c.anim!;
+      expect(Math.abs(a.height / a.width - c.height / c.width)).toBeLessThan(0.01);
+      expect(a.file).toMatch(/\.avif$/);
+      const head = readFileSync(new URL(a.file, dir), 'utf8').slice(4, 12);   // the box header is plain ASCII
+      expect(head).toBe('ftypavis');                                        // an AVIF image sequence
+      expect(statSync(new URL(a.file, dir)).size).toBeLessThanOrEqual(300 * 1024);
+      expect(a.fps).toBeGreaterThanOrEqual(10);
+      expect(a.frames! / a.fps!).toBeCloseTo(20, 5);                      // one turn of each curl, as the ride cloud's rest
+    }
   });
 
   it('are decorative backdrops: hidden from assistive technology, lazy, behind the content, no clicks, still under reduced motion', () => {
@@ -119,7 +142,10 @@ describe("Coco's swirl clouds in the sections", () => {
     expect(tsx).toMatch(/alt=""/);
     expect(tsx).toMatch(/loading="lazy"/);
     expect(tsx).toMatch(/decoding="async"/);
-    expect(tsx).toMatch(/onError=\{\(\) => setState\('missing'\)\}/);
+    // a loop that will not load falls back to the still; a still that will not load: no cloud
+    expect(tsx).toMatch(/onError=\{\(\) => \(still \? setState\('missing'\) : setStill\(true\)\)\}/);
+    // the loop only where motion is welcome: under reduced motion the browser shows the still
+    expect(tsx).toMatch(/<source[^>]*media="\(prefers-reduced-motion: no-preference\)"[^>]*srcSet=\{asset\(cloudPath\(file\.anim\.file\)\)\}/);
     // placed from the section's measured content, again whenever the section or the window changes size
     expect(tsx).toMatch(/new ResizeObserver\(place\)/);
     expect(tsx).toMatch(/addEventListener\('resize', place\)/);
@@ -131,3 +157,8 @@ describe("Coco's swirl clouds in the sections", () => {
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{\s*\.sky-cloud \{ animation: none; \}/);
   });
 });
+
+// (tests/types/node-fs.d.ts declares the Node APIs the tests share; this one only the loops' size check uses)
+declare module 'node:fs' {
+  export function statSync(path: string | URL): { size: number };
+}

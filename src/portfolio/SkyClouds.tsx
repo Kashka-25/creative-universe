@@ -1,8 +1,9 @@
 // A few of Coco's swirl clouds drifting behind a section. Purely decorative: hidden from assistive
 // technology, never taking a click, drawn behind the section's content, and still under reduced
-// motion. Coco treats each cloud as content, over the whole of its drift (negativeSpace.ts cloudRect):
-// he never rides over one. No list, or a still that will not load:
-// nothing is shown.
+// motion. Where motion is welcome, each spins its curls as the ride cloud's turn at rest (a looping
+// AVIF rendered in Blender; its still where the loop cannot show). Coco treats each cloud as content,
+// over the whole of its drift (negativeSpace.ts cloudRect): he never rides over one. No list, or a
+// still that will not load: nothing is shown.
 //
 // They sit only in the section's empty room (its margins, out into the window's side gutters, and
 // the gaps between its blocks): once the section is laid out, its content is measured and
@@ -119,10 +120,19 @@ export function SkyClouds({ seed, count = 2 }: { seed: string; count?: number })
   );
 }
 
+/** The visitor has asked to save data: the stills only. */
+const saveData = () => (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+
+/**
+ * One cloud: its spinning loop (its curls turning about their faces, as the ride cloud's do at rest), or its
+ * still under reduced motion (the browser picks it by the source's media query, and swaps if the setting
+ * changes), when saving data, or when the loop will not load.
+ */
 function Cloud({ file, style }: { file: CloudFile; style: CSSProperties }) {
   const [state, setState] = useState<'loading' | 'loaded' | 'missing'>('loading');
+  const [still, setStill] = useState(() => !file.anim || saveData());
   if (state === 'missing') return null;
-  return (
+  const img = (
     <img
       className={`sky-cloud${state === 'loaded' ? ' is-loaded' : ''}`}
       src={asset(cloudPath(file.file))}
@@ -133,7 +143,20 @@ function Cloud({ file, style }: { file: CloudFile; style: CSSProperties }) {
       decoding="async"
       style={style}
       onLoad={() => setState('loaded')}
-      onError={() => setState('missing')}
+      onError={() => (still ? setState('missing') : setStill(true))}
     />
+  );
+  if (still || !file.anim) return img;
+  return (
+    <picture>
+      <source
+        type="image/avif"
+        media="(prefers-reduced-motion: no-preference)"
+        srcSet={asset(cloudPath(file.anim.file))}
+        width={file.anim.width}
+        height={file.anim.height}
+      />
+      {img}
+    </picture>
   );
 }
