@@ -8,6 +8,7 @@
   "category": "Invitation website",
   "description": "Cassidy's invitation website for their first concert: “An evening of heart-channelled music.”",
   "portfolioDescription": "“My invitation website to my first concert,” in Cassidy's words. YOU (Your Own Universe) presents “A Living Eulogy with Cassidy”: “An evening of music, reflection & presence.”",
+  "cover": "media/my-living-youlogy.webp",
   "action": {
     "kind": "visit",
     "url": "https://kashka-25.github.io/living-youlogy/"

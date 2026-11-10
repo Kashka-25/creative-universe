@@ -13,6 +13,7 @@
     "The map is also shown inside Kronk, the community's social platform.",
     "About this demo: the people, projects and ideas in it are made up. You are the admin, so you can approve ideas, decide who runs what, and watch how a project space would run. Nothing you do leaves your browser, and Reset starts it again."
   ],
+  "cover": "media/freethedream.webp",
   "action": { "kind": "demo", "url": "demos/freethedream/" },
   "preview": {
     "images": [
