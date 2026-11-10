@@ -15,6 +15,7 @@
   ],
   "role": "Contributor. Cassidy built the Booth tidy (#2127, merged 13 Oct 2026); live sets and listening tools (#2339, merged 23 Oct 2026: My sets, saves, kinds, sort, play next, Remind me, Shoutouts, First listens and a live banner); and the FreeTheDream korner, the map inside Kronk (#1988 and #2010, merged Oct 2026). More Booth work is in progress.",
   "credits": "Kronk is run by Tal.",
+  "cover": "media/kronk.webp",
   "action": {
     "kind": "tour",
     "url": "demos/kronk/"

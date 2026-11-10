@@ -341,7 +341,7 @@
       },
       "realm": "ventures",
       "cover": {
-        "src": "content/covers/intothelighthouse.868c7c0a.webp",
+        "src": "content/covers/intothelighthouse.aa5f7828.webp",
         "width": 1600,
         "height": 900
       }
@@ -453,6 +453,11 @@
             "height": 544
           }
         ]
+      },
+      "cover": {
+        "src": "content/covers/freethedream.7128b676.webp",
+        "width": 1600,
+        "height": 900
       }
     },
     {
@@ -510,6 +515,11 @@
             "height": 506
           }
         ]
+      },
+      "cover": {
+        "src": "content/covers/kronk.a86fd806.webp",
+        "width": 1600,
+        "height": 900
       }
     },
     {
@@ -548,6 +558,11 @@
             "height": 1055
           }
         ]
+      },
+      "cover": {
+        "src": "content/covers/my-living-youlogy.fe776061.webp",
+        "width": 1600,
+        "height": 900
       }
     },
     {
@@ -557,7 +572,12 @@
       "source": "works/wachuneed.json",
       "title": "Wachuneed",
       "category": "Collaboration",
-      "description": "Kronk's marketplace, where members offer and ask for art, stuff and services from each other. Kronk handles no payment: buyer and seller agree that between them."
+      "description": "Kronk's marketplace, where members offer and ask for art, stuff and services from each other. Kronk handles no payment: buyer and seller agree that between them.",
+      "cover": {
+        "src": "content/covers/wachuneed.dc5a324b.webp",
+        "width": 1600,
+        "height": 900
+      }
     }
   ]
 }
