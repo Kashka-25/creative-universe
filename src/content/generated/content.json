@@ -14,16 +14,20 @@
       "lead": "Artwork by the wonderful",
       "label": "@starzillaa_",
       "href": "https://www.instagram.com/starzillaa_/",
-      "note": "Animated by Cassidy Rae"
+      "note": "Animated by Cassidy Rae:",
+      "noteLink": {
+        "label": "@_FreeTheDream_",
+        "href": "https://www.instagram.com/_freethedream_/"
+      }
     },
     "contact": [
       {
-        "label": "Email",
-        "href": "mailto:YourOwnUniverse.life@gmail.com"
+        "label": "Email: yourownuniverse.life@gmail.com",
+        "href": "mailto:yourownuniverse.life@gmail.com"
       },
       {
-        "label": "Instagram",
-        "href": "https://www.instagram.com/freethedream/"
+        "label": "Instagram: @_FreeTheDream_",
+        "href": "https://www.instagram.com/_freethedream_/"
       }
     ]
   },

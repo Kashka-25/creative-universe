@@ -23,7 +23,7 @@ The full proposal is at https://claude.ai/artifact/Bz16tnjtbRq71HYoFKsvVc (secti
 - **YOUrigin is the source of updates.** A planned YOUrigin feature links a Project to its destination here, keeps change notes on it, and publishes a snapshot this site reads at build time.
 - **Open demos (decided 9 Nov 2026):** demos of YOU and YOUrigin are open to anyone, with no entry key. They use example data in the visitor's browser and never touch real user data.
 - **Hosting:** GitHub Pages for now. Netlify once Cassidy has a domain.
-- **Contact:** YourOwnUniverse.life@gmail.com · Instagram FreeTheDream.
+- **Contact:** yourownuniverse.life@gmail.com · Instagram @_FreeTheDream_ (instagram.com/_freethedream_, confirmed by Cassidy 10 Nov 2026).
 
 ## The other projects (all in `C:\Users\cassi\Projects`)
 

@@ -328,7 +328,11 @@ describe('content pipeline', () => {
   });
 
   it('credits the artist of Coco’s portrait on About (Cassidy, 10 Nov 2026)', () => {
-    expect(generated.about.portraitCredit).toEqual({ lead: 'Artwork by the wonderful', label: '@starzillaa_', href: 'https://www.instagram.com/starzillaa_/', note: 'Animated by Cassidy Rae' });
+    expect(generated.about.portraitCredit).toEqual({ lead: 'Artwork by the wonderful', label: '@starzillaa_', href: 'https://www.instagram.com/starzillaa_/', note: 'Animated by Cassidy Rae:', noteLink: { label: '@_FreeTheDream_', href: 'https://www.instagram.com/_freethedream_/' } });
+    expect(generated.about.contact).toEqual([
+      { label: 'Email: yourownuniverse.life@gmail.com', href: 'mailto:yourownuniverse.life@gmail.com' },
+      { label: 'Instagram: @_FreeTheDream_', href: 'https://www.instagram.com/_freethedream_/' },
+    ]);
   });
 });
 
