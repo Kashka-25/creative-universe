@@ -257,7 +257,16 @@ export function AboutPage() {
                 <a href={about.portraitCredit.href} target="_blank" rel="noopener noreferrer">
                   {about.portraitCredit.label}<span className="visually-hidden"> on Instagram (opens in a new tab)</span>
                 </a>
-                {about.portraitCredit.note && <><br />{about.portraitCredit.note}</>}
+                {about.portraitCredit.note && (
+                  <>
+                    <br />{about.portraitCredit.note}
+                    {about.portraitCredit.noteLink && (
+                      <>{' '}<a href={about.portraitCredit.noteLink.href} target="_blank" rel="noopener noreferrer">
+                        {about.portraitCredit.noteLink.label}<span className="visually-hidden"> on Instagram (opens in a new tab)</span>
+                      </a></>
+                    )}
+                  </>
+                )}
               </figcaption>
             )}
           </figure>
