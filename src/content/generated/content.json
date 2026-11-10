@@ -187,9 +187,9 @@
       "title": "Wandering",
       "category": "Travel & connection",
       "colour": "sky",
-      "status": "Not yet released",
-      "description": "A modern explorer's atlas for documenting adventures, planning journeys, preserving memories and discovering where friends are.",
-      "portfolioDescription": "A modern explorer's atlas. Wandering keeps a private map of where you've been, where you dream of going and the journeys you're planning, alongside a separate map of friends who choose to share where they are, so it's easier to meet in real life.",
+      "status": "Waiting to be published",
+      "description": "A modern explorer's atlas: a private map of your travels and plans, and an easy way to meet up with friends when you choose.",
+      "portfolioDescription": "Wandering is a modern explorer's atlas. It keeps a private map of where you've been, where you dream of going and the journeys you're planning: places, Moments with photos, expeditions, routes that follow the curve of the Earth, and journeys recorded as you walk, ride or drive, even with the screen off. Social Wandering sits alongside it, only when you choose: find friends, share where you are with the people you pick for as long as you pick, and post Stories that end on their own.\n\nPrivacy is enforced on the server, not just hidden in the app, and proven by 400 automated privacy checks. Location sharing keeps only where you are now, never a history. Version 2 is complete and runs as a standalone Android app; it's waiting on its final name and domain before it goes to Google Play.",
       "action": {
         "kind": "demo",
         "url": "demos/wandering/"
@@ -225,6 +225,24 @@
             "alt": "A place card: Visits and Moments with Check in and New Moment buttons, and a History of the place moving from Wishlist to Planned to In progress.",
             "width": 540,
             "height": 1170
+          },
+          {
+            "src": "content/previews/wandering3-social-map.webp",
+            "alt": "Social map of Lisbon with two friends sharing their location, one live and one approximate",
+            "width": 515,
+            "height": 1115
+          },
+          {
+            "src": "content/previews/wandering3-story.webp",
+            "alt": "A friend's Story with private reactions and reply",
+            "width": 824,
+            "height": 1784
+          },
+          {
+            "src": "content/previews/wandering3-share-location.webp",
+            "alt": "Share my location: who can see you, for how long, and how precisely",
+            "width": 824,
+            "height": 1784
           }
         ],
         "clip": {
