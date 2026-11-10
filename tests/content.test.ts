@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 // @ts-expect-error plain JS module shared with the build script
-import { slugify, parseDataUri, imageSize, worksFromStarter, placeWorks } from '../scripts/lib/content-core.mjs';
+import { slugify, parseDataUri, imageSize, worksFromStarter, placeWorks, siteDemoFile } from '../scripts/lib/content-core.mjs';
 // @ts-expect-error plain JS module shared with the CLI
 import { validateGuide, sanitizeName } from '../scripts/lib/guide-validate.mjs';
 
@@ -30,11 +30,284 @@ describe('content pipeline', () => {
     }
   });
 
+  it('lists a work in other realms too with "alsoIn", and refuses unknown realms', () => {
+    const realmIds = ['digital', 'music', 'art'];
+    const w = [{ title: 'Two Homes', slug: 'two-homes', realm: 'digital', alsoIn: ['music', 'digital', 'music'] }];
+    expect(placeWorks(w, {}, realmIds)).toEqual([]);
+    expect(w[0].alsoIn).toEqual(['music']);
+    const same = [{ title: 'One Home', slug: 'one-home', realm: 'digital', alsoIn: ['digital'] }];
+    expect(placeWorks(same, {}, realmIds)).toEqual([]);
+    expect(same[0]).not.toHaveProperty('alsoIn');
+    const bad = [{ title: 'Lost', slug: 'lost', realm: 'digital', alsoIn: ['about'] }];
+    expect(placeWorks(bad, {}, realmIds)[0]).toMatch(/unknown realm/);
+  });
+
+  it('the generated content lists Kronk in Digital and in Music', () => {
+    const kronk = generated.works.find((x: { slug: string }) => x.slug === 'kronk');
+    expect(kronk.realm).toBe('digital');
+    expect(kronk.alsoIn).toEqual(['music']);
+    expect(kronk.category).toBe('Collaboration');
+  });
+
   it('places every starter work in a realm and refuses to guess', () => {
     const works = worksFromStarter(pack);
     expect(placeWorks(works, placement, ['digital', 'ventures', 'music', 'books', 'art'])).toEqual([]);
     const orphan = [{ title: 'Mystery', slug: 'mystery', collection: 'Unknown shelf' }];
     expect(placeWorks(orphan, placement, ['digital'])[0]).toMatch(/no realm/);
+  });
+
+  describe("YOUrigin's export: optional realm, slug and change notes", () => {
+    const quiet = () => {};
+    const exported = (extra: Record<string, unknown>[], top: Record<string, unknown> = {}) => ({
+      format: 'yourigin-starter-portfolio',
+      key: 'test-v1',
+      source: 'yourigin',
+      exportedAt: '2026-11-09T10:00:00.000Z',
+      ...top,
+      sections: [{ heading: 'Apps', projects: [
+        { title: 'First One', description: 'One.', ...extra[0] },
+        { title: 'Second One', description: 'Two.', ...extra[1] },
+      ] }],
+    });
+    const collect = () => { const msgs: string[] = []; return { msgs, warn: (m: string) => msgs.push(m) }; };
+
+    it('a pack without them imports exactly as before, with no warnings', () => {
+      const { msgs, warn } = collect();
+      const inPublic = (rel: string) => existsSync(new URL(`../public/${rel}`, import.meta.url));
+      const plain = worksFromStarter(pack, warn, inPublic);
+      expect(msgs).toEqual([]);
+      for (const w of plain) {
+        expect(w).not.toHaveProperty('realm');
+        expect(w).not.toHaveProperty('changes');
+        expect(w.slug).toBe(slugify(w.title));
+      }
+      // Adding the top-level export markers changes nothing.
+      expect(worksFromStarter({ ...pack, source: 'yourigin', exportedAt: '2026-11-09T10:00:00.000Z' }, warn, inPublic)).toEqual(plain);
+      expect(msgs).toEqual([]);
+    });
+
+    it('takes a valid realm, and placeWorks prefers it over the section', () => {
+      const works = worksFromStarter(exported([{ realm: 'music' }, {}]), quiet);
+      expect(works[0].realm).toBe('music');
+      expect(works[1]).not.toHaveProperty('realm');
+      expect(placeWorks(works, { bySection: { Apps: 'digital' } }, ['digital', 'music'])).toEqual([]);
+      expect(works.map((w: { realm: string }) => w.realm)).toEqual(['music', 'digital']);
+    });
+
+    it('ignores an unknown realm with a warning and places by section', () => {
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([{ realm: 'about' }, { realm: 42 }]), warn);
+      expect(works[0]).not.toHaveProperty('realm');
+      expect(works[1]).not.toHaveProperty('realm');
+      expect(msgs).toHaveLength(2);
+      expect(msgs[0]).toMatch(/First One.*realm "about"/);
+      placeWorks(works, { bySection: { Apps: 'digital' } }, ['digital']);
+      expect(works[0].realm).toBe('digital');
+    });
+
+    it('takes a valid slug override', () => {
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([{ slug: 'the-first' }, { slug: 'second-one' }]), warn);
+      expect(works.map((w: { slug: string }) => w.slug)).toEqual(['the-first', 'second-one']);
+      expect(msgs).toEqual([]);
+    });
+
+    it('ignores a badly formed or colliding slug with a warning', () => {
+      for (const bad of ['First One', 'first--one', '-first', 'Ünïcode', '', 7]) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ slug: bad }, {}]), warn);
+        expect(works[0].slug).toBe('first-one');
+        expect(msgs).toHaveLength(1);
+      }
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([{ slug: 'second-one' }, {}]), warn);
+      expect(works.map((w: { slug: string }) => w.slug)).toEqual(['first-one', 'second-one']);
+      expect(msgs[0]).toMatch(/already used by "Second One"/);
+    });
+
+    it('keeps valid change notes verbatim, newest first', () => {
+      const changes = [
+        { date: '2026-10-01', text: 'Older note.' },
+        { date: '2026-11-08', text: '  New home page, with *stars*.  ' },
+        { date: '2026-11-08', text: 'Same day, second.' },
+      ];
+      const works = worksFromStarter(exported([{ changes }, {}]), quiet);
+      expect(works[0].changes).toEqual([
+        { date: '2026-11-08', text: '  New home page, with *stars*.  ' },
+        { date: '2026-11-08', text: 'Same day, second.' },
+        { date: '2026-10-01', text: 'Older note.' },
+      ]);
+      expect(works[1]).not.toHaveProperty('changes');
+    });
+
+    it('drops invalid change notes with a warning', () => {
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([{ changes: [
+        { date: '2026-11-08', text: 'Kept.', extra: 'not copied' },
+        { date: '8 Nov 2026', text: 'Bad date.' },
+        { date: '2026-02-30', text: 'No such day.' },
+        { date: '2026-11-07', text: '   ' },
+        { date: '2026-11-07' },
+        null,
+      ] }, { changes: [{ date: 'soon', text: 'x' }] }]), warn);
+      expect(works[0].changes).toEqual([{ date: '2026-11-08', text: 'Kept.' }]);
+      expect(works[1]).not.toHaveProperty('changes');
+      expect(msgs).toHaveLength(2);
+      expect(msgs[0]).toMatch(/ignored 5 change note/);
+
+      const notList = worksFromStarter(exported([{ changes: 'yesterday' }, {}]), warn);
+      expect(notList[0]).not.toHaveProperty('changes');
+    });
+
+    // Clearly fake addresses only: real project links are supplied by each project.
+    it('takes each kind of action', () => {
+      for (const kind of ['visit', 'demo', 'vision']) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ action: { kind, url: 'https://example.test/app/', extra: 'dropped' } }, {}]), warn);
+        expect(works[0].action).toEqual({ kind, url: 'https://example.test/app/' });
+        expect(works[1]).not.toHaveProperty('action');
+        expect(msgs).toEqual([]);
+      }
+    });
+
+    it('a work with no action gets no button data', () => {
+      const plain = worksFromStarter(exported([{ link: 'https://example.test/' }, {}]), quiet);
+      for (const w of plain) {
+        expect(w).not.toHaveProperty('action');
+        expect(w).not.toHaveProperty('preview');
+      }
+    });
+
+    it('rejects unknown kinds and non-http(s) URLs with a warning', () => {
+      const bad = [
+        { kind: 'buy', url: 'https://example.test/' },
+        { kind: 'Visit', url: 'https://example.test/' },
+        { kind: 'visit', url: 'javascript:alert(1)' },
+        { kind: 'demo', url: 'ftp://example.test/file' },
+        { kind: 'vision', url: '/work/local-page' },
+        { kind: 'visit', url: 'https://' },
+        { kind: 'visit' },
+        'https://example.test/',
+      ];
+      for (const action of bad) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ action }, {}]), warn);
+        expect(works[0]).not.toHaveProperty('action');
+        expect(msgs).toHaveLength(1);
+      }
+    });
+
+    it('takes a site-hosted demo under demos/ only when its file is in public/', () => {
+      const files = new Set(['demos/fake-demo/index.html', 'demos/fake-demo/other.html']);
+      const exists = (rel: string) => files.has(rel);
+      expect(siteDemoFile('demos/fake-demo/')).toBe('demos/fake-demo/index.html');
+      expect(siteDemoFile('demos/fake-demo/other.html')).toBe('demos/fake-demo/other.html');
+      for (const url of ['demos/fake-demo/', 'demos/fake-demo/other.html']) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ action: { kind: 'demo', url } }, {}]), warn, exists);
+        expect(works[0].action).toEqual({ kind: 'demo', url });
+        expect(msgs).toEqual([]);
+      }
+      const refused = [
+        'demos/missing-demo/', // no file in public/
+        'demos/fake-demo', // a directory needs its trailing slash
+        '/demos/fake-demo/',
+        './demos/fake-demo/',
+        'demos/../secrets/',
+        'demos/fake-demo/../../x.html',
+        'demos/fake-demo/.hidden',
+        'demos/Fake Demo/',
+        'demos/fake-demo/?q=1',
+        'content/previews/fake.webp',
+      ];
+      for (const url of refused) {
+        const { msgs, warn } = collect();
+        const works = worksFromStarter(exported([{ action: { kind: 'demo', url } }, {}]), warn, exists);
+        expect(works[0], url).not.toHaveProperty('action');
+        expect(msgs).toHaveLength(1);
+      }
+      // Without a way to check public/, a site demo is refused rather than trusted.
+      expect(worksFromStarter(exported([{ action: { kind: 'demo', url: 'demos/fake-demo/' } }, {}]), quiet)[0]).not.toHaveProperty('action');
+    });
+
+    it('takes the tour and idea kinds, including site-hosted pages', () => {
+      const exists = (rel: string) => rel === 'demos/fake-tour/index.html';
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([
+        { action: { kind: 'tour', url: 'demos/fake-tour/' } },
+        { action: { kind: 'idea', url: 'https://example.test/idea/' } },
+      ]), warn, exists);
+      expect(works.map((w: { action: unknown }) => w.action)).toEqual([
+        { kind: 'tour', url: 'demos/fake-tour/' },
+        { kind: 'idea', url: 'https://example.test/idea/' },
+      ]);
+      expect(msgs).toEqual([]);
+    });
+
+    it('takes a short status label as written, and refuses long or multi-line ones', () => {
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([{ status: 'In construction' }, { status: 'building' }]), warn);
+      expect(works.map((w: { status: string }) => w.status)).toEqual(['In construction', 'building']);
+      expect(msgs).toEqual([]);
+      for (const status of ['x'.repeat(33), 'Two\nlines', 42, '   ']) {
+        const c = collect();
+        const [w] = worksFromStarter(exported([{ status }, {}]), c.warn);
+        expect(w).not.toHaveProperty('status');
+        expect(c.msgs).toHaveLength(1);
+      }
+    });
+
+    it('takes an invite only as mailto: to Cassidy\'s public address', () => {
+      const ok = worksFromStarter(exported([{ invite: 'mailto:YourOwnUniverse.life@gmail.com' }, {}]), quiet);
+      expect(ok[0].invite).toBe('mailto:YourOwnUniverse.life@gmail.com');
+      expect(ok[1]).not.toHaveProperty('invite');
+      for (const invite of ['mailto:someone@example.test', 'https://example.test/', 'YourOwnUniverse.life@gmail.com', 'mailto:YourOwnUniverse.life@gmail.com?bcc=x@example.test', true]) {
+        const c = collect();
+        const [w] = worksFromStarter(exported([{ invite }, {}]), c.warn);
+        expect(w, String(invite)).not.toHaveProperty('invite');
+        expect(c.msgs).toHaveLength(1);
+      }
+    });
+
+    it('takes a preview gallery with and without a clip', () => {
+      const images = [
+        { src: 'content/previews/fake-1.webp', alt: 'Fake home screen' },
+        { src: '/content/previews/fake-2.webp', alt: 'Fake settings' },
+        { src: 'https://example.test/shot.png', alt: 'Fake web shot' },
+      ];
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([
+        { preview: { images } },
+        { preview: { images: images.slice(0, 1), clip: { src: 'content/previews/fake.mp4', poster: 'content/previews/fake-poster.webp' } } },
+      ]), warn);
+      expect(msgs).toEqual([]);
+      expect(works[0].preview).toEqual({ images: [
+        { src: 'content/previews/fake-1.webp', alt: 'Fake home screen' },
+        { src: 'content/previews/fake-2.webp', alt: 'Fake settings' },
+        { src: 'https://example.test/shot.png', alt: 'Fake web shot' },
+      ] });
+      expect(works[0].preview).not.toHaveProperty('clip');
+      expect(works[1].preview.clip).toEqual({ src: 'content/previews/fake.mp4', poster: 'content/previews/fake-poster.webp' });
+    });
+
+    it('keeps preview files under public/ and needs alt text and a poster', () => {
+      const { msgs, warn } = collect();
+      const works = worksFromStarter(exported([
+        { preview: { images: [
+          { src: '../secrets/shot.webp', alt: 'Escapes public/' },
+          { src: 'C:\\shots\\a.webp', alt: 'Windows path' },
+          { src: 'file:///shots/a.webp', alt: 'File URL' },
+          { src: '//example.test/a.webp', alt: 'Protocol-relative' },
+          { src: 'content/previews/no-alt.webp' },
+          { src: 'content/previews/ok.webp', alt: 'Kept' },
+        ], clip: { src: 'content/previews/fake.mp4' } } },
+        { preview: { images: [{ src: '../x.webp', alt: 'x' }], clip: { src: 'javascript:x', poster: 'p.webp' } } },
+      ]), warn);
+      expect(works[0].preview).toEqual({ images: [{ src: 'content/previews/ok.webp', alt: 'Kept' }] });
+      expect(works[1]).not.toHaveProperty('preview');
+      expect(msgs.some((m) => /ignored 5 preview image/.test(m))).toBe(true);
+      expect(msgs.some((m) => /clip needs/.test(m))).toBe(true);
+    });
   });
 
   it('decodes cover images and reads their size', () => {
@@ -47,7 +320,8 @@ describe('content pipeline', () => {
   it('the generated site content matches the starter pack', () => {
     expect(generated.owner.name).toBe(pack.ownerName);
     expect(generated.owner.intro).toBe(pack.intro);
-    expect(generated.works.map((w: { title: string }) => w.title)).toEqual(
+    const fromPack = generated.works.filter((w: { source: string }) => w.source.startsWith('starter:'));
+    expect(fromPack.map((w: { title: string }) => w.title)).toEqual(
       pack.sections.flatMap((s: { projects: { title: string }[] }) => s.projects.map((p) => p.title)),
     );
     expect(generated.realms.map((r: { id: string }) => r.id)).toEqual(['digital', 'ventures', 'music', 'books', 'art', 'about']);

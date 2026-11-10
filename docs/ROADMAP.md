@@ -13,16 +13,20 @@ The ecosystem audit and architecture proposal are done.
 - [x] The content import reads `../YOUrigin` (works from the Projects folder)
 - [x] Contact links (email, Instagram)
 
-## Phase 3 — Independent project environments (in progress)
+## Phase 3 — Independent project environments ✅ (8 Nov 2026; PRs waiting for review)
 
 - [x] All projects gathered in `C:\Users\cassi\Projects`, with a Desktop shortcut
-- [x] Old copies moved to `_Archive`; worktrees removed; merged branches pruned
+- [x] Old copies moved to `_Archive`; worktrees removed; merged branches pruned; broken package links from the move repaired (Wandering, Kronk-Booth)
 - [x] Example-Empatherapy archived on GitHub; stale Empatherapy PRs #2 and #3 closed
-- [ ] One small PR per repo adding `CLAUDE.md` and `docs/ROADMAP.md`, plus `portfolio.json` for public repos
-- [ ] Rename HOPEIUM to **IntoTheLighthouse (I.T.L)**: site text and wordmark, repo name (the Pages URL changes), Empatherapy draft PR #5, the YOUrigin starter pack
-- [ ] Atlantean Gardens: fix the failing Pages build; decide which prototype (`living-atlas-prototype` v4 or `mvp-nextjs`) the site grows from
-- [ ] Wandering: open the PR for `feat/phase-1-foundation`; restart local Supabase once from the new folder
-- [ ] Fix the YOU starter-pack link, which points to the old vanilla app instead of yourownuniverse.life
+- [x] A `CLAUDE.md` and roadmap for every project, each in a PR: YOUrigin #25, YOU #105 (to `staging`), Wandering #1, IntoTheLighthouse #1, next.empatherapy #1, empatherapy #6, CommYOUnity #31, FreeTheDream #1, Atlantean-Gardens #1
+- [x] HOPEIUM renamed **IntoTheLighthouse**: the repo is now Kashka-25/IntoTheLighthouse and the new site is kashka-25.github.io/IntoTheLighthouse (the old /HOPEIUM link now gives 404); the site text and wordmark change is in PR #1
+- [x] Atlantean Gardens: the "failed" site build was a stale record from January; the fix is in PR #1
+- [x] Wandering: PR #1 opened for Phases 0–2
+- [x] YOUrigin starter pack: YOU now links to yourownuniverse.life, and HOPEIUM is renamed IntoTheLighthouse (local file only; starters are gitignored)
+- [ ] **Your review:** merge the nine PRs above
+- [ ] Decisions waiting for you: a new IntoTheLighthouse tagline (the old acronym line was removed); which Atlantean Gardens prototype to build from; whether to close CommYOUnity issue #2 (all its phases have merged)
+- [ ] `portfolio.json` manifests come in Phase 4, once the registry schema exists
+- [ ] Wandering: restart local Supabase once from the new folder (start Docker first)
 
 ## Phase 4 — Registry and connections
 
@@ -36,7 +40,7 @@ The ecosystem audit and architecture proposal are done.
 - [ ] Routes: `/explore` (map of the universe), `/world/:id` (project destination with an "Enter" link), `/journey` (creative timeline), `/contact`
 - [ ] Companion behaviours: travel between spots, realm gestures, one line per place, click reactions
 - [ ] Blender: install it, sculpt the guide from `blender/README.md`, export, then `npm run check:guide -- --register`
-- [ ] Entry key and demo access to YOU and YOUrigin (blank or example user, never real data); needs its own design pass first
+- [ ] Open demos of YOU and YOUrigin, with no entry key (decided 9 Nov 2026): example data in the visitor's browser, never real user data. Add each one's "Try the demo" action once its demo is live.
 
 ## Phase 6 — Testing
 

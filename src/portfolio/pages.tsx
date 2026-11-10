@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import {
-  about, asset, neighbours, owner, realmById, realms, workBySlug, works, worksIn, type RealmId,
+  about, asset, neighbours, owner, pageAction, realmById, realms, workBySlug, works, worksIn, type RealmId,
 } from '../content';
+import { ActionButton, InviteLine, LiveLink, PreviewGallery } from './actions';
+import { InterestForm } from './InterestForm';
 import { Cover, HeroStage, RealmMedallion, StatusPill, WorkCard, realmCount, realmHref } from './components';
 import { CloudScroll, LeafDivider, Vine } from './ornaments';
 import { SkyClouds } from './SkyClouds';
@@ -151,6 +153,12 @@ function groupByCollection<T extends { collection?: string }>(list: T[]): [strin
   return [...map.entries()];
 }
 
+/** "2026-11-09" -> "9 Nov 2026", read as a calendar day (no time zone shift). */
+function formatDay(day: string) {
+  const d = new Date(`${day}T00:00:00Z`);
+  return Number.isNaN(d.getTime()) ? day : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+
 // ── A single work ──────────────────────────────────────────
 export function WorkPage() {
   const { slug = '' } = useParams();
@@ -201,13 +209,23 @@ export function WorkPage() {
             {work.gallery.map((g) => <img key={g.src} src={asset(g.src)} alt={g.alt} loading="lazy" />)}
           </div>
         )}
-        {work.link && (
-          <p>
-            <a className="button button--primary" href={work.link} target="_blank" rel="noopener noreferrer">
-              Visit {work.title} <span aria-hidden>↗</span><span className="visually-hidden"> (opens in a new tab)</span>
-            </a>
-          </p>
+        <PreviewGallery work={work} preview={work.preview} />
+        {work.changes && work.changes.length > 0 && (
+          <section className="work-page__changes" aria-labelledby="whats-new">
+            <h2 id="whats-new" className="work-page__label">What's new</h2>
+            <ul>
+              {work.changes.map((c, i) => (
+                <li key={`${c.date}-${i}`}><time dateTime={c.date}>{formatDay(c.date)}</time> {c.text}</li>
+              ))}
+            </ul>
+          </section>
         )}
+        <InviteLine invite={work.invite} />
+        {pageAction(work) && (
+          <p><ActionButton work={work} action={pageAction(work)} variant="page" /></p>
+        )}
+        <LiveLink work={work} />
+        <InterestForm project={work.title} />
       </div>
 
       <LeafDivider className="divider" />

@@ -1,0 +1,19 @@
+/* The shared "I'm interested" form on work pages (src/portfolio/InterestForm.tsx). */
+.interest { margin-block: var(--space-4); max-width: var(--measure); }
+.interest__intro, .interest__privacy { color: var(--ink-soft); }
+.interest__privacy { font-size: var(--step--1); }
+.interest__form { display: grid; gap: var(--space-2); }
+.interest__field { display: grid; gap: 0.25rem; }
+.interest__field span { font-weight: 600; }
+.interest__field em { font-weight: 400; font-style: normal; color: var(--ink-soft); }
+.interest__field input,
+.interest__field textarea {
+  font: inherit; color: var(--ink);
+  background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem; width: 100%; box-sizing: border-box;
+}
+.interest__field input[aria-invalid='true'] { border-color: var(--ember-deep); }
+.interest__problem { color: var(--ember-deep); }
+.interest__form .button { justify-self: start; }
+/* the honeypot: off-screen, never shown or announced */
+.interest__trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }

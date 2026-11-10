@@ -8,6 +8,7 @@ import './styles/base.css';
 import './styles/intro.css';
 import './styles/portfolio.css';
 import './styles/invitation.css';
+import './styles/interest.css';
 import { Layout } from './portfolio/Layout';
 import { noteNavigation } from './portfolio/transitions';
 import { AboutPage, NotFound, RealmPage, WorkPage, WorldPage } from './portfolio/pages';
