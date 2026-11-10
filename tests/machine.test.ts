@@ -1,24 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { createMachine, type Scheduler } from '../src/intro/machine';
-import { createIntroMachine } from '../src/intro/introMachine';
-
-/** A scheduler we drive by hand: no real timers in tests. */
-function fakeClock() {
-  let now = 0;
-  const jobs: { at: number; fn: () => void; dead: boolean }[] = [];
-  const schedule: Scheduler = (fn, ms) => {
-    const job = { at: now + ms, fn, dead: false };
-    jobs.push(job);
-    return () => { job.dead = true; };
-  };
-  const advance = (ms: number) => {
-    now += ms;
-    for (const j of [...jobs].sort((a, b) => a.at - b.at)) {
-      if (!j.dead && j.at <= now) { j.dead = true; j.fn(); }
-    }
-  };
-  return { schedule, advance };
-}
+import { createMachine, createPausableScheduler } from '../src/intro/machine';
+import { fakeClock } from './helpers/fakeClock';
 
 describe('createMachine', () => {
   type S = 'a' | 'b' | 'c';
@@ -65,65 +47,79 @@ describe('createMachine', () => {
     m.send({ type: 'GO' });
     expect(seen).toEqual(['a->b']);
   });
+
+  it('tries several guarded targets for one event in order (the first that passes wins)', () => {
+    let busy = false;
+    const m = () => createMachine<S, E>({
+      initial: 'a',
+      states: {
+        a: { on: { GO: [{ target: 'c', guard: () => busy }, { target: 'b' }] } },
+        b: {},
+        c: {},
+      },
+    });
+    const free = m();
+    free.send({ type: 'GO' });
+    expect(free.state).toBe('b');
+    busy = true;
+    const held = m();
+    held.send({ type: 'GO' });
+    expect(held.state).toBe('c');
+    const none = createMachine<S, E>({ initial: 'a', states: { a: { on: { GO: [{ target: 'b', guard: () => false }] } }, b: {}, c: {} } });
+    expect(none.send({ type: 'GO' })).toBe(false);
+  });
+
+  it('decides an after-target when the timer fires, not when the state is entered', () => {
+    const clock = fakeClock();
+    let where: S = 'b';
+    const m = createMachine<S, E>({ initial: 'a', states: { a: { after: { ms: 100, target: () => where } }, b: {}, c: {} } }, clock.schedule);
+    where = 'c';
+    clock.advance(100);
+    expect(m.state).toBe('c');
+  });
 });
 
-describe('intro story', () => {
-  it('plays the whole welcome: wake, acknowledge, beckon, follow, rise, fly, land', () => {
+describe('timers', () => {
+  type S = 'a' | 'b';
+  type E = { type: 'GO' };
+
+  it('reads a lazy "after" each time the state is entered (timings known only at runtime)', () => {
     const clock = fakeClock();
-    const m = createIntroMachine(clock.schedule);
-    m.send({ type: 'FULL' });
-    m.send({ type: 'READY' });
-    expect(m.state).toBe('seated');
-    clock.advance(2400);
-    expect(m.state).toBe('awakening');
-    m.send({ type: 'CLIP_DONE', clip: 'acknowledge' }); // wrong clip: ignored
-    expect(m.state).toBe('awakening');
-    m.send({ type: 'CLIP_DONE', clip: 'wake' });
-    m.send({ type: 'CLIP_DONE', clip: 'acknowledge' });
-    expect(m.state).toBe('beckoning');
-    m.send({ type: 'FOLLOW' });
-    m.send({ type: 'CLIP_DONE', clip: 'rise' });
-    expect(m.state).toBe('flying');
-    m.send({ type: 'PASSED' });
-    expect(m.state).toBe('revealing');
-    m.send({ type: 'LANDED' });
-    expect(m.state).toBe('done');
-    expect(m.history).toEqual(['boot', 'loading', 'seated', 'awakening', 'acknowledging', 'beckoning', 'rising', 'flying', 'revealing', 'done']);
+    let ms = 0;
+    const m = createMachine<S, E>({ initial: 'a', states: { a: { on: { GO: 'b' } }, b: { after: { ms: () => ms, target: 'a' } } } }, clock.schedule);
+    ms = 500;
+    m.send({ type: 'GO' });
+    clock.advance(499);
+    expect(m.state).toBe('b');
+    clock.advance(1);
+    expect(m.state).toBe('a');
   });
 
-  it('never traps a visitor: every beat times out', () => {
+  it('pauses timers with a hidden tab and resumes them where they were', () => {
     const clock = fakeClock();
-    const m = createIntroMachine(clock.schedule);
-    m.send({ type: 'FULL' });
-    m.send({ type: 'READY' });
-    clock.advance(60_000); // no clip ever reports back
-    for (let i = 0; i < 12 && m.state !== 'done'; i++) clock.advance(10_000);
-    expect(m.state).toBe('done');
+    const pausable = createPausableScheduler(clock.schedule, clock.now);
+    let fired = 0;
+    pausable.schedule(() => fired++, 1000);
+    clock.advance(400);
+    pausable.pause();
+    clock.advance(10_000);              // hidden for ten seconds: nothing happens
+    expect(fired).toBe(0);
+    pausable.resume();
+    clock.advance(599);
+    expect(fired).toBe(0);              // 600 ms were left
+    clock.advance(1);
+    expect(fired).toBe(1);
   });
 
-  it('skips from any beat', () => {
-    for (const steps of [0, 1, 2]) {
-      const m = createIntroMachine(fakeClock().schedule);
-      m.send({ type: 'FULL' });
-      if (steps > 0) m.send({ type: 'READY' });
-      if (steps > 1) m.send({ type: 'INTERACT' });
-      m.send({ type: 'SKIP' });
-      expect(m.state).toBe('revealing');
-    }
-  });
-
-  it('falls back to the illustrated welcome when the 3D cannot load', () => {
-    const m = createIntroMachine(fakeClock().schedule);
-    m.send({ type: 'FULL' });
-    m.send({ type: 'LOAD_FAILED' });
-    expect(m.state).toBe('lite');
-    m.send({ type: 'FOLLOW' });
-    expect(m.state).toBe('liteFlight');
-  });
-
-  it('goes straight to the perched guide for returning visitors', () => {
-    const m = createIntroMachine(fakeClock().schedule);
-    m.send({ type: 'PERCH' });
-    expect(m.state).toBe('done');
+  it('cancels a paused timer for good', () => {
+    const clock = fakeClock();
+    const pausable = createPausableScheduler(clock.schedule, clock.now);
+    let fired = 0;
+    const cancel = pausable.schedule(() => fired++, 100);
+    pausable.pause();
+    cancel();
+    pausable.resume();
+    clock.advance(1000);
+    expect(fired).toBe(0);
   });
 });

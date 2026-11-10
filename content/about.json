@@ -1,7 +1,8 @@
 {
-  "$comment": "About & Contact. Name, line and intro come from the starter pack (ownerName, ownerLine, intro). Add contact links here; nothing is shown to visitors until you do. Example link: { \"label\": \"Email\", \"href\": \"mailto:you@example.com\" }",
+  "$comment": "About & Contact. Name, line and intro come from the starter pack (ownerName, ownerLine, intro). The portrait’s artist is credited under it (portraitCredit). Add contact links here; nothing is shown to visitors until you do. Example link: { \"label\": \"Email\", \"href\": \"mailto:you@example.com\" }",
   "portrait": "art/guide.webp",
   "portraitAlt": "Cassidy’s guide: a shaggy chimp in an orange-red beanie and dungarees, eyes closed in meditation, a turquoise third eye on his forehead, gold hoops in his ears, cradling a turquoise cloud, with the sun and a lightning bolt behind him.",
+  "portraitCredit": { "lead": "Artwork by", "label": "@starzillaa_", "href": "https://www.instagram.com/starzillaa_/" },
   "contact": [
     { "label": "Email", "href": "mailto:YourOwnUniverse.life@gmail.com" },
     { "label": "Instagram", "href": "https://www.instagram.com/freethedream/" }

@@ -74,7 +74,9 @@ export interface Work {
 
 export interface Owner { name: string; line: string; intro: string; packTitle: string; packKey: string }
 export interface ContactLink { label: string; href: string }
-export interface About { portrait: string | null; portraitAlt: string; contact: ContactLink[] }
+/** Credit for the portrait's artist, shown under it (Cassidy, 10 Nov 2026). */
+export interface PortraitCredit { lead: string; label: string; href: string }
+export interface About { portrait: string | null; portraitAlt: string; portraitCredit: PortraitCredit | null; contact: ContactLink[] }
 
 const content = data as unknown as { owner: Owner; about: About; realms: Realm[]; works: Work[] };
 

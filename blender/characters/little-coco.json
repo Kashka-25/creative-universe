@@ -1,0 +1,357 @@
+{
+  "$comment": "Little Coco, the young explorer. Landmarks measured on close orthographic views of blender/sculpt/little-coco-open.glb (Blender axes, metres: +X to the viewer's right, -Y towards you, +Z up). His head is tilted about 9 degrees, so every feature has its own position (A = viewer's left, B = right). Painted moods: joyful = his closed-eyed sculpt with the Joyful sheet's grin laid on; surprised = his own open face with the Surprised sheet's 'oh' mouth (outlines traced round the lips, in sheet pixels).",
+  "source": "little-coco-open.glb",
+  "removeBackdrop": {
+    "minY": 0.27
+  },
+  "tris": 90000,
+  "height": 1.9,
+  "face": {
+    "cx": 0.075,
+    "cz": 0.255,
+    "rx": 0.25,
+    "rz": 0.22,
+    "front": -0.12
+  },
+  "headZ": 0.03,
+  "baseZ": -0.62,
+  "joints": {
+    "root": [
+      0.07,
+      0,
+      -0.9
+    ],
+    "hips": [
+      0.07,
+      0,
+      -0.5
+    ],
+    "spine": [
+      0.07,
+      -0.02,
+      -0.34
+    ],
+    "chest": [
+      0.07,
+      -0.06,
+      -0.18
+    ],
+    "neck": [
+      0.07,
+      -0.1,
+      -0.02
+    ],
+    "head": [
+      0.07,
+      -0.1,
+      0.05
+    ],
+    "upperarm_L": [
+      0.32,
+      -0.04,
+      -0.08
+    ],
+    "forearm_L": [
+      0.4,
+      -0.18,
+      -0.38
+    ],
+    "hand_L": [
+      0.2,
+      -0.36,
+      -0.44
+    ],
+    "upperarm_R": [
+      -0.22,
+      -0.04,
+      -0.08
+    ],
+    "forearm_R": [
+      -0.32,
+      -0.18,
+      -0.38
+    ],
+    "hand_R": [
+      -0.06,
+      -0.36,
+      -0.44
+    ]
+  },
+  "closed": {
+    "source": "little-coco-closed.glb",
+    "span": 0.7,
+    "landmarks": {
+      "eyeA": [
+        -0.015,
+        0.46
+      ],
+      "eyeB": [
+        0.265,
+        0.5
+      ],
+      "third": [
+        0.11,
+        0.6175
+      ],
+      "mouth": [
+        0.154,
+        0.374
+      ]
+    }
+  },
+  "moods": {
+    "neutral": {
+      "keys": {}
+    },
+    "curious": {
+      "keys": {
+        "browsUp": 0.8
+      }
+    },
+    "welcoming": {
+      "keys": {
+        "smile": 0.5,
+        "cheekRaise": 0.6,
+        "browsUp": 0.25
+      }
+    },
+    "content": {
+      "keys": {
+        "smile": 0.4,
+        "cheekRaise": 0.6,
+        "squint": 0.3
+      },
+      "paint": "closed"
+    },
+    "joyful": {
+      "keys": {
+        "grin": 0.6,
+        "jawOpen": 0.3,
+        "cheekRaise": 0.8,
+        "squint": 0.6
+      },
+      "paint": {
+        "base": "closed",
+        "erase": {
+          "top": 0.04,
+          "bottom": -0.06,
+          "side": 0.06
+        },
+        "mouth": {
+          "image": "little-coco-sheets.webp",
+          "at": [
+            0,
+            -0.055
+          ],
+          "height": 0.14,
+          "outline": [
+            [
+              367.75,
+              247.75
+            ],
+            [
+              374.25,
+              245.5
+            ],
+            [
+              386.75,
+              244
+            ],
+            [
+              399.25,
+              242.75
+            ],
+            [
+              411.75,
+              241.75
+            ],
+            [
+              424.25,
+              240.5
+            ],
+            [
+              435.5,
+              238.6
+            ],
+            [
+              443,
+              235.75
+            ],
+            [
+              445.1,
+              243
+            ],
+            [
+              443.4,
+              254.9
+            ],
+            [
+              438.4,
+              266.5
+            ],
+            [
+              430.1,
+              274.9
+            ],
+            [
+              418.4,
+              279.6
+            ],
+            [
+              406.75,
+              280.25
+            ],
+            [
+              393.4,
+              277.6
+            ],
+            [
+              381.75,
+              269.9
+            ],
+            [
+              373.25,
+              258.4
+            ],
+            [
+              368,
+              249.9
+            ]
+          ]
+        }
+      }
+    },
+    "surprised": {
+      "keys": {
+        "browsUp": 0.9,
+        "mouthO": 0.25,
+        "jawOpen": 0.1
+      },
+      "paint": {
+        "base": "own",
+        "mouth": {
+          "image": "little-coco-sheets.webp",
+          "at": [
+            0,
+            -0.045
+          ],
+          "height": 0.075,
+          "outline": [
+            [
+              671.25,
+              516
+            ],
+            [
+              674.75,
+              517.5
+            ],
+            [
+              675.25,
+              521.25
+            ],
+            [
+              675,
+              526.25
+            ],
+            [
+              674,
+              531.25
+            ],
+            [
+              672.5,
+              536.25
+            ],
+            [
+              670,
+              539.75
+            ],
+            [
+              665.6,
+              540
+            ],
+            [
+              662.5,
+              538.5
+            ],
+            [
+              660.75,
+              533.75
+            ],
+            [
+              661.25,
+              527.5
+            ],
+            [
+              662.75,
+              522.5
+            ],
+            [
+              665.6,
+              518.1
+            ],
+            [
+              668.1,
+              516.25
+            ]
+          ]
+        }
+      }
+    },
+    "thoughtful": {
+      "keys": {
+        "browsFurrow": 0.8
+      }
+    }
+  },
+  "expressiveness": 1.4,
+  "landmarks": {
+    "eyeA": [
+      -0.0225,
+      0.2875
+    ],
+    "eyeB": [
+      0.195,
+      0.3225
+    ],
+    "third": [
+      0.06,
+      0.4175
+    ],
+    "mouth": [
+      0.11,
+      0.2
+    ],
+    "cornerA": [
+      -0.0325,
+      0.1775
+    ],
+    "cornerB": [
+      0.2525,
+      0.2225
+    ],
+    "browA": [
+      -0.075,
+      0.395
+    ],
+    "browB": [
+      0.2,
+      0.435
+    ],
+    "cheekA": [
+      -0.06,
+      0.225
+    ],
+    "cheekB": [
+      0.24,
+      0.27
+    ],
+    "nose": [
+      0.1075,
+      0.24
+    ],
+    "mouthBottom": [
+      0.08,
+      0.15
+    ]
+  }
+}

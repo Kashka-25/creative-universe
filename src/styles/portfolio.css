@@ -1,5 +1,7 @@
 /* ── Frame ───────────────────────────────────────────────── */
 .site-header {
+  /* stays put, live, above the page's content during a change of page (see base.css) */
+  view-transition-name: site-header;
   position: sticky;
   top: 0;
   z-index: 20;
@@ -77,6 +79,7 @@ main > * { max-width: var(--page); margin-inline: auto; }
 .site-footer__title { font-family: var(--font-display); font-size: var(--step-1); color: var(--ink); }
 .site-footer__small { font-size: var(--step--1); }
 .text-button { background: none; border: 0; padding: 0.5rem; text-decoration: underline; text-underline-offset: 0.25em; cursor: pointer; color: var(--cyan-ink); font-weight: 600; min-height: 44px; }
+a.text-button { display: inline-flex; align-items: center; }
 
 .divider { width: min(320px, 70%); margin: var(--space-4) auto; color: var(--gold); }
 
@@ -98,8 +101,9 @@ main > * { max-width: var(--page); margin-inline: auto; }
   cursor: pointer;
   transition: transform 200ms var(--ease), box-shadow 200ms, background 200ms;
 }
-.button--primary { background: var(--ember); color: #fff8ee; border: 0; box-shadow: 0 10px 22px -10px rgba(181, 55, 11, 0.7); }
-.button--primary:hover { background: var(--ember-deep); transform: translateY(-1px); }
+/* the deep ember: its light text holds 4.5:1 at body size (on the brighter ember it would not) */
+.button--primary { background: var(--ember-deep); color: #fff8ee; border: 0; box-shadow: 0 10px 22px -10px rgba(181, 55, 11, 0.7); }
+.button--primary:hover { background: #962e09; transform: translateY(-1px); }
 .button--ghost { background: transparent; border: 1.5px solid var(--ink); color: var(--ink); }
 .button--ghost:hover { background: var(--ink); color: var(--parchment); }
 
@@ -123,8 +127,12 @@ main > * { max-width: var(--page); margin-inline: auto; }
 
 /* An empty window: the 3D layer draws the guide into it. */
 .hero-stage { position: relative; aspect-ratio: 1 / 1.08; width: 100%; max-height: 78vh; justify-self: center; }
-.hero-stage--art { display: grid; place-items: center; }
-.hero-stage__art { height: 100%; width: auto; object-fit: contain; filter: drop-shadow(0 18px 26px rgba(100, 37, 33, 0.22)); animation: fade-in 600ms both; }
+/* The living painting: the guide at home. */
+.living { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+.living__canvas { display: block; filter: drop-shadow(0 18px 26px rgba(100, 37, 33, 0.22)); }
+.living__still { position: relative; height: 100%; max-width: 100%; filter: drop-shadow(0 18px 26px rgba(100, 37, 33, 0.22)); }
+.living__still img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.hero-stage__living { animation: fade-in 600ms both; cursor: default; }
 
 @media (max-width: 860px) {
   .hero { grid-template-columns: 1fr; min-height: 0; gap: var(--space-2); padding-top: var(--space-2); }
@@ -139,6 +147,8 @@ main > * { max-width: var(--page); margin-inline: auto; }
 .section-head__cloud { width: 120px; margin-top: 0.25rem; }
 
 .realms { padding-block: var(--space-3) var(--space-5); }
+/* focused by "Explore the realms" (a landing point, like main: no ring around the whole section) */
+.realms:focus { outline: none; }
 
 /* the realms as stops along a winding path */
 .realm-path {
@@ -147,6 +157,7 @@ main > * { max-width: var(--page); margin-inline: auto; }
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-3) var(--space-3);
   position: relative;
+  isolation: isolate;            /* its path (z-index -1) draws behind its stops, not behind the page */
 }
 .realm-path::before {
   content: '';
@@ -342,6 +353,13 @@ main > * { max-width: var(--page); margin-inline: auto; }
 /* Tall (portrait) screenshots: a fixed height, each as wide as its own shape. */
 .preview__item[data-shape='tall'] { flex: 0 0 auto; }
 .preview__item[data-shape='tall'] img { width: auto; height: var(--preview-tall); }
+/* phones (Cassidy, 10 Nov 2026): a smaller gallery, so more of each picture and the next one fit on screen */
+@media (max-width: 600px) {
+  .preview { --preview-tall: clamp(220px, 44vh, 340px); }
+  .preview__item { flex-basis: 62%; }
+  .preview__clip { max-height: 40vh; object-fit: contain; }
+  .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+}
 .work-page__walk { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; padding-bottom: var(--space-4); font-weight: 600; }
 .work-page__walk a { text-decoration: none; color: var(--ink-soft); }
 .work-page__walk a:hover { color: var(--ink); }
@@ -355,6 +373,7 @@ main > * { max-width: var(--page); margin-inline: auto; }
 .about-page__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: var(--space-5); align-items: start; padding-block: var(--space-4); }
 .about-page__portrait { margin: 0; position: sticky; top: 90px; }
 .about-page__portrait img { width: 100%; filter: drop-shadow(0 22px 30px rgba(100, 37, 33, 0.25)); }
+.about-page__credit { margin-top: 0.6rem; text-align: center; font-size: var(--step--1); color: var(--ink-faint); }
 .about-page__words { display: grid; gap: var(--space-2); align-content: start; }
 .about-page__words h1 { font-size: var(--step-4); }
 .about-page h2 { font-size: var(--step-2); margin-bottom: 0.75rem; }
@@ -383,3 +402,43 @@ main > * { max-width: var(--page); margin-inline: auto; }
 .studio__panel--ref img { width: 100%; height: 100%; object-fit: contain; padding: 6%; }
 .studio__panel figcaption { text-align: center; font-weight: 650; font-size: 0.85rem; padding: 0.5rem; border-top: 1px solid var(--rule); color: var(--ink-soft); }
 @media (max-width: 860px) { .studio__grid { grid-template-columns: 1fr 1fr; } }
+
+/* The live hero: space kept empty for Coco (the guide layer draws him in the page's empty space). */
+.hero-stage--live { display: grid; place-items: center; }
+.hero-stage--live > * { grid-area: 1 / 1; }
+/* A still of him while the 3D one loads; it fades away as he appears. */
+.hero-stage__poster {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  animation: fade-in 500ms both;
+  transition: opacity 700ms var(--ease);
+}
+/* he fades in over the poster first (the layer's 700 ms), then only the poster fades: no dip */
+.hero-stage__poster.is-leaving { opacity: 0; transition-delay: 700ms; }
+
+/* ── Coco's swirl clouds, drifting behind a section's content (SkyClouds) ── */
+/* the host is a stacking context of its own, so the clouds sit above its background and below
+   everything in it; they never take a click. The layer spans the window's width (the side gutters
+   are room for clouds too), and SkyClouds places each cloud only where there is no content */
+.has-clouds { position: relative; isolation: isolate; }
+.sky-clouds { position: absolute; top: 0; bottom: 0; left: calc(50% - 50vw); right: calc(50% - 50vw); z-index: -1; pointer-events: none; }
+.sky-cloud {
+  position: absolute;
+  height: auto;
+  max-width: none;
+  opacity: 0;
+  transition: opacity 1200ms var(--ease);
+  /* one slow sway, there and back, started part-way through so no two move together */
+  animation: cloud-drift var(--dur, 28s) ease-in-out var(--delay, 0s) infinite alternate;
+  will-change: transform;
+}
+.sky-cloud.is-loaded { opacity: var(--alpha, 0.7); }
+@keyframes cloud-drift {
+  from { transform: translate3d(0, 0, 0) rotate(0deg); }
+  to { transform: translate3d(var(--dx, 12px), var(--dy, 6px), 0) rotate(var(--tilt, 1.5deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky-cloud { animation: none; }
+}

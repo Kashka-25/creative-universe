@@ -5,7 +5,6 @@ html {
   -webkit-text-size-adjust: 100%;
   scroll-padding-top: 5rem;
 }
-html.intro-covering { overflow: hidden; }
 
 body {
   margin: 0;
@@ -23,9 +22,9 @@ body {
   overflow-x: hidden;
 }
 
-/* paper grain over everything, very quietly */
-body::after {
-  content: '';
+/* paper grain over everything, very quietly (its own element, main.tsx, so a change of page can
+   keep it live on top: see below) */
+.paper-grain {
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -33,6 +32,7 @@ body::after {
   opacity: 0.55;
   mix-blend-mode: multiply;
   z-index: 100;
+  view-transition-name: grain;
 }
 
 img, svg, video, iframe { display: block; max-width: 100%; }
@@ -54,8 +54,9 @@ a:hover { text-decoration-color: currentColor; }
 
 button { font: inherit; color: inherit; }
 
+/* the deep cyan holds 3:1 against the parchment, the cards and the ember button (WCAG 1.4.11) */
 :focus-visible {
-  outline: 3px solid var(--cyan);
+  outline: 3px solid var(--cyan-ink);
   outline-offset: 3px;
   border-radius: 6px;
 }
@@ -83,13 +84,42 @@ button { font: inherit; color: inherit; }
 
 main:focus { outline: none; }
 
+/* A change of page inside the site: the new page's content and footer fade in (opacity only, on
+   the compositor; no fill afterwards, so nothing is left as a stacking context). No view
+   transition: its snapshot phase holds every frame until the new page has rendered, and Coco is
+   live over the page (Layout.tsx). */
+.page-enter { animation: fade-in 420ms var(--ease) backwards; }
+
+/* A view transition: only on the way to and from the welcome (#/invitation), where the whole page
+   changes. Only the page's own content and footer crossfade: they are named per page
+   (src/portfolio/transitions.ts; the invitation is 'invitation-page'), so the old one fades out
+   exactly where it was, however far it was scrolled, and the new one fades in. Everything that
+   persists is never crossfaded with a frozen copy of itself: the background and the header simply
+   become the new page's, and Coco's layer, the paper grain and the cloud veil stay live
+   throughout, so Coco never doubles, ghosts or jumps and the grain never drops out. During the
+   change things stack as on the page: background < content < Coco < header < grain < veil. */
 @view-transition { navigation: auto; }
-::view-transition-old(root) { animation: 260ms var(--ease) both vt-out; }
-::view-transition-new(root) { animation: 420ms var(--ease) both vt-in; }
+::view-transition-group(*) { z-index: 2; }
+::view-transition-old(*) { animation: 260ms var(--ease) both vt-out; }
+::view-transition-new(*) { animation: 420ms var(--ease) both vt-in; }
+::view-transition-group(root) { z-index: auto; animation: none; }
+::view-transition-group(guide) { z-index: 3; animation: none; }
+::view-transition-group(site-header) { z-index: 4; animation: none; }
+::view-transition-group(grain) { z-index: 5; animation: none; mix-blend-mode: multiply; }
+::view-transition-group(veil) { z-index: 6; animation: none; }
+::view-transition-old(root), ::view-transition-old(guide), ::view-transition-old(site-header), ::view-transition-old(veil), ::view-transition-old(grain) { display: none; }
+::view-transition-new(root), ::view-transition-new(guide), ::view-transition-new(site-header), ::view-transition-new(veil), ::view-transition-new(grain) { animation: none; }
+/* leaving the site for the welcome (no live Coco on the other side): he fades out with the page */
+::view-transition-old(guide):only-child { display: block; animation: 260ms var(--ease) both vt-fade-out; }
 @keyframes vt-out { to { opacity: 0; transform: translateY(-6px); } }
 @keyframes vt-in { from { opacity: 0; transform: translateY(10px); } }
+@keyframes vt-fade-out { to { opacity: 0; } }
+
+/* shared: the mobile menu, the hero's painting and poster fade in; the empty realm's cloud floats */
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes float { 50% { transform: translateY(-12px); } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }

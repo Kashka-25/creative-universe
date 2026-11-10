@@ -7,7 +7,21 @@ import { ActionButton, InviteLine, LiveLink, PreviewGallery } from './actions';
 import { InterestForm } from './InterestForm';
 import { Cover, HeroStage, RealmMedallion, StatusPill, WorkCard, realmCount, realmHref } from './components';
 import { CloudScroll, LeafDivider, Vine } from './ornaments';
+import { SkyClouds } from './SkyClouds';
 import { useDocumentTitle } from './useDocumentTitle';
+import { prefersReducedMotion } from '../intro/capability';
+
+/**
+ * "Explore the realms": the view moves to them (smoothly, unless the visitor asks for reduced
+ * motion) and so does keyboard focus, so Tab carries on from there and a screen reader lands on
+ * "The realms" instead of going back to the hero.
+ */
+function exploreRealms() {
+  const section = document.getElementById('realms');
+  if (!section) return;
+  section.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  section.focus({ preventScroll: true });
+}
 
 // ── The World (home) ───────────────────────────────────────
 export function WorldPage() {
@@ -18,7 +32,8 @@ export function WorldPage() {
 
   return (
     <>
-      <section className="hero" aria-labelledby="hero-title">
+      <section className="hero has-clouds" aria-labelledby="hero-title">
+        <SkyClouds seed="home:hero" count={1} />
         <Vine className="hero__vine hero__vine--left" />
         <div className="hero__words">
           <p className="eyebrow">Cassidy’s Creative Universe</p>
@@ -26,10 +41,10 @@ export function WorldPage() {
           <p className="hero__line">{owner.line}</p>
           <p className="hero__intro">{owner.intro}</p>
           <div className="hero__actions">
-            <button type="button" className="button button--primary" onClick={() => document.getElementById('realms')?.scrollIntoView({ behavior: 'smooth' })}>
+            <button type="button" className="button button--primary" onClick={exploreRealms}>
               Explore the realms
             </button>
-            <Link to="/about" className="button button--ghost" viewTransition>About &amp; contact</Link>
+            <Link to="/about" className="button button--ghost">About &amp; contact</Link>
           </div>
         </div>
         <HeroStage />
@@ -37,15 +52,16 @@ export function WorldPage() {
 
       <LeafDivider className="divider" />
 
-      <section id="realms" className="realms" aria-labelledby="realms-title">
+      <section id="realms" className="realms has-clouds" aria-labelledby="realms-title" tabIndex={-1}>
+        <SkyClouds seed="home:realms" />
         <header className="section-head">
-          <h2 id="realms-title">The realms</h2>
+          <h2 id="realms-title" data-coco-stop="realms">The realms</h2>
           <p>Six regions of one world. Wander in any order.</p>
         </header>
         <ol className="realm-path">
           {realms.map((r, i) => (
             <li key={r.id} className="realm-path__stop" style={{ ['--i' as string]: i }}>
-              <Link to={realmHref(r)} className="realm-card" data-colour={r.accent} viewTransition>
+              <Link to={realmHref(r)} className="realm-card" data-colour={r.accent}>
                 <RealmMedallion realm={r} />
                 <span className="realm-card__text">
                   <span className="realm-card__title">{r.title}</span>
@@ -58,9 +74,10 @@ export function WorldPage() {
         </ol>
       </section>
 
-      <section className="works" aria-labelledby="works-title">
+      <section className="works has-clouds" aria-labelledby="works-title">
+        <SkyClouds seed="home:works" />
         <header className="section-head">
-          <h2 id="works-title">Works in this world</h2>
+          <h2 id="works-title" data-coco-stop="works">Works in this world</h2>
           <CloudScroll className="section-head__cloud" />
         </header>
         <div className="chips" role="group" aria-label="Show works from">
@@ -73,7 +90,7 @@ export function WorldPage() {
             </button>
           ))}
         </div>
-        <div className="work-grid">
+        <div className="work-grid" data-coco-stop="bottom">
           {shown.map((w) => <WorkCard key={w.slug} work={w} />)}
         </div>
       </section>
@@ -94,9 +111,10 @@ export function RealmPage() {
   const groups = groupByCollection(list);
 
   return (
-    <article className="realm-page" data-colour={realm.accent}>
+    <article className="realm-page has-clouds" data-colour={realm.accent}>
+      <SkyClouds seed={`realm:${realm.id}`} count={3} />
       <header className="page-head">
-        <nav className="crumbs" aria-label="Breadcrumb"><Link to="/" viewTransition>World</Link> <span aria-hidden>›</span> <span aria-current="page">{realm.title}</span></nav>
+        <nav className="crumbs" aria-label="Breadcrumb"><Link to="/">World</Link> <span aria-hidden>›</span> <span aria-current="page">{realm.title}</span></nav>
         <RealmMedallion realm={realm} size="lg" />
         <h1>{realm.title}</h1>
         <p className="page-head__blurb">{realm.blurb}</p>
@@ -107,7 +125,7 @@ export function RealmPage() {
           <CloudScroll className="empty-realm__cloud" />
           <p className="empty-realm__title">This part of the world is still being drawn.</p>
           <p>Nothing has been placed here yet. Come back soon, or wander somewhere that’s already in bloom.</p>
-          <Link to="/" className="button button--ghost" viewTransition>Back to the world</Link>
+          <Link to="/" className="button button--ghost">Back to the world</Link>
         </div>
       ) : (
         groups.map(([collection, items]) => (
@@ -123,7 +141,7 @@ export function RealmPage() {
       <LeafDivider className="divider" />
       <p className="journey">
         <span>Continue the journey</span>
-        <Link to={realmHref(next)} className="journey__next" viewTransition>{next.title} <span aria-hidden>→</span></Link>
+        <Link to={realmHref(next)} className="journey__next">{next.title} <span aria-hidden>→</span></Link>
       </p>
     </article>
   );
@@ -151,10 +169,11 @@ export function WorkPage() {
   const { prev, next } = neighbours(work);
 
   return (
-    <article className="work-page" data-colour={work.colour}>
+    <article className="work-page has-clouds" data-colour={work.colour}>
+      <SkyClouds seed={`work:${work.slug}`} count={3} />
       <nav className="crumbs" aria-label="Breadcrumb">
-        <Link to="/" viewTransition>World</Link> <span aria-hidden>›</span>{' '}
-        <Link to={realmHref(realm)} viewTransition>{realm.title}</Link> <span aria-hidden>›</span>{' '}
+        <Link to="/">World</Link> <span aria-hidden>›</span>{' '}
+        <Link to={realmHref(realm)}>{realm.title}</Link> <span aria-hidden>›</span>{' '}
         <span aria-current="page">{work.title}</span>
       </nav>
 
@@ -211,9 +230,9 @@ export function WorkPage() {
 
       <LeafDivider className="divider" />
       <nav className="work-page__walk" aria-label={`More in ${realm.title}`}>
-        {prev ? <Link to={`/work/${prev.slug}`} rel="prev" viewTransition><span aria-hidden>←</span> {prev.title}</Link> : <span />}
-        <Link to={realmHref(realm)} viewTransition>All of {realm.title}</Link>
-        {next ? <Link to={`/work/${next.slug}`} rel="next" viewTransition>{next.title} <span aria-hidden>→</span></Link> : <span />}
+        {prev ? <Link to={`/work/${prev.slug}`} rel="prev"><span aria-hidden>←</span> {prev.title}</Link> : <span />}
+        <Link to={realmHref(realm)}>All of {realm.title}</Link>
+        {next ? <Link to={`/work/${next.slug}`} rel="next">{next.title} <span aria-hidden>→</span></Link> : <span />}
       </nav>
     </article>
   );
@@ -225,12 +244,21 @@ export function AboutPage() {
   useDocumentTitle(realm.title);
   const counts = useMemo(() => realms.filter((r) => r.kind === 'works').map((r) => [r, worksIn(r.id).length] as const), []);
   return (
-    <article className="about-page">
-      <nav className="crumbs" aria-label="Breadcrumb"><Link to="/" viewTransition>World</Link> <span aria-hidden>›</span> <span aria-current="page">{realm.title}</span></nav>
+    <article className="about-page has-clouds">
+      <SkyClouds seed="about" count={2} />
+      <nav className="crumbs" aria-label="Breadcrumb"><Link to="/">World</Link> <span aria-hidden>›</span> <span aria-current="page">{realm.title}</span></nav>
       <div className="about-page__grid">
         {about.portrait && (
           <figure className="about-page__portrait">
             <img src={asset(about.portrait)} alt={about.portraitAlt} />
+            {about.portraitCredit && (
+              <figcaption className="about-page__credit">
+                {about.portraitCredit.lead}{' '}
+                <a href={about.portraitCredit.href} target="_blank" rel="noopener noreferrer">
+                  {about.portraitCredit.label}<span className="visually-hidden"> on Instagram (opens in a new tab)</span>
+                </a>
+              </figcaption>
+            )}
           </figure>
         )}
         <div className="about-page__words">
@@ -254,7 +282,7 @@ export function AboutPage() {
             <h2 id="map-title">Around the world</h2>
             <ul>
               {counts.map(([r, n]) => (
-                <li key={r.id}><Link to={realmHref(r)} viewTransition>{r.title}</Link> <span>{n === 0 ? 'still growing' : n}</span></li>
+                <li key={r.id}><Link to={realmHref(r)}>{r.title}</Link> <span>{n === 0 ? 'still growing' : n}</span></li>
               ))}
             </ul>
           </section>

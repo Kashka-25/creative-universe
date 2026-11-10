@@ -1,158 +1,66 @@
-/* ── The persistent 3D layer ─────────────────────────────── */
-.stage-layer {
+/* ── Coco, the companion: one transparent 3D layer over the page's content, under its header ── */
+/* Stacking, on every page: content < Coco < the sticky header and its open menu < the paper grain
+   < the cloud veil. .site is no stacking context of its own, so the header (z 20) and Coco (z 10)
+   order against each other directly. He floats only in the page's empty space (src/guide/space.ts),
+   so being above the content never hides any of it. */
+.guide-layer {
   position: fixed;
-  inset: 0;
-  z-index: 0;
+  /* held to the window's bottom edge: while a phone's URL bar slides, the browser keeps the layer
+     on that edge (HomeStage measures it each frame) */
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* a steady box: the large viewport height, so a phone's URL bar sliding in and out never
+     resizes the canvas (he would pop bigger and smaller) */
+  height: 100vh;
+  height: 100lvh;
+  z-index: 10;
+  pointer-events: none;          /* never blocks a click: the page stays fully usable */
+  opacity: 0;
+  transition: opacity 700ms var(--ease);
+  /* a change of page never crossfades him with a frozen copy of himself (see base.css) */
+  view-transition-name: guide;
+}
+.guide-layer.is-ready { opacity: var(--coco-fade, 1); }
+/* (--coco-fade: 0 while no empty space fits him; he fades out where he is, and back in at the next) */
+/* arriving under the cloud veil: the cloud is the reveal, so no fade of its own */
+.guide-layer.is-instant { transition: none; }
+/* on About he is not there: a gentle fade out, and back in when the visitor leaves */
+.guide-layer.is-away { opacity: 0; }
+/* content has come under him (a new page, a layout change): a quick fade out (HomeStage) */
+.guide-layer[data-quick] { transition-duration: 240ms; }
+/* placed, out of sight, in a new space: hidden at once, then faded in there (HomeStage) */
+.guide-layer[data-appear] { opacity: 0; transition: none; }
+/* flying in from beside the window: he is out of sight, so the layer is shown at once (HomeStage) */
+.guide-layer[data-fly] { transition: none; }
+.guide-canvas { width: 100% !important; height: 100% !important; }
+/* R3F gives its own wrapper pointer-events: auto; nothing in this layer may ever take a click */
+.guide-layer * { pointer-events: none !important; }
+
+/* The illustrated companion (lite): his still, placed in the document at his space (PosterCompanion),
+   so it scrolls with the page. It glides between spaces only while shown; hidden, it moves at once. */
+.guide-poster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: auto;
   pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform, opacity;
+  transition: opacity 700ms var(--ease), visibility 0s 700ms;
 }
-.stage-layer.is-intro { z-index: 60; pointer-events: auto; }
-.stage-layer.is-revealing { z-index: 60; }
-.stage-layer.is-idle { visibility: hidden; }
-.stage-canvas { position: absolute !important; inset: 0; }
-
-/* the intro's sky, painted behind the canvas */
-.stage-sky {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(60% 55% at 52% 42%, #fff6dc 0%, rgba(255, 246, 220, 0) 70%),
-    radial-gradient(90% 70% at 50% 100%, rgba(184, 255, 246, 0.55), transparent 70%),
-    linear-gradient(180deg, #f6d9a4 0%, #f3e3c2 45%, #eadcc0 100%);
-  transition: opacity 1.3s var(--ease);
-}
-.stage-sky::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: var(--paper-grain);
-  opacity: 0.7;
-  mix-blend-mode: multiply;
-}
-.stage-layer:not(.is-intro) .stage-sky { opacity: 0; }
-
-/* the page rising in as he lands */
-.site { position: relative; z-index: 1; }
-.site.is-entering .hero__words > * { animation: rise-in 900ms var(--ease) both; }
-.site.is-entering .hero__words > :nth-child(2) { animation-delay: 80ms; }
-.site.is-entering .hero__words > :nth-child(3) { animation-delay: 160ms; }
-.site.is-entering .hero__words > :nth-child(4) { animation-delay: 240ms; }
-.site.is-entering .hero__words > :nth-child(5) { animation-delay: 320ms; }
-.site.is-entering .site-header { animation: fade-in 900ms var(--ease) both; }
-@keyframes rise-in { from { opacity: 0; transform: translateY(18px); } }
-@keyframes fade-in { from { opacity: 0; } }
-
-/* ── Controls over the intro ─────────────────────────────── */
-.intro-controls {
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  pointer-events: none;
-}
-.intro-controls > * { pointer-events: auto; }
-
-.intro-skip {
-  position: absolute;
-  top: max(16px, env(safe-area-inset-top));
-  right: max(16px, env(safe-area-inset-right));
-  border: 1px solid rgba(58, 23, 20, 0.25);
-  background: rgba(251, 244, 228, 0.75);
-  backdrop-filter: blur(6px);
-  border-radius: 999px;
-  padding: 0.55rem 1.05rem;
-  font-size: var(--step--1);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  min-height: 44px;
-}
-.intro-skip:hover { background: var(--card); }
-
-.intro-follow {
-  position: absolute;
-  left: 50%;
-  bottom: max(28px, calc(env(safe-area-inset-bottom) + 20px));
-  transform: translateX(-50%);
-  border: 0;
-  border-radius: 999px;
-  padding: 0.95rem 2rem;
-  min-height: 52px;
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  font-weight: 600;
-  color: var(--ink);
-  background: linear-gradient(180deg, #ffe58a, var(--sun));
-  box-shadow: 0 0 0 6px rgba(253, 214, 58, 0.25), 0 14px 30px -10px rgba(160, 90, 10, 0.6);
-  cursor: pointer;
-  animation: follow-in 700ms var(--ease) both, follow-pulse 2.4s ease-in-out 700ms infinite;
-}
-.intro-follow:hover { background: linear-gradient(180deg, #fff0b0, #ffe066); }
-@keyframes follow-in { from { opacity: 0; transform: translate(-50%, 14px); } }
-@keyframes follow-pulse { 50% { box-shadow: 0 0 0 12px rgba(253, 214, 58, 0.12), 0 14px 30px -10px rgba(160, 90, 10, 0.6); } }
-
-.intro-loading {
-  position: absolute;
-  left: 50%;
-  bottom: 40px;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: var(--step--1);
-  color: var(--ink-soft);
-}
-.intro-loading__sun {
-  width: 18px; height: 18px; border-radius: 50%;
-  background: var(--sun);
-  box-shadow: 0 0 0 4px rgba(253, 214, 58, 0.3);
-  animation: sun-breathe 1.6s ease-in-out infinite;
-}
-@keyframes sun-breathe { 50% { transform: scale(0.75); box-shadow: 0 0 0 9px rgba(253, 214, 58, 0.12); } }
-
-.intro-debug {
-  position: fixed;
-  left: 12px;
-  bottom: 12px;
-  z-index: 95;
-  background: rgba(58, 23, 20, 0.88);
-  color: var(--parchment);
-  font: 12px/1.4 ui-monospace, monospace;
-  padding: 8px 10px;
-  border-radius: 8px;
-}
-.intro-debug button { font: inherit; margin: 4px 4px 0 0; cursor: pointer; }
-
-/* ── The illustrated (lite) welcome ──────────────────────── */
-.lite-intro {
-  position: fixed;
-  inset: 0;
-  z-index: 65;
-  display: grid;
-  grid-template-rows: 1fr auto;
-  justify-items: center;
-  align-items: center;
-  padding: 72px var(--gutter) 120px;
-  transition: opacity 900ms var(--ease);
-}
-.lite-intro__sky {
-  position: absolute; inset: 0; z-index: -1;
-  background:
-    radial-gradient(55% 50% at 50% 40%, #fff6dc 0%, rgba(255, 246, 220, 0) 70%),
-    linear-gradient(180deg, #f6d9a4 0%, #f3e3c2 50%, #eadcc0 100%);
-}
-.lite-intro__guide { margin: 0; height: min(58vh, 560px); animation: float 6s ease-in-out infinite; }
-.lite-intro__guide img { height: 100%; width: auto; filter: drop-shadow(0 18px 24px rgba(100, 37, 33, 0.25)); }
-.lite-intro__words { text-align: center; }
-.lite-intro__eyebrow { font-size: var(--step--1); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
-.lite-intro__name { font-family: var(--font-display); font-size: var(--step-3); font-weight: 600; line-height: 1.1; }
-.lite-intro .intro-follow { position: static; transform: none; margin-top: var(--space-3); animation: none; }
-.lite-intro.is-liteFlight .lite-intro__guide { animation: fly-off 1.3s cubic-bezier(0.55, 0, 0.75, 0.2) forwards; }
-.lite-intro.is-liteFlight .lite-intro__words { opacity: 0; transition: opacity 500ms; }
-.lite-intro.is-revealing { opacity: 0; pointer-events: none; }
-@keyframes float { 50% { transform: translateY(-12px); } }
-@keyframes fly-off {
-  30% { transform: translateY(10px) scale(0.98) rotate(2deg); }
-  to { transform: translate(28vw, -80vh) scale(1.4) rotate(-10deg); opacity: 0; }
+/* no empty space fits him: he peeks from a bottom corner of the window, fixed to it */
+.guide-poster.is-corner { position: fixed; }
+.guide-poster.is-shown {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 700ms var(--ease), visibility 0s, transform 2800ms var(--ease), height 2800ms var(--ease);
 }
 @media (prefers-reduced-motion: reduce) {
-  .lite-intro.is-liteFlight .lite-intro__guide { animation: none; opacity: 0; transition: opacity 600ms; }
+  /* no movement: he only fades out, moves unseen, and fades back in */
+  .guide-poster { transition: opacity 250ms linear, visibility 0s 250ms; }
+  .guide-poster.is-shown { transition: opacity 250ms linear, visibility 0s; }
 }

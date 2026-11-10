@@ -109,3 +109,47 @@ npm run check:guide -- --register
 `optimize:guide` compresses the file (meshopt, which three.js decodes natively). `check:guide` compares it with the contract and lists any problems. With `--register` it switches the site from the stand-in to your model. Reload the site and he's there. To go back to the stand-in: `npm run check:guide -- --unregister`.
 
 > **Pipeline self-test without Blender:** `npm run test:guide-pipeline` builds a crude contract-complete GLB, optimises it and checks it. It was used to verify this whole path end to end.
+
+## Coco's Awakening: the invitation take
+
+The invitation page (`#/invitation`) is hosted by **Adult Coco** (`coco-sage`). Run these from the project folder, after `build_coco_sage.py` has made `blender/characters/coco-sage.blend`:
+
+```bash
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python blender/scripts/build_coco_invite.py
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b blender/characters/invitation.blend --python blender/scripts/check_cloud_cover.py
+```
+
+- `build_coco_invite.py` copies `coco-sage.blend` to `invitation.blend` (the original is never written), keys his descent from above the window (about 4.5 s, a gentle float down on his ride cloud with one slow sway) as the clip `invite` on his own rig (60 fps; it ends on `breathe` frame 0, pose and velocity), and exports only his skeleton and that clip to `public/models/invitation/coco-invite.glb`. The site plays it on `coco-sage.glb` and then hands over to that model's own `breathe` and `float`. It writes the markers `floatIn`, `arrive`, `welcome` (the heading) and `glow` to `timeline.json`, then builds the magic cloud with `build_magic_cloud.py` (`magic-cloud.glb`, the markers after the glow, `coverFrame` and the `cloud` block) and the ride cloud with `build_ride_cloud.py` (`public/models/clouds/ride-cloud.glb`, `clips.ride` in `timeline.json`).
+- `build_ride_cloud.py` builds the swirl cloud he rides on from the magic cloud's own curls, wisp and colours. Its clips: `ride` (the welcome, on the master timeline: its curls billow up and its wisp streams while he floats down, idles, then from `glow` swells into the base of the magic cloud and thins away inside it before he is hidden), `rest` (a seamless 20 s idle loop under him on pages) and `flyin` (2 s: the path of his flight to a new space on a page, as `ctl_progress` / `ctl_lift` / `ctl_bank`, and a soft shimmer as he lands; its last frame is `rest` frame 0). The site makes it follow his root bone, so his own motion carries it.
+- `check_cloud_cover.py` renders coverage masks with the site's camera and prints the frames on which no pixel of him shows. `HIDDEN` in `build_magic_cloud.py` records that span.
+
+## Adult Coco's living details
+
+Three additions to Adult Coco (9 Nov 2026), all keyed in Blender and layered by the site:
+
+- **The sun and bolt come to life** (`radiance`, a seamless 40 s loop): the sun turns and breathes a little on its own `sun` bone, its glow swells, and the bolt shimmers softly now and then (never more than 3 times a second).
+- **His third eye blinks** (`thirdeye`, a seamless 32 s loop): it is a painted eye, so a `third_eye` bone closes it onto its lid line four times at irregular moments, with a soft glow after each blink.
+- **The welcome's awakening** (`awaken`, 6 s): he slowly opens his eyes, looks at the visitor, closes them again and bows his head in honour. His open eyes are Cassidy's own open-eyed Coco (`blender/sculpt/coco-open.glb`, never written), cut out and laid onto his lid lines by `prep_coco_eyes.py`.
+
+```bash
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python blender/scripts/prep_coco_eyes.py
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python blender/scripts/build_coco_sage.py -- coco-sage
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python blender/scripts/build_coco_invite.py
+```
+
+- `prep_coco_eyes.py` writes `blender/characters/coco-sage-eyes.png` and `.json`: two eye cards (colour from coco-open; alpha is the order in which each eye is revealed as his lids part).
+- `coco_sage_life.py` (imported by `build_coco_sage.py`) adds the bones, weights, the eye cards and the three clips. Settings are in `coco-sage.json` under `life`.
+- Glow and the eyes' opening travel as the X scale of the control bones `ctl_sun`, `ctl_bolt`, `ctl_eye` and `ctl_eyes` (value = scale.x − 1). The site turns them into material settings (`src/characters/cocoLife.ts`).
+- `build_coco_invite.py` puts the markers `wake`, `gaze`, `eyesClose` and `bow` after `welcome`, and moves the glow (and everything after it) later by the beat's length.
+
+## The section clouds, spinning
+
+The small swirl clouds behind the pages' sections (`public/models/clouds/`, placed by `src/portfolio/SkyClouds.tsx`) are rendered from the magic cloud's own curls and wisp. Each has a still (`cloud-N.webp`) and a seamless 20 s loop (`cloud-N-spin.avif`) in which every curl turns once about its own face, half one way and half the other, exactly as the ride cloud's curls turn in its `rest` loop. The site shows the loop where motion is welcome and the still under reduced motion, when saving data, or where the browser has no AVIF. The gentle CSS drift plays over both.
+
+```bash
+"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" --background --factory-startup --python blender/scripts/render_section_clouds.py -- --loops
+```
+
+- `--loops` renders the stills and the loops; `--loops-only` the loops alone (the stills stay as they are); `--only 1,3` some of the clouds. The loop frames (12 fps, 240 a loop, plus one more for the seam check) go to a temporary folder (`--frames <dir>` to choose it; `--no-encode` to stop there). They take a few seconds each.
+- `encode_cloud_loops.py` (run for you with the system's Python, which needs Pillow 11.3+ with AVIF; `--python-exe` to choose it) crops them as the still is cropped, writes the AVIF (360 px on the long side, quality 50: 135–255 KB each, about 1 MB for all six) and adds `anim: {file, width, height, fps, frames}` to the cloud's entry in `clouds.json`. It prints the seam check: frame 0 against the frame one turn later, the step from the last frame back to the first against the other steps, and the first frame against the still.
+- AVIF rather than an animated WebP: each frame of a turning curl is new, and a WebP stores each whole (over 1 MB a loop), while AVIF is AV1 video, which keeps what stays from frame to frame.

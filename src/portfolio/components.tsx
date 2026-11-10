@@ -1,10 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { asset, statusLabel, worksIn, type Realm, type Work } from '../content';
-import { useIntro } from '../intro/IntroProvider';
-import { stage } from '../scene/stage';
+import { useGuide } from '../guide/GuideProvider';
 import { ActionButton } from './actions';
 import { RealmEmblem } from './ornaments';
+import { LivingPainting } from '../living/LivingPainting';
+import { ADULT_POSTER } from '../guide/paths';
 
 export function StatusPill({ status }: { status?: string }) {
   if (!status) return null;
@@ -39,7 +40,7 @@ export function WorkCard({ work, headingLevel = 3 }: { work: Work; headingLevel?
   const H = `h${headingLevel}` as 'h2' | 'h3';
   return (
     <article className={work.action ? 'work-card work-card--action' : 'work-card'} data-colour={work.colour}>
-      <Link to={`/work/${work.slug}`} className="work-card__link" viewTransition>
+      <Link to={`/work/${work.slug}`} className="work-card__link">
         <div className="work-card__media"><Cover work={work} /></div>
         <div className="work-card__body">
           <p className="work-card__meta">
@@ -74,22 +75,47 @@ export function realmCount(r: Realm) {
 }
 
 /**
- * The spot in the hero where the guide sits. With 3D running, this is an empty
- * window the scene draws into. Otherwise it shows the painting itself.
+ * Coco's space in the hero. With 3D running it is kept empty for him ([data-guide-space]: the
+ * negative space he floats in is best here at the top of home), and a still poster of him holds it
+ * until he is ready (if there is one). Otherwise Cassidy's living painting fills it.
  */
 export function HeroStage() {
-  const { mode, sceneFailed, guideReady, state } = useIntro();
-  const ref = useRef<HTMLDivElement>(null);
-  const live = mode === 'full' && !sceneFailed;
-  useEffect(() => {
-    if (!live) return;
-    stage.set(ref.current);
-    return () => stage.set(null);
-  }, [live]);
-  const showArt = !live || (!guideReady && state === 'done');
+  const { live3D, ready, instant } = useGuide();
+  if (live3D) {
+    return (
+      <div className="hero-stage hero-stage--live" data-guide-space>
+        <Poster leaving={ready} instant={instant} />
+      </div>
+    );
+  }
   return (
-    <div className={`hero-stage ${showArt ? 'hero-stage--art' : ''}`} ref={ref} aria-hidden>
-      {showArt && <img src={asset('art/guide.webp')} alt="" className="hero-stage__art" />}
+    <div className="hero-stage" aria-hidden>
+      <LivingPainting className="hero-stage__living" />
     </div>
+  );
+}
+
+/** A still of Coco while the 3D one loads; it fades away as he appears. Nothing if there is no poster. */
+function Poster({ leaving, instant }: { leaving: boolean; instant: boolean }) {
+  const [missing, setMissing] = useState(false);
+  const [gone, setGone] = useState(false);
+  useEffect(() => {
+    if (!leaving) return;
+    // it waits, opaque, while he fades in over it, then fades itself (see .is-leaving)
+    const t = window.setTimeout(() => setGone(true), 1500);
+    return () => window.clearTimeout(t);
+  }, [leaving]);
+  // arriving under the cloud veil he is there at once: the cloud clearing is the reveal, so the
+  // still (a different pose from his settle) never shows over him
+  if (missing || gone || (leaving && instant)) return null;
+  return (
+    <img
+      className={`hero-stage__poster${leaving ? ' is-leaving' : ''}`}
+      src={asset(ADULT_POSTER)}
+      alt=""
+      aria-hidden
+      decoding="async"
+      onError={() => setMissing(true)}
+    />
   );
 }

@@ -1,0 +1,84 @@
+/* ── The invitation (#/invitation) ─────────────────────────── */
+.invitation {
+  /* it crossfades as a whole on the way in and out (see base.css) */
+  view-transition-name: invitation-page;
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(60% 55% at 50% 50%, #fff6dc 0%, rgba(255, 246, 220, 0) 70%),
+    radial-gradient(90% 70% at 50% 100%, rgba(184, 255, 246, 0.45), transparent 70%),
+    linear-gradient(180deg, #f6d9a4 0%, #f3e3c2 45%, #eadcc0 100%);
+}
+.invitation > .site-header { z-index: 20; }
+
+.invitation__main {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  justify-items: center;
+  gap: var(--space-2);
+  min-height: 0;
+  padding: var(--space-3) var(--gutter) max(var(--space-4), calc(env(safe-area-inset-bottom) + var(--space-2)));
+}
+.invitation__main > * { max-width: var(--page); width: 100%; }
+
+/* present for screen readers from the start; on screen it arrives gently once he has settled */
+.invitation__title {
+  font-size: var(--step-4);
+  text-align: center;
+  color: var(--ink);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 1.6s var(--ease), transform 1.6s var(--ease);
+}
+.invitation__title.is-shown { opacity: 1; transform: none; }
+
+/* the box he is framed in (the 3D layer draws him over it) */
+.invitation__stage { position: relative; width: 100%; height: 100%; min-height: 42vh; }
+
+.invitation__actions { display: flex; justify-content: center; }
+.invitation__enter { min-height: 52px; padding-inline: 2rem; font-size: var(--step-1); }
+
+/* the 3D take: under the words and the button, never taking a click. It covers the page itself
+   (not the window), so if the page scrolls the browser moves him with it: he never swims. */
+.invitation__layer { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.invitation__canvas { width: 100% !important; height: 100% !important; }
+.invitation__layer * { pointer-events: none !important; }
+
+/* without motion: a still of Adult Coco, or Cassidy's painting */
+.invitation__illustrated { position: absolute; inset: 0; display: grid; place-items: center; }
+/* fitted inside the stage (never over the heading or the button), whatever the still's own size */
+.invitation__still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 600ms var(--ease);
+  filter: drop-shadow(0 18px 24px rgba(100, 37, 33, 0.22));
+}
+.invitation__still.is-shown { opacity: 1; }
+/* the painting fades in as one piece once both its layers have loaded (IllustratedInvitation) */
+.invitation__painting { width: 100%; height: 100%; opacity: 0; transition: opacity 600ms var(--ease); }
+.invitation__painting.is-shown { opacity: 1; }
+
+@media (max-width: 860px) {
+  .invitation__title { font-size: var(--step-3); }
+  .invitation__stage { min-height: 46vh; }
+}
+
+/* ── The cloud veil: above everything, only while it is up ── */
+/* laid out (invisible) while idle, so a prepared canvas already has its full-size buffer */
+.cloud-veil { position: fixed; inset: 0; z-index: 200; pointer-events: none; view-transition-name: veil; }
+.cloud-veil:not(.is-up) { visibility: hidden; }
+.cloud-veil.is-blocking { pointer-events: auto; }
+.cloud-veil__host { position: absolute; inset: 0; }
+.cloud-veil__host[hidden] { display: none; }
+.cloud-veil__canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.cloud-veil__plain { position: absolute; inset: 0; opacity: 0; }

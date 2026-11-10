@@ -6,12 +6,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 5288",
-    "build": "npm run content && tsc --noEmit -p tsconfig.json && vite build",
+    "build": "npm run content && tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json && vite build",
     "preview": "vite preview --port 5289",
     "content": "node scripts/build-content.mjs",
     "content:import": "node scripts/build-content.mjs --import ../YOUrigin/starters/cassidy-ventures.json",
     "check:guide": "node scripts/check-guide.mjs",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
     "test": "vitest run",
     "optimize:guide": "node scripts/optimize-guide.mjs",
     "test:guide-pipeline": "node scripts/make-test-guide.mjs public/models/test-guide.glb && node scripts/optimize-guide.mjs public/models/test-guide.glb && node scripts/check-guide.mjs public/models/test-guide.glb"
@@ -19,7 +19,6 @@
   "dependencies": {
     "@fontsource-variable/figtree": "^5.3.0",
     "@fontsource-variable/fraunces": "^5.3.0",
-    "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

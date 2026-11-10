@@ -141,7 +141,7 @@ works.sort((a, b) => a.order - b.order);
 const out = {
   $generated: 'by scripts/build-content.mjs. Do not edit: change content/ and rebuild.',
   owner,
-  about: { portrait: about.portrait ?? null, portraitAlt: about.portraitAlt ?? '', contact: about.contact ?? [] },
+  about: { portrait: about.portrait ?? null, portraitAlt: about.portraitAlt ?? '', portraitCredit: about.portraitCredit?.label && about.portraitCredit?.href ? about.portraitCredit : null, contact: about.contact ?? [] },
   realms,
   works: works.map(({ order, ...w }) => w),
 };
