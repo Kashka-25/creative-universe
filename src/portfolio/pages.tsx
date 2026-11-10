@@ -257,6 +257,7 @@ export function AboutPage() {
                 <a href={about.portraitCredit.href} target="_blank" rel="noopener noreferrer">
                   {about.portraitCredit.label}<span className="visually-hidden"> on Instagram (opens in a new tab)</span>
                 </a>
+                {about.portraitCredit.note && <><br />{about.portraitCredit.note}</>}
               </figcaption>
             )}
           </figure>

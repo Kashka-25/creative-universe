@@ -11,9 +11,10 @@
     "portrait": "art/guide.webp",
     "portraitAlt": "Cassidy’s guide: a shaggy chimp in an orange-red beanie and dungarees, eyes closed in meditation, a turquoise third eye on his forehead, gold hoops in his ears, cradling a turquoise cloud, with the sun and a lightning bolt behind him.",
     "portraitCredit": {
-      "lead": "Artwork by",
+      "lead": "Artwork by the wonderful",
       "label": "@starzillaa_",
-      "href": "https://www.instagram.com/starzillaa_/"
+      "href": "https://www.instagram.com/starzillaa_/",
+      "note": "Animated by Cassidy Rae"
     },
     "contact": [
       {
