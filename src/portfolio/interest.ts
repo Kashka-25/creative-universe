@@ -17,8 +17,6 @@ export interface InterestInput {
   message?: string;
   project: string;
   page: string;
-  /** The honeypot: people never see it, so anything in it means a bot. */
-  gotcha?: string;
 }
 
 /** The subject Gmail filters on: "[<Project>] Interest from <name>". */
@@ -44,6 +42,32 @@ export function interestPayload(i: InterestInput): Record<string, string> {
     project: i.project,
     page: i.page,
     subject: interestSubject(i.project, i.name),
-    _gotcha: i.gotcha ?? '',
   };
+}
+
+/** Where people can write when the form can't reach Formspree. */
+export const INTEREST_EMAIL = 'YourOwnUniverse.life@gmail.com';
+
+/**
+ * A mailto link that carries what the visitor already typed, so a failed send
+ * costs them nothing: their own mail app opens with it filled in.
+ */
+export function interestMailto(i: Pick<InterestInput, 'name' | 'message' | 'project'>): string {
+  const name = i.name.trim();
+  const body = [(i.message ?? '').trim(), name ? `From ${name}` : ''].filter(Boolean).join('\n\n');
+  const subject = interestSubject(i.project, name || 'a visitor');
+  return `mailto:${INTEREST_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/** Formspree's own explanation of a refused submission, if it gave one. */
+export function interestRefusal(body: unknown): string | null {
+  if (!body || typeof body !== 'object') return null;
+  const b = body as { error?: unknown; errors?: unknown };
+  if (Array.isArray(b.errors)) {
+    const msgs = b.errors
+      .map((e) => (e && typeof e === 'object' ? (e as { message?: unknown }).message : null))
+      .filter((m): m is string => typeof m === 'string' && m.trim() !== '');
+    if (msgs.length) return msgs.join('. ');
+  }
+  return typeof b.error === 'string' && b.error.trim() ? b.error.trim() : null;
 }
