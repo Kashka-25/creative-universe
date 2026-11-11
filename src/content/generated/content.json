@@ -106,8 +106,54 @@
       "portfolioDescription": "A home for growing, together. YOU brings personal development and community into one place: guided journeys to follow at your own pace, events to meet in person, a marketplace for people who help others grow, and a playful layer that notices progress and makes it feel worth celebrating.",
       "link": "https://yourownuniverse.life/",
       "action": {
-        "kind": "visit",
-        "url": "https://yourownuniverse.life/"
+        "kind": "demo",
+        "url": "https://yourownuniverse.life/demo?from=https%3A%2F%2Fkashka-25.github.io%2Fcreative-universe%2F%23%2Fwork%2Fyou"
+      },
+      "preview": {
+        "images": [
+          {
+            "src": "content/previews/you-welcome.webp",
+            "alt": "Try YOU, the demo's welcome on a phone: “A calm, private place to journal, grow habits and see your life take shape”, with Explore as an example person, Start blank, and the beta invitation.",
+            "width": 540,
+            "height": 1169
+          },
+          {
+            "src": "content/previews/you-walkthrough.webp",
+            "alt": "A short moving walkthrough of the YOU demo on a phone: the Try YOU welcome, then Wren's Home, YOUrnal, PursYOUts, YOUrney and YOU pages, all with example data.",
+            "width": 390,
+            "height": 844
+          },
+          {
+            "src": "content/previews/you-yournal.webp",
+            "alt": "The YOUrnal for Wren, a made-up Seeker: dated entries such as a heron standing still in the river, with moods and tags.",
+            "width": 540,
+            "height": 1169
+          },
+          {
+            "src": "content/previews/you-pursyouts.webp",
+            "alt": "Wren's PursYOUts: active habits and goals, such as a river walk streak, morning pages and finishing a beginner pottery course.",
+            "width": 540,
+            "height": 1169
+          },
+          {
+            "src": "content/previews/you-yourney.webp",
+            "alt": "Wren's YOUrney: memories and a chapter called “The river years”, with a memory titled “The bowl that held water”.",
+            "width": 540,
+            "height": 1169
+          },
+          {
+            "src": "content/previews/you-pillars.webp",
+            "alt": "The YOU page: Wren's rank, Wanderer, and the eight Pillars of life drawn as petals around a golden centre.",
+            "width": 540,
+            "height": 1169
+          },
+          {
+            "src": "content/previews/you-focus.webp",
+            "alt": "Focus: “What would you like to tend?”, with Wren's pursuits to choose from for a focus session.",
+            "width": 540,
+            "height": 1169
+          }
+        ]
       },
       "invite": "mailto:YourOwnUniverse.life@gmail.com",
       "realm": "digital",
