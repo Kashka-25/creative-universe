@@ -584,6 +584,27 @@
       }
     },
     {
+      "slug": "the-art-of-free-flow",
+      "realm": "music",
+      "source": "works/the-art-of-free-flow.json",
+      "title": "The Art of Free Flow",
+      "category": "Free video course",
+      "description": "An invitation to let go, find your rhythm, and discover the freedom of spontaneous expression.",
+      "portfolioDescription": "Freestyle is the art of allowing expression to move through you without needing to know exactly where it is going. Through seven simple lessons, we'll explore how to loosen the mind, trust your instincts, develop your flow and find freedom in the moment.",
+      "body": [
+        "7 video lessons · Completely free · Learn at your own pace."
+      ],
+      "action": {
+        "kind": "visit",
+        "url": "https://kashka-25.github.io/the-art-of-free-flow/"
+      },
+      "cover": {
+        "src": "content/covers/the-art-of-free-flow.d3e0de3d.webp",
+        "width": 1600,
+        "height": 900
+      }
+    },
+    {
       "slug": "wachuneed",
       "realm": "digital",
       "collection": "Collaborations",

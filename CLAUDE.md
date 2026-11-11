@@ -39,6 +39,7 @@ The full proposal is at https://claude.ai/artifact/Bz16tnjtbRq71HYoFKsvVc (secti
 | Atlantean-Gardens/site | Kashka-25/Atlantean-Gardens |
 | FreeTheDream | Kashka-25/free-the-dream-map (private) |
 | Kronk-Booth | Kashka-25/kronk, a fork of Kronkverse/kronk (Tal's repo) |
+| TheArtOfFreeFlow | Kashka-25/the-art-of-free-flow (a free freestyle video course; shown in Music & Sound) |
 
 Kronk Booth's notes live in [projects/kronk-booth/](projects/kronk-booth/README.md), because the code is in someone else's repo. `_Archive` holds old copies; never build from it.
 
