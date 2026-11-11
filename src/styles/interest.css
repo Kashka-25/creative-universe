@@ -15,5 +15,3 @@
 .interest__field input[aria-invalid='true'] { border-color: var(--ember-deep); }
 .interest__problem { color: var(--ember-deep); }
 .interest__form .button { justify-self: start; }
-/* the honeypot: off-screen, never shown or announced */
-.interest__trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }

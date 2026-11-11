@@ -13,7 +13,6 @@ The form is hidden until an endpoint is set, so nothing shows until Cassidy has 
 | `project` | the work's title, e.g. `Kronk` |
 | `page` | the page it was sent from |
 | `subject` | `[Kronk] Interest from Sam` (Formspree uses this as the email subject) |
-| `_gotcha` | honeypot against spam bots; people never see it |
 
 Code: `src/portfolio/InterestForm.tsx` (the form) and `src/portfolio/interest.ts` (endpoint check, subject, payload; tested in `tests/interest.test.ts`). Styles: `src/styles/interest.css`.
 
@@ -65,3 +64,7 @@ In Gmail, go to Settings, then Filters and blocked addresses, then Create a new 
 A filter with only `Interest from` in the Subject and the label **Interest** catches all of them.
 
 The subject uses the work's title as it appears on the site. If a title changes, update its filter.
+
+## Spam and failed sends
+
+There is no hidden honeypot field: phone autofill can fill one, and the message is then silently dropped. Formspree's own spam filter handles bots, so check the form's **Spam** tab in Formspree if a message seems missing. When a send fails, the visitor sees Formspree's reason and a link that opens their own email app with their message already filled in, addressed to YourOwnUniverse.life@gmail.com.
