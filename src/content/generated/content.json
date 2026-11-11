@@ -101,10 +101,15 @@
       "title": "YOU",
       "category": "Human development",
       "colour": "jade",
-      "status": "building",
+      "status": "Beta testing",
       "description": "A human development and community ecosystem: personal growth, community, guided journeys, events, a marketplace and gamification.",
       "portfolioDescription": "A home for growing, together. YOU brings personal development and community into one place: guided journeys to follow at your own pace, events to meet in person, a marketplace for people who help others grow, and a playful layer that notices progress and makes it feel worth celebrating.",
       "link": "https://yourownuniverse.life/",
+      "action": {
+        "kind": "visit",
+        "url": "https://yourownuniverse.life/"
+      },
+      "invite": "mailto:YourOwnUniverse.life@gmail.com",
       "realm": "digital",
       "cover": {
         "src": "content/covers/you.e5d96b75.webp",
@@ -170,9 +175,10 @@
       "title": "CommYOUnity",
       "category": "Community technology",
       "colour": "olive",
-      "status": "building",
+      "status": "Beta testing",
       "description": "A small app for the people living and working at Terra Sangha, an eight-hectare community on the land in Portugal.",
       "portfolioDescription": "A shared home, in an app, for the people living and working at Terra Sangha, an eight-hectare community on the land in Portugal. CommYOUnity brings together community tasks and rotas, shared expenses, a calendar of arrivals and gatherings, a noticeboard, and GratitYOUde, a simple way to thank one another.",
+      "invite": "mailto:YourOwnUniverse.life@gmail.com",
       "realm": "digital",
       "cover": {
         "src": "content/covers/commyounity.44c25a9f.webp",
@@ -310,7 +316,7 @@
       "title": "Sweet Vital Nectar",
       "category": "Fragrance",
       "colour": "rose",
-      "status": "building",
+      "status": "Resting",
       "description": "A fragrance brand: personal scent and botanical roll-on perfumes.",
       "portfolioDescription": "A fragrance brand about personal scent. Sweet Vital Nectar makes botanical roll-on perfumes: small, warm and close to the skin.",
       "realm": "ventures",
@@ -371,10 +377,37 @@
       "title": "Empatherapy",
       "category": "Therapeutic wellbeing",
       "colour": "teal",
-      "status": "building",
-      "description": "A therapeutic and wellbeing venture, including the Empatherapy healing fund initiative.",
-      "portfolioDescription": "Therapy and wellbeing grounded in empathy. Alongside its sessions, Empatherapy gives 10% of session revenue to its own Healing Fund.",
-      "link": "https://empatherapy.co/",
+      "status": "Vision in progress",
+      "description": "Where Seekers meet Alchemists for holistic healing. A vision in progress.",
+      "portfolioDescription": "Empatherapy is a vision in progress: a home where Seekers meet Alchemists for holistic healing, with its own Healing Fund. The idea has grown, and the website is being rebuilt for it; the screens below use made-up example Alchemists.",
+      "preview": {
+        "images": [
+          {
+            "src": "content/previews/empatherapy-home.webp",
+            "alt": "The Empatherapy vision home page, labelled “Vision in progress · example data”.",
+            "width": 1440,
+            "height": 900
+          },
+          {
+            "src": "content/previews/empatherapy-alchemists.webp",
+            "alt": "Find an Alchemist: a directory of made-up example practitioners, each with an initials avatar and their approach.",
+            "width": 1440,
+            "height": 900
+          },
+          {
+            "src": "content/previews/empatherapy-profile.webp",
+            "alt": "A made-up example Alchemist’s profile, marked “Example profile”, with their bio, approach and example sessions.",
+            "width": 1440,
+            "height": 900
+          },
+          {
+            "src": "content/previews/empatherapy-healing-fund.webp",
+            "alt": "The Healing Fund page of the Empatherapy vision.",
+            "width": 1440,
+            "height": 900
+          }
+        ]
+      },
       "realm": "ventures",
       "cover": {
         "src": "content/covers/empatherapy.d7135987.webp",
@@ -389,9 +422,9 @@
       "title": "Chantilly's Tallow",
       "category": "Client work",
       "colour": "moss",
-      "status": "complete",
+      "status": "Live",
       "description": "Grass-fed, organic tallow skincare, handcrafted on a farm in Gippsland.",
-      "portfolioDescription": "Grass-fed, organic tallow skincare, handcrafted on a farm in Gippsland with ethical, sustainable practices. A client project I assisted with.",
+      "portfolioDescription": "Grass-fed, organic tallow skincare, handcrafted on a farm in Gippsland with ethical, sustainable practices. A client project for business owner Chantelle: I was the project coordinator, and the website was developed by Cherryslabs.com.",
       "link": "https://chantillytallow.com/",
       "realm": "digital",
       "cover": {
@@ -407,7 +440,7 @@
       "title": "ReFocus Counselling",
       "category": "Client work",
       "colour": "amber",
-      "status": "complete",
+      "status": "Live",
       "description": "Counselling with Julie Santall, helping people transform past pain into lasting strength.",
       "portfolioDescription": "Counselling with Julie Santall, who brings more than 35 years of experience to helping people transform past pain into lasting strength and rewrite their own story. A client project I assisted with.",
       "link": "https://www.refocuscounselling.com/",
@@ -610,10 +643,10 @@
             "height": 500
           },
           {
-            "src": "content/previews/living-youlogy-phone.webp",
-            "alt": "The opening screen on a phone: the candle and the title \"My Living YOUlogy\".",
-            "width": 488,
-            "height": 1055
+            "src": "content/previews/living-youlogy-know.webp",
+            "alt": "A section headed “You are in control of your experience”: the evening holds space for emotional depth, and guests may sit in silence, feel nothing, cry or laugh.",
+            "width": 1440,
+            "height": 900
           }
         ]
       },
@@ -652,6 +685,22 @@
       "title": "Wachuneed",
       "category": "Collaboration",
       "description": "Kronk's marketplace, where members offer and ask for art, stuff and services from each other. Kronk handles no payment: buyer and seller agree that between them.",
+      "preview": {
+        "images": [
+          {
+            "src": "content/previews/wachuneed-offered.webp",
+            "alt": "Wachuneed in the Kronk tour, with example data: members’ Offered listings, such as linocut prints, an old keyboard and mixing help, each with a Message button.",
+            "width": 1440,
+            "height": 900
+          },
+          {
+            "src": "content/previews/wachuneed-desired.webp",
+            "alt": "Wachuneed’s Desired listings in the Kronk tour, with example data: borrowing a microphone for a weekend and a kid’s bike.",
+            "width": 1440,
+            "height": 900
+          }
+        ]
+      },
       "cover": {
         "src": "content/covers/wachuneed.dc5a324b.webp",
         "width": 1600,
