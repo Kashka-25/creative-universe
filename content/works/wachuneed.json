@@ -5,5 +5,17 @@
   "collection": "Collaborations",
   "category": "Collaboration",
   "description": "Kronk's marketplace, where members offer and ask for art, stuff and services from each other. Kronk handles no payment: buyer and seller agree that between them.",
-  "cover": "media/wachuneed.webp"
+  "cover": "media/wachuneed.webp",
+  "preview": {
+    "images": [
+      {
+        "src": "content/previews/wachuneed-offered.webp",
+        "alt": "Wachuneed in the Kronk tour, with example data: members’ Offered listings, such as linocut prints, an old keyboard and mixing help, each with a Message button."
+      },
+      {
+        "src": "content/previews/wachuneed-desired.webp",
+        "alt": "Wachuneed’s Desired listings in the Kronk tour, with example data: borrowing a microphone for a weekend and a kid’s bike."
+      }
+    ]
+  }
 }

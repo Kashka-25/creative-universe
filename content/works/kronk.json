@@ -20,24 +20,24 @@
   "preview": {
     "images": [
       {
-        "src": "content/previews/kronk-tour-booth.webp",
-        "alt": "The Kronk tour at step 5, the Booth: a live banner for a made-up member's set above the Musik grid of example sets with play and save buttons, beside a short explanation of the Booth."
-      },
-      {
-        "src": "content/previews/kronk-tour-set.webp",
-        "alt": "The Kronk tour's set page for an example set, with credits, a track list, Play next and Shoutouts."
+        "src": "content/previews/kronk-tour-welcome.webp",
+        "alt": "The Kronk tour's welcome, with example data: “A small community, built together”, beside a map of what you'll see: Home, Mates, the Hub, the Booth, Live, Wachuneed and Join."
       },
       {
         "src": "content/previews/kronk-tour-home.webp",
         "alt": "The Kronk tour's Home step: a feed of made-up members' posts in time order."
       },
       {
-        "src": "content/previews/kronk-about.webp",
-        "alt": "Kronk's About page: a ring of round icons for About, How-it-works, Contributors, Governance, Rules, Privacy and Terms around the Kronk emblem, on a dark background."
+        "src": "content/previews/kronk-tour-mates.webp",
+        "alt": "The Kronk tour's Mates step: a post with its reach ladder (Just me, Mates, Orbit, Kronkverse) and made-up people you might know."
       },
       {
-        "src": "content/previews/kronk-booth-musik.webp",
-        "alt": "The Booth's Musik page: a grid of sets and mixes with cover art, including My Living YOUlogy and Lavender Skies by Cassidy Rae, and Waiting For A Ride by Cassidy Rae ft Taylah Mayne."
+        "src": "content/previews/kronk-tour-hub.webp",
+        "alt": "The Kronk tour's Hub: korners such as the Booth, Kalendar, Kommons, Kuestions, Moments, Wachuneed, Albutts and Krew, each to tune in to."
+      },
+      {
+        "src": "content/previews/kronk-about.webp",
+        "alt": "Kronk's About page: a ring of round icons for About, How-it-works, Contributors, Governance, Rules, Privacy and Terms around the Kronk emblem, on a dark background."
       }
     ]
   }

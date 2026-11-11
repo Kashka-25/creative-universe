@@ -167,9 +167,13 @@ export function previewSrc(s) {
  */
 export function siteDemoFile(url) {
   if (typeof url !== 'string') return null;
-  const m = /^demos\/[a-z0-9][a-z0-9-]*\/((?:[A-Za-z0-9_-][A-Za-z0-9._-]*\/)*(?:[A-Za-z0-9_-][A-Za-z0-9._-]*)?)$/.exec(url);
+  // An optional #step (letters, digits, - and _) opens the demo at that step, e.g. "demos/kronk/#5".
+  const parts = url.split('#');
+  if (parts.length > 2 || (parts.length === 2 && !/^[A-Za-z0-9_-]+$/.test(parts[1]))) return null;
+  const path = parts[0];
+  const m = /^demos\/[a-z0-9][a-z0-9-]*\/((?:[A-Za-z0-9_-][A-Za-z0-9._-]*\/)*(?:[A-Za-z0-9_-][A-Za-z0-9._-]*)?)$/.exec(path);
   if (!m) return null;
-  return url.endsWith('/') ? `${url}index.html` : url;
+  return path.endsWith('/') ? `${path}index.html` : path;
 }
 
 /**

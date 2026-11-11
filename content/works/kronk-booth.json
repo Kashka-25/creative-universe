@@ -11,21 +11,25 @@
   "cover": "media/kronk-booth.webp",
   "action": {
     "kind": "tour",
-    "url": "demos/kronk/"
+    "url": "demos/kronk/#5"
   },
   "preview": {
     "images": [
       {
         "src": "content/previews/kronk-tour-booth.webp",
-        "alt": "The Kronk tour at step 5, the Booth: a live banner for a made-up member's set above the Musik grid of example sets with play and save buttons, beside a short explanation of the Booth."
+        "alt": "The Booth in the Kronk tour, with example data: a live banner for a made-up member's set above the Musik grid of example sets with play and save buttons."
       },
       {
         "src": "content/previews/kronk-tour-set.webp",
-        "alt": "The Kronk tour's set page for an example set, with credits, a track list, Play next and Shoutouts."
+        "alt": "A set's page in the Booth tour: credits, a track list, Play next and Shoutouts, with example data."
+      },
+      {
+        "src": "content/previews/kronk-tour-live.webp",
+        "alt": "The Booth's Live sets in the tour: a made-up live set to listen in to, and coming-up sets with Remind me."
       },
       {
         "src": "content/previews/kronk-booth-musik.webp",
-        "alt": "The Booth's Musik page: a grid of sets and mixes with cover art, including My Living YOUlogy and Lavender Skies by Cassidy Rae, and Waiting For A Ride by Cassidy Rae ft Taylah Mayne."
+        "alt": "The Booth's Musik page on Kronk: a grid of sets and mixes with cover art, including My Living YOUlogy and Lavender Skies by Cassidy Rae, and Waiting For A Ride by Cassidy Rae ft Taylah Mayne."
       }
     ]
   }

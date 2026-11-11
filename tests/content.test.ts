@@ -205,6 +205,9 @@ describe('content pipeline', () => {
       const exists = (rel: string) => files.has(rel);
       expect(siteDemoFile('demos/fake-demo/')).toBe('demos/fake-demo/index.html');
       expect(siteDemoFile('demos/fake-demo/other.html')).toBe('demos/fake-demo/other.html');
+      expect(siteDemoFile('demos/fake-demo/#5')).toBe('demos/fake-demo/index.html');
+      expect(siteDemoFile('demos/fake-demo/#bad step')).toBeNull();
+      expect(siteDemoFile('demos/fake-demo/#a#b')).toBeNull();
       for (const url of ['demos/fake-demo/', 'demos/fake-demo/other.html']) {
         const { msgs, warn } = collect();
         const works = worksFromStarter(exported([{ action: { kind: 'demo', url } }, {}]), warn, exists);
