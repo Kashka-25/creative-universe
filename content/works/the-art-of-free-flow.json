@@ -1,12 +1,19 @@
 {
-  "$comment": "Cassidy's free freestyle video course (repo Kashka-25/the-art-of-free-flow, its own project; this site only links out). Words are Cassidy's, verbatim from the course's brief (src/data/course.ts in that repo). Lesson titles and descriptions are not final, so none are quoted here. Cover: the rockstar Coco figure from the course, chosen by Cassidy (11 Nov 2026).",
+  "$comment": "Cassidy's free freestyle video course (repo Kashka-25/the-art-of-free-flow, its own project; this site only links out). Words are Cassidy's, verbatim from the course's brief (src/data/course.ts in that repo). Lesson titles are copied verbatim from src/data/lessons.ts in that repo, final as of 11 Nov 2026; Cassidy asked for them here. Cover: the rockstar Coco figure from the course, chosen by Cassidy (11 Nov 2026).",
   "title": "The Art of Free Flow",
   "realm": "music",
   "category": "Free video course",
   "description": "An invitation to let go, find your rhythm, and discover the freedom of spontaneous expression.",
   "portfolioDescription": "Freestyle is the art of allowing expression to move through you without needing to know exactly where it is going. Through seven simple lessons, we'll explore how to loosen the mind, trust your instincts, develop your flow and find freedom in the moment.",
   "body": [
-    "7 video lessons · Completely free · Learn at your own pace."
+    "7 video lessons · Completely free · Learn at your own pace.",
+    "1 · Introduction to Free Flow: Light Language",
+    "2 · Adding the Words",
+    "3 · Stringing Language Together",
+    "4 · Squeezing the Juice",
+    "5 · Trusting Your Instincts",
+    "6 · Putting It Together: Developing Your Flow",
+    "7 · Anchors of Freedom"
   ],
   "cover": "media/the-art-of-free-flow.webp",
   "action": { "kind": "visit", "url": "https://kashka-25.github.io/the-art-of-free-flow/" }
