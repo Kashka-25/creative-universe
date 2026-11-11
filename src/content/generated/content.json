@@ -224,6 +224,32 @@
       "status": "Beta testing",
       "description": "A small app for the people living and working at Terra Sangha, an eight-hectare community on the land in Portugal.",
       "portfolioDescription": "A shared home, in an app, for the people living and working at Terra Sangha, an eight-hectare community on the land in Portugal. CommYOUnity brings together community tasks and rotas, shared expenses, a calendar of arrivals and gatherings, a noticeboard, and GratitYOUde, a simple way to thank one another.",
+      "action": {
+        "kind": "demo",
+        "url": "https://commyounity.app/demo/"
+      },
+      "preview": {
+        "images": [
+          {
+            "src": "content/previews/commyounity-demo-welcome.webp",
+            "alt": "Welcome to Bramble Hollow, the CommYOUnity demo on a phone: an example community where you're Sam, its newest member, with a note that CommYOUnity is in beta.",
+            "width": 540,
+            "height": 1169
+          },
+          {
+            "src": "content/previews/commyounity-demo-home.webp",
+            "alt": "Bramble Hollow's Home: “Good afternoon, Sam”, a vote needed on planting a native hedge, 11 things tended to, and the noticeboard.",
+            "width": 540,
+            "height": 1169
+          },
+          {
+            "src": "content/previews/commyounity-demo-board.webp",
+            "alt": "The Community board: a proposal needing your vote, an open vote on the winter work days, and recent decisions such as buying a shared apple press.",
+            "width": 540,
+            "height": 1169
+          }
+        ]
+      },
       "invite": "mailto:YourOwnUniverse.life@gmail.com",
       "realm": "digital",
       "cover": {
