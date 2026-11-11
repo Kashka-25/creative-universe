@@ -189,16 +189,16 @@
           "preview": {
             "images": [
               {
-                "src": "content/previews/hopeium-home.webp",
-                "alt": "Home page: the HOPEIUM name with a lighthouse for the letter I, over dusky mountains and a low sun, with a \"Get support now\" button."
+                "src": "content/previews/intothelighthouse-home.webp",
+                "alt": "IntoTheLighthouse home page: the wordmark with a lighthouse as the ‘i’ of ‘Lighthouse’, over a dusk mountain scene, with a ‘Get support now’ button."
               },
               {
-                "src": "content/previews/hopeium-support.webp",
-                "alt": "Support page: \"How would you like to reach out?\", with two cream cards, \"Book a session\" and \"Request the next available time\"."
+                "src": "content/previews/intothelighthouse-support.webp",
+                "alt": "IntoTheLighthouse support page asking ‘How would you like to reach out?’, with two cards: book a session, or request the next available time."
               },
               {
-                "src": "content/previews/hopeium-request.webp",
-                "alt": "Request page: \"You don't need the perfect words.\", above a short form asking for a name and how to be contacted."
+                "src": "content/previews/intothelighthouse-safety.webp",
+                "alt": "IntoTheLighthouse safety page, ‘Your safety comes first’, showing emergency numbers for the UK, Ireland, the US, Canada and Australia."
               }
             ]
           }
