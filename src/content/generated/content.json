@@ -424,31 +424,31 @@
       "category": "Therapeutic wellbeing",
       "colour": "teal",
       "status": "Vision in progress",
-      "description": "Where Seekers meet Alchemists for holistic healing. A vision in progress.",
-      "portfolioDescription": "Empatherapy is a vision in progress: a home where Seekers meet Alchemists for holistic healing, with its own Healing Fund. The idea has grown, and the website is being rebuilt for it; the screens below use made-up example Alchemists.",
+      "description": "Discover new pathways to yourself. Seekers meet Alchemists, explore unfamiliar practices, and find a little light.",
+      "portfolioDescription": "Empatherapy is a vision in progress: a place to discover new pathways to yourself. Seekers meet Alchemists, explore unfamiliar practices through a gentle discovery tool, and find a little light, with IntoTheLighthouse for when someone simply needs care. The screens below use made-up example profiles; nothing can be booked yet.",
       "preview": {
         "images": [
           {
-            "src": "content/previews/empatherapy-home.webp",
-            "alt": "The Empatherapy vision home page, labelled “Vision in progress · example data”.",
+            "src": "content/previews/empatherapy-v2-home.webp",
+            "alt": "The Empatherapy vision home page: “Your journey starts somewhere”, with Begin your discovery and Explore Alchemists beside a drawn window with a plant and a cup of tea.",
             "width": 1440,
             "height": 900
           },
           {
-            "src": "content/previews/empatherapy-alchemists.webp",
-            "alt": "Find an Alchemist: a directory of made-up example practitioners, each with an initials avatar and their approach.",
+            "src": "content/previews/empatherapy-v2-alchemists.webp",
+            "alt": "Discover Alchemists: “People, not listings”, a note that example profiles are fictional and nothing can be booked yet, and a search by practice, format, location and price.",
             "width": 1440,
             "height": 900
           },
           {
-            "src": "content/previews/empatherapy-profile.webp",
-            "alt": "A made-up example Alchemist’s profile, marked “Example profile”, with their bio, approach and example sessions.",
+            "src": "content/previews/empatherapy-v2-discover.webp",
+            "alt": "The discovery results: “Here are a few paths you might like to explore”, suggesting a made-up example Alchemist for breathwork, with the reasons explained.",
             "width": 1440,
             "height": 900
           },
           {
-            "src": "content/previews/empatherapy-healing-fund.webp",
-            "alt": "The Healing Fund page of the Empatherapy vision.",
+            "src": "content/previews/empatherapy-v2-lighthouse.webp",
+            "alt": "The IntoTheLighthouse page within Empatherapy: “You don't have to navigate everything alone”, beside a lit lighthouse.",
             "width": 1440,
             "height": 900
           }
