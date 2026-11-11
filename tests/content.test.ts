@@ -42,11 +42,14 @@ describe('content pipeline', () => {
     expect(placeWorks(bad, {}, realmIds)[0]).toMatch(/unknown realm/);
   });
 
-  it('the generated content lists Kronk in Digital and in Music', () => {
+  it('lists Kronk in Digital only, and its Booth in Music', () => {
     const kronk = generated.works.find((x: { slug: string }) => x.slug === 'kronk');
     expect(kronk.realm).toBe('digital');
-    expect(kronk.alsoIn).toEqual(['music']);
+    expect(kronk.alsoIn ?? []).not.toContain('music');
     expect(kronk.category).toBe('Collaboration');
+    const booth = generated.works.find((x: { slug: string }) => x.slug === 'kronk-booth');
+    expect(booth.realm).toBe('music');
+    expect(booth.category).toBe('Collaboration');
   });
 
   it('places every starter work in a realm and refuses to guess', () => {

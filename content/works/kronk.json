@@ -1,10 +1,7 @@
 {
-  "$comment": "A collaboration: Kronk is Tal's platform, and Cassidy has helped build it. Facts from projects/kronk-booth/README.md and the Kronk Booth session (checked against the repo and the live site, 9 Nov 2026); Cassidy to review. Sharing permission confirmed by Cassidy, 9 Nov 2026. The action is a guided tour with example data (demos/kronk/), because Kronk is invite-only: the tour ends at Kronk's public About page, never a sign-up.",
+  "$comment": "A collaboration: Kronk is Tal's platform, and Cassidy has helped build it. Facts from projects/kronk-booth/README.md and the Kronk Booth session (checked against the repo and the live site, 9 Nov 2026); Cassidy to review. Sharing permission confirmed by Cassidy, 9 Nov 2026. The action is a guided tour with example data (demos/kronk/), because Kronk is invite-only: the tour ends at Kronk's public About page, never a sign-up. Kronk itself is a digital collaboration (Digital Creations only); its Booth has its own music entry, kronk-booth.json (Cassidy, 11 Nov 2026).",
   "title": "Kronk",
   "realm": "digital",
-  "alsoIn": [
-    "music"
-  ],
   "collection": "Collaborations",
   "category": "Collaboration",
   "description": "A community-owned social platform run by Tal. Cassidy has helped build the Booth, Kronk's stage for music.",
