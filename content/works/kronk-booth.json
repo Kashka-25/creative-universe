@@ -1,0 +1,32 @@
+{
+  "$comment": "The Booth, Kronk's music space, as its own music entry (Cassidy, 11 Nov 2026: Kronk is a digital collaboration; the Booth is music). Facts from projects/kronk-booth/README.md and the Kronk entry. Kronk is run by Tal; sharing permission confirmed by Cassidy, 9 Nov 2026.",
+  "title": "Kronk Booth",
+  "realm": "music",
+  "collection": "Collaborations",
+  "category": "Collaboration",
+  "description": "The Booth, Kronk's stage for music. Cassidy has helped build it with Tal.",
+  "portfolioDescription": "The Booth is Kronk's stage for music, with DJ sets, mixes, tracks, albums, readings and live sets. It plays music made by members and credits who made it.",
+  "role": "Contributor. Cassidy built the Booth tidy (#2127, merged 13 Oct 2026) and live sets and listening tools (#2339, merged 23 Oct 2026: My sets, saves, kinds, sort, play next, Remind me, Shoutouts, First listens and a live banner). More Booth work is in progress.",
+  "credits": "Kronk is run by Tal.",
+  "cover": "media/kronk-booth.webp",
+  "action": {
+    "kind": "tour",
+    "url": "demos/kronk/"
+  },
+  "preview": {
+    "images": [
+      {
+        "src": "content/previews/kronk-tour-booth.webp",
+        "alt": "The Kronk tour at step 5, the Booth: a live banner for a made-up member's set above the Musik grid of example sets with play and save buttons, beside a short explanation of the Booth."
+      },
+      {
+        "src": "content/previews/kronk-tour-set.webp",
+        "alt": "The Kronk tour's set page for an example set, with credits, a track list, Play next and Shoutouts."
+      },
+      {
+        "src": "content/previews/kronk-booth-musik.webp",
+        "alt": "The Booth's Musik page: a grid of sets and mixes with cover art, including My Living YOUlogy and Lavender Skies by Cassidy Rae, and Waiting For A Ride by Cassidy Rae ft Taylah Mayne."
+      }
+    ]
+  }
+}

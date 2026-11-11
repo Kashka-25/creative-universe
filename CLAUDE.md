@@ -16,7 +16,7 @@ This is **the central project** of Cassidy's ecosystem: a character-led portfoli
 The full proposal is at https://claude.ai/artifact/Bz16tnjtbRq71HYoFKsvVc (sections 8 and 9).
 
 - **Realms:** Digital Homes, with the sub-categories Healing (IntoTheLighthouse, Empatherapy) and Worlds & Stories (Atlantean Gardens), alongside YOUrigin, YOU, CommYOUnity, Wandering and FreeTheDream · Music & Sound (Cassidy's personal music portfolio) · Books & Poetry · Art · About. Contact and Creative Journey are pages of their own.
-- **Kronk** is shown as a collaboration with Tal (Cassidy has helped build it), in both Digital Homes and Music & Sound, covering its **Booth** and its **Marketplace (Wachuneed)**. Wachuneed gets a card only. Cassidy confirmed sharing permission on 9 Nov 2026.
+- **Kronk** is shown as a digital collaboration with Tal (Cassidy has helped build it), in Digital Homes, covering its **Booth** and its **Marketplace (Wachuneed)**. The **Booth** also has its own entry in Music & Sound (Cassidy, 11 Nov 2026). Wachuneed gets a card only. Cassidy confirmed sharing permission on 9 Nov 2026.
 - **Sweet Vital Nectar** stays as a card labelled Discontinued. Client work (Chantilly's Tallow, ReFocus Counselling) stays.
 - **HOPEIUM is renamed IntoTheLighthouse (I.T.L).** It keeps its own project space and stays ready to join the Empatherapy ecosystem.
 - **next.empatherapy leads Empatherapy.** Its destination shows a clearly labelled "vision in progress".
