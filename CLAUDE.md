@@ -16,8 +16,9 @@ This is **the central project** of Cassidy's ecosystem: a character-led portfoli
 The full proposal is at https://claude.ai/artifact/Bz16tnjtbRq71HYoFKsvVc (sections 8 and 9).
 
 - **Realms:** Digital Homes, with the sub-categories Healing (IntoTheLighthouse, Empatherapy) and Worlds & Stories (Atlantean Gardens), alongside YOUrigin, YOU, CommYOUnity, Wandering and FreeTheDream · Music & Sound (Cassidy's personal music portfolio) · Books & Poetry · Art · About. Contact and Creative Journey are pages of their own.
-- **Kronk** is shown as a digital collaboration with Tal (Cassidy has helped build it), in Digital Homes, covering its **Booth** and its **Marketplace (Wachuneed)**. The **Booth** also has its own entry in Music & Sound (Cassidy, 11 Nov 2026). Wachuneed gets a card only. Cassidy confirmed sharing permission on 9 Nov 2026.
-- **Sweet Vital Nectar** stays as a card labelled Discontinued. Client work (Chantilly's Tallow, ReFocus Counselling) stays.
+- **Kronk** is shown as a digital collaboration with Tal (Cassidy has helped build it), in Digital Homes. The **Booth** also has its own entry in Music & Sound (Cassidy, 11 Nov 2026). Cassidy confirmed sharing permission on 9 Nov 2026.
+- **Excluded from the site (13 Nov 2026):** Sweet Vital Nectar, Kronk Marketplace (Wachuneed), Living YOUlogy, Rhythm Relics and Creative Wellness. They are "Other projects" in the registry with `show: false`, to be sorted later into client or dormant work. Client work (Chantilly's Tallow, ReFocus Counselling) stays.
+- **The project registry** (`registry/projects.json`, see [docs/REGISTRY.md](docs/REGISTRY.md)) is the source of truth for which projects exist, their repos, demos and deploys, and which cards reach the site. Every card must be claimed there or the build stops.
 - **HOPEIUM is renamed IntoTheLighthouse (I.T.L).** It keeps its own project space and stays ready to join the Empatherapy ecosystem.
 - **next.empatherapy leads Empatherapy.** Its destination shows a clearly labelled "vision in progress".
 - **YOUrigin is the source of updates.** A planned YOUrigin feature links a Project to its destination here, keeps change notes on it, and publishes a snapshot this site reads at build time.

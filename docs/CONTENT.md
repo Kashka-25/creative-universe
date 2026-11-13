@@ -44,6 +44,10 @@ Without an `action`, a work's card shows no button, and its page keeps showing t
 }
 ```
 
+## Which cards reach the site
+
+Every card, from the starter pack or `content/works/`, must be claimed by a project in `registry/projects.json`, or the build stops. Cards owned by an "other project" with `"show": false` are left off the site. See [REGISTRY.md](REGISTRY.md).
+
 ## Realms
 
 `content/realms.json` defines the six realms (titles, nav labels, short blurbs, emblem, accent colour). Blurbs are site copy, so edit freely. The two works realms' blurbs reuse the starter pack's own intro words.

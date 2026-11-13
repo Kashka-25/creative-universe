@@ -55,9 +55,6 @@ In Gmail, go to Settings, then Filters and blocked addresses, then Create a new 
 | `[Empatherapy]` | Interest/Empatherapy |
 | `[FreeTheDream]` | Interest/FreeTheDream |
 | `[Kronk]` | Interest/Kronk |
-| `[Wachuneed]` | Interest/Kronk |
-| `[My Living YOUlogy]` | Interest/Music |
-| `[Sweet Vital Nectar]` | Interest/Sweet Vital Nectar |
 | `[Chantilly's Tallow]` | Interest/Client work |
 | `[ReFocus Counselling]` | Interest/Client work |
 

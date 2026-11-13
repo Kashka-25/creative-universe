@@ -5,6 +5,7 @@
 //   content/placement.json   which realm each starter-pack work belongs to
 //   content/realms.json      the six realms
 //   content/about.json       About & Contact
+//   registry/projects.json   which project owns each card, and which stay off the site
 // and writes:
 //   src/content/generated/content.json   what the site reads
 //   public/content/covers/<slug>.<ext>   cover images pulled out of data URIs
@@ -18,6 +19,7 @@ import { createHash } from 'node:crypto';
 import { join, basename, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { worksFromStarter, placeWorks, parseDataUri, imageSize, checkWork, readAction, readPreview, readStatus, readInvite, isWebUrl, EXTRA_FIELDS, STARTER_FIELDS, slugify } from './lib/content-core.mjs';
+import { checkRegistry, applyRegistry } from './lib/registry.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const P = (...s) => join(ROOT, ...s);
@@ -81,6 +83,19 @@ if (existsSync(worksDir)) {
   });
 }
 
+// 3. The project registry: every card needs an owner there, and hidden projects stay off the site.
+const registry = readJson(P('registry/projects.json'));
+const registryProblems = checkRegistry(registry);
+if (registryProblems.length) {
+  console.error('registry/projects.json has problems:\n  - ' + registryProblems.join('\n  - '));
+  process.exit(1);
+}
+const registered = applyRegistry(works, registry);
+problems.push(...registered.problems);
+works.splice(0, works.length, ...registered.works);
+if (registered.hidden.length) console.log(`Registry: left off the site: ${registered.hidden.map((w) => w.title).join(', ')}`);
+if (registered.missing.length) console.log(`Registry: listed, but no card yet: ${registered.missing.join(', ')}`);
+
 problems.push(...placeWorks(works, placement, realmIds));
 if (problems.length) {
   console.error('Content build stopped:\n  - ' + problems.join('\n  - '));
@@ -112,7 +127,7 @@ for (const w of works) {
   } else delete w.preview;
 }
 
-// 3. Covers: write image files, keep only paths + sizes in the JSON
+// 4. Covers: write image files, keep only paths + sizes in the JSON
 const coverDir = P('public/content/covers');
 rmSync(coverDir, { recursive: true, force: true });
 mkdirSync(coverDir, { recursive: true });

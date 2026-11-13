@@ -156,6 +156,7 @@
         ]
       },
       "invite": "mailto:YourOwnUniverse.life@gmail.com",
+      "project": "you",
       "realm": "digital",
       "cover": {
         "src": "content/covers/you.e5d96b75.webp",
@@ -207,6 +208,7 @@
         ]
       },
       "invite": "mailto:YourOwnUniverse.life@gmail.com",
+      "project": "yourigin",
       "realm": "digital",
       "cover": {
         "src": "content/covers/yourigin.de9c245f.webp",
@@ -251,6 +253,7 @@
         ]
       },
       "invite": "mailto:YourOwnUniverse.life@gmail.com",
+      "project": "commyounity",
       "realm": "digital",
       "cover": {
         "src": "content/covers/commyounity.44c25a9f.webp",
@@ -330,6 +333,7 @@
           "height": 1170
         }
       },
+      "project": "wandering",
       "realm": "digital",
       "cover": {
         "src": "content/covers/wandering.77c73822.webp",
@@ -374,26 +378,10 @@
           }
         ]
       },
+      "project": "atlantean-gardens",
       "realm": "ventures",
       "cover": {
         "src": "content/covers/atlantean-gardens.5005dbc9.webp",
-        "width": 1600,
-        "height": 900
-      }
-    },
-    {
-      "slug": "sweet-vital-nectar",
-      "collection": "Creative Ventures & Worlds",
-      "source": "starter:cassidy-ventures-v1",
-      "title": "Sweet Vital Nectar",
-      "category": "Fragrance",
-      "colour": "rose",
-      "status": "Resting",
-      "description": "A fragrance brand: personal scent and botanical roll-on perfumes.",
-      "portfolioDescription": "A fragrance brand about personal scent. Sweet Vital Nectar makes botanical roll-on perfumes: small, warm and close to the skin.",
-      "realm": "ventures",
-      "cover": {
-        "src": "content/covers/sweet-vital-nectar.87809cb1.webp",
         "width": 1600,
         "height": 900
       }
@@ -435,6 +423,7 @@
           }
         ]
       },
+      "project": "intothelighthouse",
       "realm": "ventures",
       "cover": {
         "src": "content/covers/intothelighthouse.aa5f7828.webp",
@@ -480,6 +469,7 @@
           }
         ]
       },
+      "project": "empatherapy",
       "realm": "ventures",
       "cover": {
         "src": "content/covers/empatherapy.d7135987.webp",
@@ -498,6 +488,7 @@
       "description": "Grass-fed, organic tallow skincare, handcrafted on a farm in Gippsland.",
       "portfolioDescription": "Grass-fed, organic tallow skincare, handcrafted on a farm in Gippsland with ethical, sustainable practices. A client project for business owner Chantelle: I was the project coordinator, and the website was developed by Cherryslabs.com.",
       "link": "https://chantillytallow.com/",
+      "project": "chantillys-tallow",
       "realm": "digital",
       "cover": {
         "src": "content/covers/chantillys-tallow.ba8d0d21.webp",
@@ -516,6 +507,7 @@
       "description": "Counselling with Julie Santall, helping people transform past pain into lasting strength.",
       "portfolioDescription": "Counselling with Julie Santall, who brings more than 35 years of experience to helping people transform past pain into lasting strength and rewrite their own story. A client project I assisted with.",
       "link": "https://www.refocuscounselling.com/",
+      "project": "refocus-counselling",
       "realm": "digital",
       "cover": {
         "src": "content/covers/refocus-counselling.cd98805d.webp",
@@ -577,6 +569,7 @@
           }
         ]
       },
+      "project": "freethedream",
       "cover": {
         "src": "content/covers/freethedream.7128b676.webp",
         "width": 1600,
@@ -626,6 +619,7 @@
           }
         ]
       },
+      "project": "kronk-booth",
       "cover": {
         "src": "content/covers/kronk-booth.5d34cbc1.webp",
         "width": 1600,
@@ -685,51 +679,9 @@
           }
         ]
       },
+      "project": "kronk",
       "cover": {
         "src": "content/covers/kronk.a86fd806.webp",
-        "width": 1600,
-        "height": 900
-      }
-    },
-    {
-      "slug": "my-living-youlogy",
-      "realm": "music",
-      "source": "works/my-living-youlogy.json",
-      "title": "My Living YOUlogy",
-      "category": "Invitation website",
-      "description": "Cassidy's invitation website for their first concert: “An evening of heart-channelled music.”",
-      "portfolioDescription": "“My invitation website to my first concert,” in Cassidy's words. YOU (Your Own Universe) presents “A Living Eulogy with Cassidy”: “An evening of music, reflection & presence.”",
-      "alsoIn": [
-        "digital"
-      ],
-      "action": {
-        "kind": "visit",
-        "url": "https://kashka-25.github.io/living-youlogy/"
-      },
-      "preview": {
-        "images": [
-          {
-            "src": "content/previews/living-youlogy-home.webp",
-            "alt": "The opening screen: a lit candle above the title \"My Living YOUlogy\", with \"With Cassidy\" and \"Enter\" below, on a dark background.",
-            "width": 800,
-            "height": 500
-          },
-          {
-            "src": "content/previews/living-youlogy-evening.webp",
-            "alt": "A section headed \"An evening of music, reflection & presence\", with a few lines of invitation text below.",
-            "width": 800,
-            "height": 500
-          },
-          {
-            "src": "content/previews/living-youlogy-know.webp",
-            "alt": "A section headed “You are in control of your experience”: the evening holds space for emotional depth, and guests may sit in silence, feel nothing, cry or laugh.",
-            "width": 1440,
-            "height": 900
-          }
-        ]
-      },
-      "cover": {
-        "src": "content/covers/my-living-youlogy.fe776061.webp",
         "width": 1600,
         "height": 900
       }
@@ -756,38 +708,9 @@
         "kind": "visit",
         "url": "https://kashka-25.github.io/the-art-of-free-flow/"
       },
+      "project": "the-art-of-free-flow",
       "cover": {
         "src": "content/covers/the-art-of-free-flow.d3e0de3d.webp",
-        "width": 1600,
-        "height": 900
-      }
-    },
-    {
-      "slug": "wachuneed",
-      "realm": "digital",
-      "collection": "Collaborations",
-      "source": "works/wachuneed.json",
-      "title": "Wachuneed",
-      "category": "Collaboration",
-      "description": "Kronk's marketplace, where members offer and ask for art, stuff and services from each other. Kronk handles no payment: buyer and seller agree that between them.",
-      "preview": {
-        "images": [
-          {
-            "src": "content/previews/wachuneed-offered.webp",
-            "alt": "Wachuneed in the Kronk tour, with example data: members’ Offered listings, such as linocut prints, an old keyboard and mixing help, each with a Message button.",
-            "width": 1440,
-            "height": 900
-          },
-          {
-            "src": "content/previews/wachuneed-desired.webp",
-            "alt": "Wachuneed’s Desired listings in the Kronk tour, with example data: borrowing a microphone for a weekend and a kid’s bike.",
-            "width": 1440,
-            "height": 900
-          }
-        ]
-      },
-      "cover": {
-        "src": "content/covers/wachuneed.dc5a324b.webp",
         "width": 1600,
         "height": 900
       }

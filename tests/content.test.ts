@@ -9,6 +9,7 @@ const pack = JSON.parse(readFileSync(new URL('../content/starter/cassidy-venture
 const placement = JSON.parse(readFileSync(new URL('../content/placement.json', import.meta.url), 'utf8'));
 const contract = JSON.parse(readFileSync(new URL('../contract/guide-contract.json', import.meta.url), 'utf8'));
 const generated = JSON.parse(readFileSync(new URL('../src/content/generated/content.json', import.meta.url), 'utf8'));
+const registry = JSON.parse(readFileSync(new URL('../registry/projects.json', import.meta.url), 'utf8'));
 
 describe('content pipeline', () => {
   it('slugifies titles', () => {
@@ -327,8 +328,13 @@ describe('content pipeline', () => {
     expect(generated.owner.name).toBe(pack.ownerName);
     expect(generated.owner.intro).toBe(pack.intro);
     const fromPack = generated.works.filter((w: { source: string }) => w.source.startsWith('starter:'));
+    const hiddenSlugs = registry.otherProjects.entries
+      .filter((o: { portfolio: { show: boolean } }) => !o.portfolio.show)
+      .flatMap((o: { portfolio: { works: string[] } }) => o.portfolio.works);
     expect(fromPack.map((w: { title: string }) => w.title)).toEqual(
-      pack.sections.flatMap((s: { projects: { title: string }[] }) => s.projects.map((p) => p.title)),
+      pack.sections
+        .flatMap((s: { projects: { title: string }[] }) => s.projects.map((p) => p.title))
+        .filter((title: string) => !hiddenSlugs.includes(slugify(title))),
     );
     expect(generated.realms.map((r: { id: string }) => r.id)).toEqual(['digital', 'ventures', 'music', 'books', 'art', 'about']);
   });

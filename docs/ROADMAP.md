@@ -30,9 +30,10 @@ The ecosystem audit and architecture proposal are done.
 
 ## Phase 4 — Registry and connections
 
-- [ ] `registry/projects.json` with a schema covering name, description, cover, logo, URL, repo, status, category or realm, relationships, featured, and guide line
+- [x] `registry/projects.json`: every project's repo, branch, stack, stage, demo, production URL, deploy and dependencies, and which cards it owns; excluded projects kept off the site (13 Nov 2026, [REGISTRY.md](REGISTRY.md))
+- [ ] Grow the registry's site fields (cover, logo, realm, relationships, featured, guide line) as the new routes need them
 - [ ] Build-time reading of the registry, project manifests and YOUrigin's published snapshot, keeping the last good copy if a fetch fails
-- [ ] Content model changes: the new realms (Digital Homes with Healing and Worlds & Stories sub-categories, Music & Sound, Books & Poetry, Art, About); a "discontinued" status; a "helped build" collection (Kronk Booth, Kronk Marketplace); a work able to sit in two realms (Kronk Booth)
+- [ ] Content model changes: the new realms (Digital Homes with Healing and Worlds & Stories sub-categories, Music & Sound, Books & Poetry, Art, About); a "discontinued" status; a "helped build" collection (Kronk, Kronk Booth); a work able to sit in two realms (Kronk Booth)
 - [ ] YOUrigin: link a Project to its Creative Universe destination, with change notes and a publish step (a PR in YOUrigin)
 
 ## Phase 5 — The guide experience

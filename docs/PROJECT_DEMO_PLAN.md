@@ -11,6 +11,8 @@ Each Creative Universe project keeps its own repository and owns its own demo. C
 
 ## Project register
 
+The facts in this table (repos, demo links, deploys) now live in [`registry/projects.json`](../registry/projects.json) ([REGISTRY.md](REGISTRY.md)). Update the registry first; this table keeps each demo's scope and acceptance notes.
+
 | Project | Repository / owning session | Link type for Creative Universe | Demo scope and acceptance |
 |---|---|---|---|
 | YOU | `Kashka-25/you-app-build` | Dedicated demo preview | Build a polished, read-only visitor demo using fictional/sample data. Show the core personal-growth journey, values/pillars, pursuits, memory/calendar and avatar progression. No real account, private user data, live writes or exposed secrets. Use the current app as the base; label simulated flows honestly. |
