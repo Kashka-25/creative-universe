@@ -1,5 +1,5 @@
 {
-  "$comment": "The Enquire page (#/enquire, also #/contact). Words are Cassidy's own (13 Nov 2026), with spelling fixed only. Prices, session formats, credentials and anything else about the offerings are not known yet: ask Cassidy before adding any. Enquiries go to the same Formspree form as 'I'm interested', with the subject '[General enquiry] Interest from <name>'.",
+  "$comment": "The Enquire page (#/enquire, also #/contact). Words are Cassidy’s own (13 Nov 2026; Digital creator added first as the most important, 13 Nov 2026), with spelling fixed only. Prices, session formats, credentials and anything else about the offerings are not known yet: ask Cassidy before adding any. Enquiries go to the same Formspree form as 'I'm interested', with the subject '[General enquiry] Interest from <name>'.",
   "title": "Enquire",
   "dream": {
     "heading": "Bring a dream into the digital world",
@@ -8,6 +8,7 @@
   "offerings": {
     "heading": "My offerings",
     "roles": [
+      "Digital creator",
       "Holistic counsellor",
       "Complementary therapist",
       "Psychedelic integration therapist",
