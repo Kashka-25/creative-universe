@@ -5,6 +5,8 @@ import {
 } from '../content';
 import { ActionButton, InviteLine, LiveLink, PreviewGallery } from './actions';
 import { InterestForm } from './InterestForm';
+import { EnquiryButton, OfferingsList } from './Offerings';
+import enquire from '../../content/enquire.json';
 import { Cover, HeroStage, RealmMedallion, StatusPill, WorkCard, realmCount, realmHref } from './components';
 import { CloudScroll, LeafDivider, Vine } from './ornaments';
 import { SkyClouds } from './SkyClouds';
@@ -277,13 +279,19 @@ export function AboutPage() {
           <p className="hero__line">{owner.line}</p>
           <p className="prose">{owner.intro}</p>
 
+          <section aria-labelledby="offer-title" className="about-offer">
+            <h2 id="offer-title">{enquire.dream.heading}</h2>
+            <p className="prose">{enquire.dream.text}</p>
+            <OfferingsList headingLevel={3} />
+            <EnquiryButton />
+          </section>
+
           {about.contact.length > 0 ? (
             <section aria-labelledby="contact-title" className="contact">
               <h2 id="contact-title">Get in touch</h2>
               <ul>
                 {about.contact.map((c) => <li key={c.href}><a href={c.href} rel="noopener noreferrer">{c.label}</a></li>)}
               </ul>
-              <p><Link to="/enquire" className="button button--primary">Send an enquiry</Link></p>
             </section>
           ) : import.meta.env.DEV ? (
             <p className="dev-slot">Contact links go in <code>content/about.json</code>. Visitors don’t see this note.</p>

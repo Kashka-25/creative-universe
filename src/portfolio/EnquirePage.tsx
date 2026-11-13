@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import enquire from '../../content/enquire.json';
 import { about } from '../content';
 import { InterestForm } from './InterestForm';
+import { OfferingsList } from './Offerings';
 import { LeafDivider } from './ornaments';
 import { SkyClouds } from './SkyClouds';
 import { useDocumentTitle } from './useDocumentTitle';
@@ -27,13 +28,7 @@ export function EnquirePage() {
       </header>
 
       <div className="work-page__body">
-        <section aria-labelledby="offerings-title" className="enquire-page__offerings">
-          <h2 id="offerings-title" className="work-page__label">{enquire.offerings.heading}</h2>
-          <ul className="enquire-page__roles">
-            {enquire.offerings.roles.map((r) => <li key={r}>{r}</li>)}
-          </ul>
-          <p className="prose">{enquire.offerings.consultation}</p>
-        </section>
+        <OfferingsList />
 
         <InterestForm project={enquire.form.project} heading={enquire.form.heading} intro={enquire.form.intro} />
 

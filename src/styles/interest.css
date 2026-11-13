@@ -21,3 +21,10 @@
 .enquire-page__roles { padding-inline-start: 1.2em; display: grid; gap: 0.35rem; }
 .enquire-page__roles li::marker { color: var(--ember-deep); }
 .enquire-page__other { color: var(--ink-soft); }
+
+/* The same offerings, open on the About page, with a button that opens the form in place. */
+.about-offer { display: grid; gap: var(--space-2); }
+.about-offer .enquire-page__offerings { margin-block-end: 0; }
+.about-offer .enquire-page__roles { font-size: var(--step-1); }
+.about-offer h3.work-page__label { font-size: var(--step-1); }
+.enquiry-toggle .interest { margin-block: 0; }
