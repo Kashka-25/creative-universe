@@ -6,6 +6,7 @@ describe('the Enquire page', () => {
   it("carries Cassidy's own words and offerings", () => {
     expect(enquire.dream.text).toContain('bringing a dream of theirs into the digital world');
     expect(enquire.offerings.roles).toEqual([
+      'Digital creator',
       'Holistic counsellor',
       'Complementary therapist',
       'Psychedelic integration therapist',
