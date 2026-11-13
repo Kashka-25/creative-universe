@@ -222,8 +222,8 @@
       "category": "Community technology",
       "colour": "olive",
       "status": "Beta testing",
-      "description": "A small app for the people living and working at Terra Sangha, an eight-hectare community on the land in Portugal.",
-      "portfolioDescription": "A shared home, in an app, for the people living and working at Terra Sangha, an eight-hectare community on the land in Portugal. CommYOUnity brings together community tasks and rotas, shared expenses, a calendar of arrivals and gatherings, a noticeboard, and GratitYOUde, a simple way to thank one another.",
+      "description": "A shared home, in an app, for teams co-creating something together. First built for a land project in Portugal, now opening up to other communities, festivals and events.",
+      "portfolioDescription": "CommYOUnity was first built for Terra Sangha, an eight-hectare land project in Portugal, as a shared home in an app for the people living and working there. Now it is growing to be shared with other community projects, including festival and event organising, where teams come together to co-create something beautiful. It brings together tasks and rotas, shared expenses, a calendar of arrivals and gatherings, a noticeboard, decisions and votes, and GratitYOUde, a simple way to thank one another.",
       "action": {
         "kind": "demo",
         "url": "https://commyounity.app/demo/"
