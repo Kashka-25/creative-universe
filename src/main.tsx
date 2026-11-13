@@ -12,6 +12,7 @@ import './styles/interest.css';
 import { Layout } from './portfolio/Layout';
 import { noteNavigation } from './portfolio/transitions';
 import { AboutPage, NotFound, RealmPage, WorkPage, WorldPage } from './portfolio/pages';
+import { ENQUIRE_PATH, EnquirePage } from './portfolio/EnquirePage';
 import { applyFirstEntry, INVITATION_PATH } from './invitation/entry';
 import { InvitationPoster } from './invitation/InvitationPoster';
 import { introAlreadySeen, introStorageAvailable, markIntroSeen } from './intro/capability';
@@ -57,6 +58,8 @@ const router = createHashRouter([
       { path: '/realm/:id', element: <RealmPage /> },
       { path: '/work/:slug', element: <WorkPage /> },
       { path: '/about', element: <AboutPage /> },
+      { path: ENQUIRE_PATH, element: <EnquirePage /> },
+      { path: '/contact', element: <Navigate to={ENQUIRE_PATH} replace /> },
       { path: '*', element: <NotFound /> },
     ],
   },

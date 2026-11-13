@@ -17,7 +17,7 @@ import { INTEREST_EMAIL, interestEndpoint, interestMailto, interestPayload, inte
 type State = 'idle' | 'sending' | 'sent' | 'error';
 const TIMEOUT_MS = 15000;
 
-export function InterestForm({ project }: { project: string }) {
+export function InterestForm({ project, heading: title = 'I’m interested', intro }: { project: string; heading?: string; intro?: string }) {
   const endpoint = interestEndpoint();
   const id = useId();
   const form = useRef<HTMLFormElement>(null);
@@ -69,16 +69,16 @@ export function InterestForm({ project }: { project: string }) {
   if (state === 'sent') {
     return (
       <section className="interest" aria-labelledby={heading}>
-        <h2 id={heading} className="work-page__label">I’m interested</h2>
-        <p role="status">Thank you. Cassidy will be in touch about {project}.</p>
+        <h2 id={heading} className="work-page__label">{title}</h2>
+        <p role="status">{intro ? 'Thank you. Cassidy will be in touch.' : `Thank you. Cassidy will be in touch about ${project}.`}</p>
       </section>
     );
   }
   const needsFixing = !!(problems.name || problems.email);
   return (
     <section className="interest" aria-labelledby={heading}>
-      <h2 id={heading} className="work-page__label">I’m interested</h2>
-      <p className="interest__intro">Want to hear more about {project}, or be part of it? Leave your details and Cassidy will reply.</p>
+      <h2 id={heading} className="work-page__label">{title}</h2>
+      <p className="interest__intro">{intro ?? `Want to hear more about ${project}, or be part of it? Leave your details and Cassidy will reply.`}</p>
       <form ref={form} className="interest__form" onSubmit={send} noValidate>
         <label className="interest__field">
           <span>Name</span>

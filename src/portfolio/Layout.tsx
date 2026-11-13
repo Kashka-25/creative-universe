@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FocusEvent } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate, Link } from 'react-router-dom';
 import { owner, realms } from '../content';
+import { ENQUIRE_PATH } from './EnquirePage';
 import { GuideProvider, useGuide } from '../guide/GuideProvider';
 import { INVITATION_PATH } from '../invitation/entry';
 import { veil } from '../veil/veil';
@@ -141,6 +142,7 @@ export function Header({ replace = false, crossfade = false }: { replace?: boole
           {realms.map((r) => (
             <li key={r.id}><NavLink to={realmHref(r)} replace={replace} onClick={go(realmHref(r))}>{r.nav}</NavLink></li>
           ))}
+          <li><NavLink to={ENQUIRE_PATH} replace={replace} onClick={go(ENQUIRE_PATH)}>Enquire</NavLink></li>
         </ul>
       </nav>
     </header>

@@ -283,6 +283,7 @@ export function AboutPage() {
               <ul>
                 {about.contact.map((c) => <li key={c.href}><a href={c.href} rel="noopener noreferrer">{c.label}</a></li>)}
               </ul>
+              <p><Link to="/enquire" className="button button--primary">Send an enquiry</Link></p>
             </section>
           ) : import.meta.env.DEV ? (
             <p className="dev-slot">Contact links go in <code>content/about.json</code>. Visitors don’t see this note.</p>

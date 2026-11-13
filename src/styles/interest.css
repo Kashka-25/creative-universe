@@ -15,3 +15,9 @@
 .interest__field input[aria-invalid='true'] { border-color: var(--ember-deep); }
 .interest__problem { color: var(--ember-deep); }
 .interest__form .button { justify-self: start; }
+
+/* The Enquire page (src/portfolio/EnquirePage.tsx): Cassidy's offerings above the enquiry form. */
+.enquire-page__offerings { max-width: var(--measure); margin-block-end: var(--space-3); }
+.enquire-page__roles { padding-inline-start: 1.2em; display: grid; gap: 0.35rem; }
+.enquire-page__roles li::marker { color: var(--ember-deep); }
+.enquire-page__other { color: var(--ink-soft); }
