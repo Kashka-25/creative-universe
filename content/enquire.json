@@ -1,0 +1,24 @@
+{
+  "$comment": "The Enquire page (#/enquire, also #/contact). Words are Cassidy's own (13 Nov 2026), with spelling fixed only. Prices, session formats, credentials and anything else about the offerings are not known yet: ask Cassidy before adding any. Enquiries go to the same Formspree form as 'I'm interested', with the subject '[General enquiry] Interest from <name>'.",
+  "title": "Enquire",
+  "dream": {
+    "heading": "Bring a dream into the digital world",
+    "text": "For anyone who wants to reach out to enquire about receiving work on bringing a dream of theirs into the digital world."
+  },
+  "offerings": {
+    "heading": "My offerings",
+    "roles": [
+      "Holistic counsellor",
+      "Complementary therapist",
+      "Psychedelic integration therapist",
+      "Shadow work facilitator",
+      "Someone whose main intention is supporting people in freeing their dreams"
+    ],
+    "consultation": "A consultation with me is more about encouraging an individual that anything is possible, and I am here to support them in bringing their creation to life, offering the digital service as one of my main implementations."
+  },
+  "form": {
+    "project": "General enquiry",
+    "heading": "Send an enquiry",
+    "intro": "Leave your details and Cassidy will reply."
+  }
+}
