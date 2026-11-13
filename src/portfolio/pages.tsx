@@ -26,6 +26,9 @@ function exploreRealms() {
 }
 
 // ── The World (home) ───────────────────────────────────────
+/** Cassidy's introduction, one paragraph per blank line in the starter's intro. */
+const introParagraphs = () => owner.intro.split(/\n\s*\n/).map((t) => t.trim()).filter(Boolean);
+
 export function WorldPage() {
   useDocumentTitle();
   const [filter, setFilter] = useState<RealmId | 'all'>('all');
@@ -41,7 +44,7 @@ export function WorldPage() {
           <p className="eyebrow">Cassidy’s Creative Universe</p>
           <h1 id="hero-title" className="hero__title">{owner.name}</h1>
           <p className="hero__line">{owner.line}</p>
-          <p className="hero__intro">{owner.intro}</p>
+          {introParagraphs().map((t, i) => <p key={i} className="hero__intro">{t}</p>)}
           <div className="hero__actions">
             <button type="button" className="button button--primary" onClick={exploreRealms}>
               Explore the realms
@@ -277,7 +280,7 @@ export function AboutPage() {
           <RealmMedallion realm={realm} />
           <h1>{owner.name}</h1>
           <p className="hero__line">{owner.line}</p>
-          <p className="prose">{owner.intro}</p>
+          {introParagraphs().map((t, i) => <p key={i} className="prose">{t}</p>)}
 
           <section aria-labelledby="offer-title" className="about-offer">
             <h2 id="offer-title">{enquire.dream.heading}</h2>
