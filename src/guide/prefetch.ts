@@ -1,4 +1,4 @@
-// Home's Adult Coco, fetched into the HTTP cache while the invitation plays, so he is there at once
+// Home's Adult Earnest, fetched into the HTTP cache while the invitation plays, so he is there at once
 // when the cloud clears. It can be stopped: if home gives up on him (too slow, a lost context, an
 // error), the download stops too and no longer competes with the painting that stands in. No
 // three.js here (the invitation page imports it before any 3D code has loaded).

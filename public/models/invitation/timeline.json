@@ -1,5 +1,5 @@
 {
-  "$comment": "Coco's Awakening, invitation page. Frames are on one 60 fps master timeline (frame / fps = seconds into the take). Adult Coco's take: blender/scripts/build_coco_invite.py (the clip 'invite', played on models/characters/coco-sage.glb; from its last frame, 'arrive', he breathes and floats with that model's own 'breathe' and 'float'; at 'wake' the site layers that model's 'awaken' on it: he opens his eyes, looks at the visitor ('gaze'), closes them ('eyesClose') and bows ('bow')). The magic cloud: blender/scripts/build_magic_cloud.py.",
+  "$comment": "Earnest's Awakening, invitation page. Frames are on one 60 fps master timeline (frame / fps = seconds into the take). Adult Earnest's take: blender/scripts/build_coco_invite.py (the clip 'invite', played on models/characters/coco-sage.glb; from its last frame, 'arrive', he breathes and floats with that model's own 'breathe' and 'float'; at 'wake' the site layers that model's 'awaken' on it: he opens his eyes, looks at the visitor ('gaze'), closes them ('eyesClose') and bows ('bow')). The magic cloud: blender/scripts/build_magic_cloud.py.",
   "fps": 60,
   "markers": {
     "floatIn": 0,
@@ -50,7 +50,7 @@
     ]
   ],
   "cloud": {
-    "$comment": "The magic cloud (blender/scripts/build_magic_cloud.py), in the same frame as Adult Coco (glTF axes, metres). He is fully hidden from hiddenFrom to hiddenTo, coverFrame included (coverage masks with the site's camera, blender/scripts/check_cloud_cover.py). ctl_glow and ctl_fade carry glow and opacity as scale.x. adultBox: Adult Coco seated at his place, sun and bolt included.",
+    "$comment": "The magic cloud (blender/scripts/build_magic_cloud.py), in the same frame as Adult Earnest (glTF axes, metres). He is fully hidden from hiddenFrom to hiddenTo, coverFrame included (coverage masks with the site's camera, blender/scripts/check_cloud_cover.py). ctl_glow and ctl_fade carry glow and opacity as scale.x. adultBox: Adult Earnest seated at his place, sun and bolt included.",
     "hiddenFrom": 880,
     "hiddenTo": 954,
     "centre": [

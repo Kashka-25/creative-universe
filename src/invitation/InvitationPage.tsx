@@ -1,6 +1,6 @@
 // The invitation: its own page (#/invitation), outside the portfolio's Layout.
 //
-// Adult Coco's Blender take plays once: he floats down from above the window on his swirl cloud, meditating, settles and breathes;
+// Adult Earnest's Blender take plays once: he floats down from above the window on his swirl cloud, meditating, settles and breathes;
 // then the magic cloud glows from the cloud in his hands, engulfs him and carries the visitor home
 // under the cloud veil, where he sits meditating. "Come on in" is always there: during the take it
 // jumps straight to the glow, so the transformation and the trip home start at once. Escape goes home at once. The realms stay one click away in the header, and the

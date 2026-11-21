@@ -20,7 +20,7 @@ import { HEADING_MARKERS, headingWaitAfterJump, JUMP_SECONDS } from '../src/invi
 import { createPausableScheduler } from '../src/intro/machine';
 import { fakeClock } from './helpers/fakeClock';
 
-// A timeline shaped like the Blender export (60 fps, master frames): Adult Coco floats down and
+// A timeline shaped like the Blender export (60 fps, master frames): Adult Earnest floats down and
 // arrives, the heading comes in ('welcome'), then the magic cloud.
 const RAW = {
   fps: 60,
@@ -142,7 +142,7 @@ describe('the timeline from Blender', () => {
     expect(markersCrossed(full, -0.001, 547)).toEqual(['floatIn', 'arrive', 'welcome', 'glow']);
   });
 
-  it("the real timeline.json: Adult Coco's take and the magic cloud, playable as shipped", () => {
+  it("the real timeline.json: Adult Earnest's take and the magic cloud, playable as shipped", () => {
     const file = new URL('../public/models/invitation/timeline.json', import.meta.url);
     if (!existsSync(file)) return;                                                                       // not exported yet
     const raw = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown> & { markers: Record<string, number> };
@@ -230,7 +230,7 @@ describe('the timeline from Blender', () => {
     expect(page).toMatch(/headingWaitAfterJump\(timelineRef\.current, markerRef\.current\)/);
     expect(page).toMatch(/const headingShown = illustrated \|\| \(!headingHeld && /);
     const stage = readFileSync(new URL('../src/invitation/InvitationStage.tsx', import.meta.url), 'utf8');
-    expect(stage).toMatch(/playAt\(p\.coco, glow, JUMP_SECONDS\)/);
+    expect(stage).toMatch(/playAt\(p\.earnest, glow, JUMP_SECONDS\)/);
   });
 
   it('starts the magic cloud at the glow when the timeline does not place it (never at the first frame)', () => {
@@ -531,8 +531,8 @@ describe('the invitation machine', () => {
 
   it('narrates only what is on screen, for known beats', () => {
     for (const name of Object.keys(NARRATION)) expect(MARKERS).toContain(name);
-    expect(NARRATION.floatIn).toMatch(/^Coco floats gently down/);
-    expect(Object.values(NARRATION).join(' ')).not.toMatch(/young|smile|turns|offer|looks down/i);   // only what Adult Coco does
+    expect(NARRATION.floatIn).toMatch(/^Earnest floats gently down/);
+    expect(Object.values(NARRATION).join(' ')).not.toMatch(/young|smile|turns|offer|looks down/i);   // only what Adult Earnest does
   });
 
   it('speaks beats that Blender puts close together as one line, when the last of them happens', () => {

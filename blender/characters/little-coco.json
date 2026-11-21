@@ -1,5 +1,5 @@
 {
-  "$comment": "Little Coco, the young explorer. Landmarks measured on close orthographic views of blender/sculpt/little-coco-open.glb (Blender axes, metres: +X to the viewer's right, -Y towards you, +Z up). His head is tilted about 9 degrees, so every feature has its own position (A = viewer's left, B = right). Painted moods: joyful = his closed-eyed sculpt with the Joyful sheet's grin laid on; surprised = his own open face with the Surprised sheet's 'oh' mouth (outlines traced round the lips, in sheet pixels).",
+  "$comment": "Little Earnest, the young explorer. Landmarks measured on close orthographic views of blender/sculpt/little-coco-open.glb (Blender axes, metres: +X to the viewer's right, -Y towards you, +Z up). His head is tilted about 9 degrees, so every feature has its own position (A = viewer's left, B = right). Painted moods: joyful = his closed-eyed sculpt with the Joyful sheet's grin laid on; surprised = his own open face with the Surprised sheet's 'oh' mouth (outlines traced round the lips, in sheet pixels).",
   "source": "little-coco-open.glb",
   "removeBackdrop": {
     "minY": 0.27

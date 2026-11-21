@@ -104,7 +104,7 @@ describe('the hero at the top of home', () => {
     expect(heroSpot({ left: 16, top: 70, right: 374, bottom: 428 }, 0.73, 180).h).toBeLessThanOrEqual(358 * HERO.heightShare);
   });
 
-  it('hands over to the companion with hysteresis, so only one Coco is ever shown', () => {
+  it('hands over to the companion with hysteresis, so only one Earnest is ever shown', () => {
     expect(heroMode(false, 1)).toBe(true);
     expect(heroMode(true, 0.5)).toBe(true);
     expect(heroMode(true, 0.4)).toBe(false);

@@ -1,5 +1,5 @@
 {
-  "$comment": "Coco, the adult guide. Landmarks measured on orthographic views of blender/sculpt/coco-open.glb (Blender axes, metres: +X his left, -Y towards you, +Z up).",
+  "$comment": "Earnest, the adult guide. Landmarks measured on orthographic views of blender/sculpt/coco-open.glb (Blender axes, metres: +X his left, -Y towards you, +Z up).",
   "source": "coco-open.glb",
   "removeBackdrop": {
     "minY": 0.28

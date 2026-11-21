@@ -1,6 +1,6 @@
 // The cloud that carries the visitor home. Mounted ABOVE the router, so it stays on screen while the
 // page changes underneath: the invitation's cloud swells to fill the screen, the home page takes its
-// place, and the cloud clears to reveal Coco meditating there.
+// place, and the cloud clears to reveal Earnest meditating there.
 //
 // Drawn with one small WebGL shader: each pixel of the Blender-rendered matte (veil-matte.webp) holds
 // when the cloud reaches it; the authored curve (veil.json, made for that matte) says how far it has

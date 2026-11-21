@@ -4,7 +4,7 @@
 // A page's own content and footer get names unique to that page, so on a change of page the old
 // one and the new one are separate groups: the old fades out exactly where it was (however far it
 // was scrolled) and the new fades in where it lands. Everything that persists (the background, the
-// header, Coco's layer, the cloud veil) is never crossfaded with a frozen copy of itself.
+// header, Earnest's layer, the cloud veil) is never crossfaded with a frozen copy of itself.
 
 /** A CSS <custom-ident> made from a route: letters, digits and hyphens, never starting with a digit. */
 export function routeIdent(pathname: string): string {
@@ -22,7 +22,7 @@ export function pageTransitionNames(pathname: string): { content: string; footer
 // here, never through React Router's own option for it: the router remembers every navigation made
 // with that option (for the rest of the tab session, reloads included) and plays a view transition
 // on its own on any later Back or Forward between those pages. Inside the site that would freeze
-// Coco, who is live over the page, for every frame of the transition's update.
+// Earnest, who is live over the page, for every frame of the transition's update.
 
 /** What a navigate function needs to accept (React Router's fits). */
 export interface WelcomeNavOptions { replace?: boolean; state?: unknown; flushSync?: boolean }

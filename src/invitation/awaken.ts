@@ -1,4 +1,4 @@
-// The welcome's awakening beat (Cassidy, 9 Nov 2026): once Adult Coco has arrived in the middle of the page he
+// The welcome's awakening beat (Cassidy, 9 Nov 2026): once Adult Earnest has arrived in the middle of the page he
 // slowly opens his eyes from his deep slumber, looks at the visitor, closes them again and bows his head in
 // honour; then the cloud glows and engulfs him as before. The movement is Blender's clip 'awaken' on his model
 // (blender/scripts/coco_sage_life.py), layered on his breathing from the timeline's 'wake' marker; the markers

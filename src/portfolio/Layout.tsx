@@ -46,7 +46,7 @@ function Site() {
   const { pathname } = useLocation();
   // A change of page inside the site: the new page's content and footer fade in (base.css
   // .page-enter, opacity only). No view transition here: its snapshot phase holds every frame until
-  // the new page has rendered, which would freeze Coco, who stays live over the page. The page
+  // the new page has rendered, which would freeze Earnest, who stays live over the page. The page
   // the visitor arrived on does not fade (it is already the first thing they see).
   const arrivedOn = useRef(pathname);
   const moved = useRef(false);
@@ -91,7 +91,7 @@ export function Header({ replace = false, crossfade = false }: { replace?: boole
   useEffect(() => setOpen(false), [location.pathname]);
   useEffect(() => {
     if (!open) return;
-    // Coco, the companion, tucks himself away below the window while the menu is open
+    // Earnest, the companion, tucks himself away below the window while the menu is open
     document.documentElement.setAttribute('data-menu-open', '');
     // Escape closes it and gives focus back to its button (the focused link inside it disappears)
     const close = (e: KeyboardEvent) => {
@@ -164,8 +164,8 @@ function Footer({ transitionName, className }: { transitionName: string; classNa
         // pushed entry would leave two home entries (Back from home would seem to do nothing). The
         // price: Back pressed while a welcome replayed from home is playing goes to the page before
         // home (or leaves the site), not to home. From any other page Back returns there.
-        // A crossfade here (transitions.ts welcomeNavigate): Coco leaves with the page (no live
-        // Coco on the other side).
+        // A crossfade here (transitions.ts welcomeNavigate): Earnest leaves with the page (no live
+        // Earnest on the other side).
         <Link
           to={INVITATION_PATH}
           replace={pathname === '/'}

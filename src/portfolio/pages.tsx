@@ -60,7 +60,7 @@ export function WorldPage() {
       <section id="realms" className="realms has-clouds" aria-labelledby="realms-title" tabIndex={-1}>
         <SkyClouds seed="home:realms" />
         <header className="section-head">
-          <h2 id="realms-title" data-coco-stop="realms">The realms</h2>
+          <h2 id="realms-title" data-earnest-stop="realms">The realms</h2>
           <p>Six regions of one world. Wander in any order.</p>
         </header>
         <ol className="realm-path">
@@ -82,7 +82,7 @@ export function WorldPage() {
       <section className="works has-clouds" aria-labelledby="works-title">
         <SkyClouds seed="home:works" />
         <header className="section-head">
-          <h2 id="works-title" data-coco-stop="works">Works in this world</h2>
+          <h2 id="works-title" data-earnest-stop="works">Works in this world</h2>
           <CloudScroll className="section-head__cloud" />
         </header>
         <div className="chips" role="group" aria-label="Show works from">
@@ -95,7 +95,7 @@ export function WorldPage() {
             </button>
           ))}
         </div>
-        <div className="work-grid" data-coco-stop="bottom">
+        <div className="work-grid" data-earnest-stop="bottom">
           {shown.map((w) => <WorkCard key={w.slug} work={w} />)}
         </div>
       </section>

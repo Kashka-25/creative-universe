@@ -1,7 +1,7 @@
-// A few of Coco's swirl clouds drifting behind a section. Purely decorative: hidden from assistive
+// A few of Earnest's swirl clouds drifting behind a section. Purely decorative: hidden from assistive
 // technology, never taking a click, drawn behind the section's content, and still under reduced
 // motion. Where motion is welcome, each spins its curls as the ride cloud's turn at rest (a looping
-// AVIF rendered in Blender; its still where the loop cannot show). Coco treats each cloud as content,
+// AVIF rendered in Blender; its still where the loop cannot show). Earnest treats each cloud as content,
 // over the whole of its drift (negativeSpace.ts cloudRect): he never rides over one. No list, or a
 // still that will not load: nothing is shown.
 //
@@ -18,7 +18,7 @@ const LIST = 'models/clouds/clouds.json';
 
 /**
  * What a cloud must never sit behind: text, headings, images, media, controls, cards, ornaments,
- * Coco's own space in the hero, and anything else holding text of its own (see ownText).
+ * Earnest's own space in the hero, and anything else holding text of its own (see ownText).
  */
 const CONTENT = [
   'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'li', 'dt', 'dd', 'blockquote', 'pre', 'table', 'figure',

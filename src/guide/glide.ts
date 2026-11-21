@@ -1,4 +1,4 @@
-// How Coco moves between places: a critically damped spring (it starts and stops with zero speed,
+// How Earnest moves between places: a critically damped spring (it starts and stops with zero speed,
 // with no overshoot), soft enough that he floats rather than travels. Pure (tested in node);
 // HomeStage reads it every frame. Where he goes is space.ts's business.
 

@@ -1,4 +1,4 @@
-// Coco's ride cloud (blender/scripts/build_ride_cloud.py → models/clouds/ride-cloud.glb): the swirl
+// Earnest's ride cloud (blender/scripts/build_ride_cloud.py → models/clouds/ride-cloud.glb): the swirl
 // cloud he rides in on, on the welcome and on every page. Shared by InvitationStage and HomeStage.
 //
 // - It follows his root bone: the code copies the bone's movement (from its rest pose) onto the cloud,
@@ -73,22 +73,22 @@ export function applyRideLook(p: RideParts, opacity = 1): number {
 }
 
 /**
- * Makes `cloud` (a sibling of `coco` under the same parent) follow Coco's root bone: call capture()
+ * Makes `cloud` (a sibling of `earnest` under the same parent) follow Earnest's root bone: call capture()
  * while he is in his rest pose (before any clip has posed him), then follow() every frame after his
  * clips have been applied.
  */
-export function createRootFollow(coco: Object3D, cloud: Object3D) {
-  const bone = coco.getObjectByName(ROOT_BONE) ?? null;
+export function createRootFollow(earnest: Object3D, cloud: Object3D) {
+  const bone = earnest.getObjectByName(ROOT_BONE) ?? null;
   const restInv = new Matrix4();
   const now = new Matrix4();
-  const toCoco = new Matrix4();
+  const toEarnest = new Matrix4();
   let captured = false;
   cloud.matrixAutoUpdate = false;
   const relative = (out: Matrix4) => {
-    coco.updateWorldMatrix(true, false);
+    earnest.updateWorldMatrix(true, false);
     bone!.updateWorldMatrix(true, false);
-    toCoco.copy(coco.matrixWorld).invert();
-    return out.multiplyMatrices(toCoco, bone!.matrixWorld);
+    toEarnest.copy(earnest.matrixWorld).invert();
+    return out.multiplyMatrices(toEarnest, bone!.matrixWorld);
   };
   return {
     bone,
@@ -97,16 +97,16 @@ export function createRootFollow(coco: Object3D, cloud: Object3D) {
       restInv.copy(relative(new Matrix4())).invert();
       captured = true;
     },
-    /** The bone's rest (in Coco's own space), measured earlier, before any clip posed him. */
+    /** The bone's rest (in Earnest's own space), measured earlier, before any clip posed him. */
     captureFrom(rest: Matrix4) {
       if (!bone) return;
       restInv.copy(rest).invert();
       captured = true;
     },
     follow() {
-      if (!bone || !captured) { cloud.matrix.copy(coco.matrix); cloud.matrixWorldNeedsUpdate = true; return; }
-      relative(now).multiply(restInv);                  // the bone's movement from rest, in Coco's own space
-      cloud.matrix.multiplyMatrices(coco.matrix, now);  // ... carried into the shared parent's space
+      if (!bone || !captured) { cloud.matrix.copy(earnest.matrix); cloud.matrixWorldNeedsUpdate = true; return; }
+      relative(now).multiply(restInv);                  // the bone's movement from rest, in Earnest's own space
+      cloud.matrix.multiplyMatrices(earnest.matrix, now);  // ... carried into the shared parent's space
       cloud.matrixWorldNeedsUpdate = true;
     },
   };

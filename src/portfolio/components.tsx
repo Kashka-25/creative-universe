@@ -75,7 +75,7 @@ export function realmCount(r: Realm) {
 }
 
 /**
- * Coco's space in the hero. With 3D running it is kept empty for him ([data-guide-space]: the
+ * Earnest's space in the hero. With 3D running it is kept empty for him ([data-guide-space]: the
  * negative space he floats in is best here at the top of home), and a still poster of him holds it
  * until he is ready (if there is one). Otherwise Cassidy's living painting fills it.
  */
@@ -95,7 +95,7 @@ export function HeroStage() {
   );
 }
 
-/** A still of Coco while the 3D one loads; it fades away as he appears. Nothing if there is no poster. */
+/** A still of Earnest while the 3D one loads; it fades away as he appears. Nothing if there is no poster. */
 function Poster({ leaving, instant }: { leaving: boolean; instant: boolean }) {
   const [missing, setMissing] = useState(false);
   const [gone, setGone] = useState(false);

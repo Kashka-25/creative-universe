@@ -1,4 +1,4 @@
-// Adult Coco's living details on the site (coco-sage.glb, blender/scripts/coco_sage_life.py). Every movement is
+// Adult Earnest's living details on the site (coco-sage.glb, blender/scripts/coco_sage_life.py). Every movement is
 // Blender's: the sun turns and breathes, the third eye blinks and his lids part on bones, in the clips 'radiance',
 // 'thirdeye' and 'awaken'. What glTF cannot animate in three (r187 has no KHR_animation_pointer) travels as the X
 // scale of four control bones, value = scale.x - 1, and is turned into material settings here, every frame:
@@ -47,7 +47,7 @@ export function ctlValue(node: Object3D | null | undefined): number {
 /** An emission multiplier from a control value: never below 0. */
 export const glowFactor = (value: number) => Math.max(0, 1 + value);
 
-export interface CocoLife {
+export interface EarnestLife {
   /** Applies the control bones' values to the materials (call after the clips have posed him). */
   update(): void;
   /** How far his eyes are open now (0..1). */
@@ -56,7 +56,7 @@ export interface CocoLife {
 }
 
 /** Finds his living parts under `scene` and gives them their own materials (restored on dispose). */
-export function createCocoLife(scene: Object3D): CocoLife {
+export function createEarnestLife(scene: Object3D): EarnestLife {
   const restore: [Mesh, Material | Material[]][] = [];
   const made: Material[] = [];
   const own = (m: Mesh, setup: (c: MeshStandardMaterial, name: string) => void) => {

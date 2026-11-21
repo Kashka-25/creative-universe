@@ -10,7 +10,7 @@ const R = (left: number, top: number, right: number, bottom: number): Rect => ({
 
 /** Some section layouts (the layer's px: the window's width, the section's height). */
 const LAYOUTS: Record<string, { area: Rect; content: Rect[]; W: number }> = {
-  // home hero at 1280: the words on the left, Coco's space on the right, a vine at the bottom left
+  // home hero at 1280: the words on the left, Earnest's space on the right, a vine at the bottom left
   hero1280: { W: 1280, area: R(0, 0, 1265, 690), content: [
     R(64, 120, 620, 150), R(64, 160, 620, 240), R(64, 250, 600, 300), R(64, 310, 560, 420), R(64, 440, 250, 490), R(270, 440, 450, 490),
     R(660, 60, 1200, 650), R(30, 560, 250, 690),
@@ -32,7 +32,7 @@ const LAYOUTS: Record<string, { area: Rect; content: Rect[]; W: number }> = {
   full: { W: 1280, area: R(0, 0, 1280, 600), content: [R(0, 0, 1280, 600)] },
 };
 
-describe("Coco's swirl clouds in the sections", () => {
+describe("Earnest's swirl clouds in the sections", () => {
   const run = (seed: string, key: string, count = 3) => {
     const L = LAYOUTS[key];
     return placeClouds(seed, FILES, count, L.area, L.content, cloudSizes(L.W));

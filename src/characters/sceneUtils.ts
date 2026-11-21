@@ -1,4 +1,4 @@
-// Small three.js helpers shared by the invitation's take and home's Adult Coco. Only the 3D chunks
+// Small three.js helpers shared by the invitation's take and home's Adult Earnest. Only the 3D chunks
 // import this (it pulls in three). Nothing here does per-vertex work on skinned meshes: measuring
 // a posed skinned mesh walks every vertex on the CPU (tens of ms on a 70k-vertex character), so
 // boxes come from the geometry's stored bounds (the bind pose) or from bone positions instead.

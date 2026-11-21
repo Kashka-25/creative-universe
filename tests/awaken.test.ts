@@ -1,4 +1,4 @@
-// Adult Coco's living details (9 Nov 2026): the sun and bolt come to life and his third eye blinks wherever he
+// Adult Earnest's living details (9 Nov 2026): the sun and bolt come to life and his third eye blinks wherever he
 // is, and on the welcome he wakes, looks at the visitor, closes his eyes again and bows before the cloud.
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -6,7 +6,7 @@ import {
   AnimationClip, Group, Mesh, MeshStandardMaterial, NumberKeyframeTrack, Object3D, PlaneGeometry,
 } from 'three';
 import { ClipPlayer } from '../src/characters/ClipPlayer';
-import { createCocoLife, ctlValue, EYES_ALPHA, EYES_SHUT, eyesCutoff, glowFactor, SUN_GLOW } from '../src/characters/cocoLife';
+import { createEarnestLife, ctlValue, EYES_ALPHA, EYES_SHUT, eyesCutoff, glowFactor, SUN_GLOW } from '../src/characters/earnestLife';
 import { awakenSeconds, awakenStart, AWAKEN_RELEASE_SECONDS } from '../src/invitation/awaken';
 import { createNarrator, NARRATION } from '../src/invitation/invitationMachine';
 import { BEAT, markersCrossed, MARKERS, parseTimeline, timingFrom, type MarkerName } from '../src/invitation/timeline';
@@ -203,7 +203,7 @@ describe("his eyes' cards and the glow controls", () => {
 
   it('turns the control bones into the glow of the sun, the bolt and the third eye, and his eyes opening', () => {
     const { scene, sun, bolt, third, eyes, ctl } = model();
-    const life = createCocoLife(scene);
+    const life = createEarnestLife(scene);
     life.update();
     const m = (x: Mesh) => x.material as MeshStandardMaterial;
     // at rest: the steady glow they always had, his eyes shut
@@ -225,7 +225,7 @@ describe("his eyes' cards and the glow controls", () => {
 
   it('gives back the model exactly as it came', () => {
     const { scene, sun, bolt, third, eyes, originals } = model();
-    const life = createCocoLife(scene);
+    const life = createEarnestLife(scene);
     expect(sun.material).not.toBe(originals[0]);
     life.dispose();
     expect([sun.material, bolt.material, third.material, eyes.material]).toEqual(originals);
@@ -236,7 +236,7 @@ describe("his eyes' cards and the glow controls", () => {
     const sunBolt = new Mesh(new PlaneGeometry(), Object.assign(new MeshStandardMaterial(), { name: 'sun_bolt' }));
     sunBolt.name = 'sun_bolt';
     scene.add(sunBolt);
-    const life = createCocoLife(scene);
+    const life = createEarnestLife(scene);
     life.update();
     expect((sunBolt.material as MeshStandardMaterial).emissiveIntensity).toBeCloseTo(SUN_GLOW.intensity);
     expect(life.open()).toBe(0);

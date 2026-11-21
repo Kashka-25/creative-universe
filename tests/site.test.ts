@@ -23,7 +23,7 @@ describe('a change of page', () => {
     for (const n of names) expect(n).toMatch(/^[a-z][a-z0-9-]*$/);         // a valid CSS name
   });
 
-  it('never crossfades Coco, the header, the paper grain or the veil with a frozen copy of themselves', () => {
+  it('never crossfades Earnest, the header, the paper grain or the veil with a frozen copy of themselves', () => {
     const css = (f: string) => readFileSync(new URL(`../src/styles/${f}`, import.meta.url), 'utf8');
     const base = css('base.css');
     for (const name of ['root', 'guide', 'site-header', 'grain', 'veil']) {
@@ -41,7 +41,7 @@ describe('a change of page', () => {
     expect(z('veil')).toBeGreaterThan(z('grain'));
   });
 
-  it('changes page inside the site without a view transition, so Coco (live over the page) never freezes', () => {
+  it('changes page inside the site without a view transition, so Earnest (live over the page) never freezes', () => {
     const src = (f: string) => readFileSync(new URL(`../src/portfolio/${f}`, import.meta.url), 'utf8');
     const layout = src('Layout.tsx');
     expect(layout).toMatch(/<Header \/>/);                                   // the site's own header: no crossfade
@@ -54,7 +54,7 @@ describe('a change of page', () => {
 
   it("never uses React Router's own view-transition option: it would replay a transition on every later Back or Forward", () => {
     // the router remembers each navigation made with it and runs a view transition by itself on a
-    // later POP between those pages (freezing the live Coco); the welcome starts its own instead
+    // later POP between those pages (freezing the live Earnest); the welcome starts its own instead
     const files = [
       'main.tsx', 'portfolio/Layout.tsx', 'portfolio/pages.tsx', 'portfolio/components.tsx', 'portfolio/transitions.ts',
       'invitation/InvitationPage.tsx', 'invitation/InvitationPoster.tsx', 'invitation/IllustratedInvitation.tsx',
@@ -112,7 +112,7 @@ describe('a change of page', () => {
     expect(layout).toMatch(/onBlur=\{onBlur\}/);
   });
 
-  it('draws Coco only while he can be seen: out of the window or faded out on About, his canvas does no GPU work and his clips hold where they are', () => {
+  it('draws Earnest only while he can be seen: out of the window or faded out on About, his canvas does no GPU work and his clips hold where they are', () => {
     const home = readFileSync(new URL('../src/guide/HomeStage.tsx', import.meta.url), 'utf8');
     // a frame callback with a priority turns R3F's own render off; his draws while he is in view,
     // and once more as he leaves it (so no sliver of him is left on the canvas)

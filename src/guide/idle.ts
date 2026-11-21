@@ -1,4 +1,4 @@
-// What Coco does while he meditates on the home page, decided by a pure, seeded scheduler (no
+// What Earnest does while he meditates on the home page, decided by a pure, seeded scheduler (no
 // timers, no three.js: the stage asks it at the right moments, and tests drive it with numbers).
 //
 //   drifts     a rare, tiny posture drift (drift_a / drift_b / drift_c), started only on a

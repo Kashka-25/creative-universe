@@ -1,5 +1,5 @@
 {
-  "$comment": "Adult Coco, the closed-eyed sage with the sun and lightning (blender/sculpt/meshy-cloud-monkey-sage.glb). Read by blender/scripts/build_coco_sage.py (and, for the face landmarks, by character_prep.py's helpers). Blender axes, metres: +X his left, -Y towards you, +Z up. Landmarks, face ellipse and joints were measured on gridded orthographic renders of the full-res sculpt (face at 0.375 mm per pixel) and checked again on the web copy.",
+  "$comment": "Adult Earnest, the closed-eyed sage with the sun and lightning (blender/sculpt/meshy-cloud-monkey-sage.glb). Read by blender/scripts/build_coco_sage.py (and, for the face landmarks, by character_prep.py's helpers). Blender axes, metres: +X his left, -Y towards you, +Z up. Landmarks, face ellipse and joints were measured on gridded orthographic renders of the full-res sculpt (face at 0.375 mm per pixel) and checked again on the web copy.",
   "source": "meshy-cloud-monkey-sage.glb",
   "height": 1.9,
   "expressiveness": 1.0,
@@ -132,7 +132,7 @@
   },
   "fps": 30,
   "breath": {
-    "$comment": "breathe: 5.0 s loop (150 frames). Inhale 40%, exhale 52%, rest 8%. Degrees (local; negative chest = the ribcage lifts), millimetres; lag in frames after the belly (the belly leads, the chest follows, the shoulders come last, the head trails). The lower spine gives a little as the ribcage lifts and the neck levels the head, so his head stays steady while his chest and shoulders rise. 9 Nov 2026 (Cassidy: 'slightly increase the visibility of Coco's breathing, the diaphragm'): belly 4.0 -> 6.0 mm (1.5x), chest, spine and neck 1.2x, shoulders 1.2x; the hands, held cloud, legs and sun stay as they were.",
+    "$comment": "breathe: 5.0 s loop (150 frames). Inhale 40%, exhale 52%, rest 8%. Degrees (local; negative chest = the ribcage lifts), millimetres; lag in frames after the belly (the belly leads, the chest follows, the shoulders come last, the head trails). The lower spine gives a little as the ribcage lifts and the neck levels the head, so his head stays steady while his chest and shoulders rise. 9 Nov 2026 (Cassidy: 'slightly increase the visibility of Earnest's breathing, the diaphragm'): belly 4.0 -> 6.0 mm (1.5x), chest, spine and neck 1.2x, shoulders 1.2x; the hands, held cloud, legs and sun stay as they were.",
     "frames": 150,
     "inhale": 0.4,
     "exhale": 0.52,

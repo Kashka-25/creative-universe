@@ -1,4 +1,4 @@
-"""Build Adult Coco, the closed-eyed sage with the sun and lightning, for the Home page.
+"""Build Adult Earnest, the closed-eyed sage with the sun and lightning, for the Home page.
 
     blender --background --factory-startup --python blender/scripts/build_coco_sage.py -- coco-sage [options]
 
@@ -86,7 +86,7 @@ print = functools.partial(builtins.print, flush=True)  # noqa: A001  (progress s
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 ARGS = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-# This script builds Adult Coco only. Every output path comes from NAME, so any other name could land on
+# This script builds Adult Earnest only. Every output path comes from NAME, so any other name could land on
 # another character's files (coco, little-coco): refuse it rather than overwrite them.
 NAME = "coco-sage"
 if ARGS and not ARGS[0].startswith("--") and ARGS[0] != NAME:

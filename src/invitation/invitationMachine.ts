@@ -153,7 +153,7 @@ export function invitationVisual(state: InvitationState, illustratedNow: boolean
 
 /** What a screen reader hears as each beat begins: only what is happening on screen. */
 export const NARRATION: Partial<Record<MarkerName, string>> = {
-  floatIn: 'Coco floats gently down on his cloud, meditating, his eyes closed.',
+  floatIn: 'Earnest floats gently down on his cloud, meditating, his eyes closed.',
   arrive: 'He settles in front of you and breathes slowly.',
   wake: 'He slowly opens his eyes and looks at you.',
   bow: 'He closes his eyes again and bows his head to you.',
