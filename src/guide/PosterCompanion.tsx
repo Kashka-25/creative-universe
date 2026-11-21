@@ -1,4 +1,4 @@
-// The illustrated companion: where Coco is not drawn in 3D (lite: reduced motion, data saver, low
+// The illustrated companion: where Earnest is not drawn in 3D (lite: reduced motion, data saver, low
 // memory, no WebGL; or 3D gave up), a still of him (a Blender render) floats in the page's negative
 // space on every page but About, by the same rules as the 3D companion (space.ts, companion.ts): he
 // moves only once scrolling has stopped (STILL_S), and while the hero at the top of home is on
@@ -16,7 +16,7 @@ import { CORNER_REST, cornerSpot, createDwell, dwelled, heroMode, heroSpot, STIL
 import { cornerFree, lookAround, measurePage, stopAnchors, wayClear } from './negativeSpace';
 import { isHome, restSpot, stopFor, tourOn, type StopName } from './tour';
 
-/** On the home journey his still is as small as the riding Coco (HomeStage COMPANION_SCALE). */
+/** On the home journey his still is as small as the riding Earnest (HomeStage COMPANION_SCALE). */
 const TOUR_SCALE = 0.65;
 import { createRoam, spaceSizes, visibleShare, type Spot } from './space';
 import { ADULT_POSTER } from './paths';

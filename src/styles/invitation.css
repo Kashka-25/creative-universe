@@ -50,7 +50,7 @@
 .invitation__canvas { width: 100% !important; height: 100% !important; }
 .invitation__layer * { pointer-events: none !important; }
 
-/* without motion: a still of Adult Coco, or Cassidy's painting */
+/* without motion: a still of Adult Earnest, or Cassidy's painting */
 .invitation__illustrated { position: absolute; inset: 0; display: grid; place-items: center; }
 /* fitted inside the stage (never over the heading or the button), whatever the still's own size */
 .invitation__still {

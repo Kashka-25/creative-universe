@@ -1,4 +1,4 @@
-// Where Coco floats: in the page's negative space. Pure (tested in node); negativeSpace.ts measures
+// Where Earnest floats: in the page's negative space. Pure (tested in node); negativeSpace.ts measures
 // the page and HomeStage / PosterCompanion read the result.
 //
 // The finder: the page's content blocks (text, images, cards, buttons, headings, the header) are

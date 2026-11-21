@@ -1,6 +1,6 @@
-/* ── Coco, the companion: one transparent 3D layer over the page's content, under its header ── */
-/* Stacking, on every page: content < Coco < the sticky header and its open menu < the paper grain
-   < the cloud veil. .site is no stacking context of its own, so the header (z 20) and Coco (z 10)
+/* ── Earnest, the companion: one transparent 3D layer over the page's content, under its header ── */
+/* Stacking, on every page: content < Earnest < the sticky header and its open menu < the paper grain
+   < the cloud veil. .site is no stacking context of its own, so the header (z 20) and Earnest (z 10)
    order against each other directly. He floats only in the page's empty space (src/guide/space.ts),
    so being above the content never hides any of it. */
 .guide-layer {
@@ -22,8 +22,8 @@
   /* a change of page never crossfades him with a frozen copy of himself (see base.css) */
   view-transition-name: guide;
 }
-.guide-layer.is-ready { opacity: var(--coco-fade, 1); }
-/* (--coco-fade: 0 while no empty space fits him; he fades out where he is, and back in at the next) */
+.guide-layer.is-ready { opacity: var(--earnest-fade, 1); }
+/* (--earnest-fade: 0 while no empty space fits him; he fades out where he is, and back in at the next) */
 /* arriving under the cloud veil: the cloud is the reveal, so no fade of its own */
 .guide-layer.is-instant { transition: none; }
 /* on About he is not there: a gentle fade out, and back in when the visitor leaves */

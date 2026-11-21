@@ -1,4 +1,4 @@
-// Coco's journey down the home page on a laptop or desktop (Cassidy, 9 Nov 2026): one Coco, the
+// Earnest's journey down the home page on a laptop or desktop (Cassidy, 9 Nov 2026): one Earnest, the
 // hero's own. As the visitor scrolls away from the hero he shrinks and flies gently on his ride cloud
 // to rest stage right of "The realms", then stage right of "Works in this world"; while the project
 // cards fill the screen he rests in the bottom-right corner; once space opens below the cards he
@@ -6,9 +6,9 @@
 // grows back. Pure (tested in node); HomeStage flies him (ride.ts followStep), PosterCompanion shows
 // his still at each stop under reduced motion.
 //
-// The stops are found by the page's own hooks, never by heading text: [data-coco-stop="realms"],
-// [data-coco-stop="works"] (each section's heading; measured by its text, see negativeSpace.ts
-// stopAnchors) and [data-coco-stop="bottom"] (the works grid: the space opens below it). The stop is chosen by what is in view now (stopFor), with
+// The stops are found by the page's own hooks, never by heading text: [data-earnest-stop="realms"],
+// [data-earnest-stop="works"] (each section's heading; measured by its text, see negativeSpace.ts
+// stopAnchors) and [data-earnest-stop="bottom"] (the works grid: the space opens below it). The stop is chosen by what is in view now (stopFor), with
 // hysteresis at every edge, so a fast scroll goes straight to the stop of the section in view and
 // never visits the ones already passed; a new stop must hold a moment (TOUR.holdS) before he goes.
 // In flight he may pass over text and cards (Cassidy asked for it); where he rests never covers
@@ -49,7 +49,7 @@ export const isHome = (path: string) => path === '' || path === '/' || path === 
 export const tourOn = (path: string, width: number) => isHome(path) && width >= TOUR.minWidth;
 
 /**
- * The stop for what is in view now: the hero while its Coco's place is in view (the hero's own
+ * The stop for what is in view now: the hero while its Earnest's place is in view (the hero's own
  * hysteresis, heroShare: how much of that place is in view), else the furthest-down section whose
  * stop is in view, else the corner (the cards fill the screen). `prev` is the stop he is at or
  * heading for (each edge has hysteresis).

@@ -1,4 +1,4 @@
-// Coco riding his cloud with the visitor (Cassidy, 9 Nov 2026: "make coco move on a animated cloud
+// Earnest riding his cloud with the visitor (Cassidy, 9 Nov 2026: "make coco move on a animated cloud
 // (like it is his magic carpet) so he is flying on the cloud with the visitor as they scroll, doing
 // his best to follow the negative space"). Pure (tested in node); HomeStage applies it every frame.
 //

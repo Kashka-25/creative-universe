@@ -6,7 +6,7 @@
 // Blender's exporter writes every joint's translation, rotation and scale (and the face's shape-key weights) into
 // every clip, held still where the clip does not move them. In the clips named by --clips (additive layers: a
 // channel held at rest adds nothing) every such channel goes; in every clip, so do the channels of the joints named
-// by --nodes (Adult Coco's living-detail bones: only their own clips move them, and a joint no clip touches stays
+// by --nodes (Adult Earnest's living-detail bones: only their own clips move them, and a joint no clip touches stays
 // at rest). Nothing that moves is touched, nor any other joint's channels in the older clips. Each channel is one
 // sampler and two accessors in the file's JSON, so a few hundred still ones are a sizeable part of it.
 import { statSync } from 'node:fs';

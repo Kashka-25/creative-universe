@@ -1,4 +1,4 @@
-"""Adult Coco's living details, built into coco-sage.blend / coco-sage.glb by build_coco_sage.py (imported there).
+"""Adult Earnest's living details, built into coco-sage.blend / coco-sage.glb by build_coco_sage.py (imported there).
 
   - The sun and lightning bolt behind him come to life: a 'sun' bone (the disc and its rays turn a little and
     breathe in scale about the sun's middle; the bolt's arms blend from it to the root just outside the disc), the
@@ -7,7 +7,7 @@
   - His third eye is a painted eye (an almond with an iris, as on Cassidy's Emblem Evolutions sheet), so it blinks
     like one: a 'third_eye' bone on his forehead closes the almond onto its lid line along the forehead's surface
     (a squash, as lids meet), then it opens again with a soft glow (ctl_eye).
-  - His open eyes for the welcome's awakening: two cards on his face carrying Cassidy's open-eyed Coco's own eyes
+  - His open eyes for the welcome's awakening: two cards on his face carrying Cassidy's open-eyed Earnest's own eyes
     (blender/characters/coco-sage-eyes.png, made by prep_coco_eyes.py). The card's alpha is the order in which
     the eye is revealed as his lids part; the site sets alphaTest from ctl_eyes (0 closed: the cards are not drawn,
     so he is exactly today's sage; 1 open).

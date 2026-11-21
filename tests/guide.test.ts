@@ -382,7 +382,7 @@ describe('his float between spaces', () => {
     expect(poster).toMatch(/const SETTLE_MS = 400;/);
     expect(poster).toMatch(/!wayClear\(/);
     // no debugging hooks left on the window
-    expect(home + poster).not.toMatch(/__coco|window as unknown as/);
+    expect(home + poster).not.toMatch(/__earnest|window as unknown as/);
   });
 });
 
@@ -401,7 +401,7 @@ describe('where he appears', () => {
     expect(css).toMatch(/\.guide-layer \{[^}]*transition: opacity 700ms/);
     // with no room anywhere he fades out where he is, and appears in a new space faded in, never
     // gliding in across the content from an edge
-    expect(css).toMatch(/\.guide-layer\.is-ready \{ opacity: var\(--coco-fade, 1\); \}/);
+    expect(css).toMatch(/\.guide-layer\.is-ready \{ opacity: var\(--earnest-fade, 1\); \}/);
     expect(css).toMatch(/\.guide-layer\[data-appear\] \{ opacity: 0; transition: none; \}/);
     // the veil's instant reveal never turns the fade on About into a pop
     expect(guide).toMatch(/instant && !wasAway && !away \? ' is-instant'/);
@@ -430,11 +430,11 @@ describe('where he appears', () => {
     const css = (f: string) => readFileSync(new URL(`../src/styles/${f}`, import.meta.url), 'utf8');
     const intro = css('intro.css'), portfolio = css('portfolio.css'), base = css('base.css'), invitation = css('invitation.css');
     const z = (src: string, sel: string) => Number(new RegExp(`${sel.replace(/[.[\]()]/g, '\\$&')}\\s*\\{[^}]*?z-index:\\s*(-?\\d+)`).exec(src)?.[1]);
-    const coco = z(intro, '.guide-layer');
-    expect(z(intro, '.guide-poster')).toBe(coco);
-    expect(z(portfolio, '.site-header')).toBeGreaterThan(coco);
-    expect(z(base, '.paper-grain')).toBeGreaterThan(coco);
-    expect(z(invitation, '.cloud-veil')).toBeGreaterThan(coco);
+    const earnest = z(intro, '.guide-layer');
+    expect(z(intro, '.guide-poster')).toBe(earnest);
+    expect(z(portfolio, '.site-header')).toBeGreaterThan(earnest);
+    expect(z(base, '.paper-grain')).toBeGreaterThan(earnest);
+    expect(z(invitation, '.cloud-veil')).toBeGreaterThan(earnest);
     expect(intro + portfolio + base).not.toMatch(/(^|\n)\.site\s*\{[^}]*z-index/);
     const vt = (name: string) => Number(new RegExp(`::view-transition-group\\(${name}\\)\\s*\\{[^}]*z-index:\\s*(\\d+)`).exec(base)?.[1]);
     const content = Number(/::view-transition-group\(\*\)\s*\{[^}]*z-index:\s*(\d+)/.exec(base)?.[1]);

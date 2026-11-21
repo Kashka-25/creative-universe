@@ -1,4 +1,4 @@
-// What the visitor is doing, as things Coco can notice: pointing at something interesting, moving
+// What the visitor is doing, as things Earnest can notice: pointing at something interesting, moving
 // keyboard focus, a new part of the page coming into view as they scroll, a tap on him.
 // Plain DOM; the 3D layer takes stimuli from here and decides how he responds. Only what the
 // visitor does counts: a page simply appearing (sections already in view) is not a stimulus.

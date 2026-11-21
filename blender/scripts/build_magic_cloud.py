@@ -1,4 +1,4 @@
-"""Coco's Awakening: the MAGIC CLOUD transformation (invitation page).
+"""Earnest's Awakening: the MAGIC CLOUD transformation (invitation page).
 
     "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" --background --factory-startup \
         --python blender/scripts/build_magic_cloud.py [-- options]
@@ -12,7 +12,7 @@
 
 Run from the repository root, after blender/scripts/build_coco_invite.py has made invitation.blend (that script
 also calls this one as its last stage, so one run rebuilds the whole scene). Re-runnable: everything this script
-made before (the "magic_cloud" collection and the "transform" action) is removed first; Adult Coco and his take
+made before (the "magic_cloud" collection and the "transform" action) is removed first; Adult Earnest and his take
 are never touched, and nothing outside the files listed below is written.
 
 Writes
@@ -35,7 +35,7 @@ The look comes from his OWN cloud: the carved spiral curls ("ruyi") of the cloud
 Colours are a 1-D ramp texture (UV u = lightness) used as base colour AND emissive map, so when the site raises
 the glow (ctl_glow) the crests and rims glow most: luminous edges, soft white highlights.
 
-Beats (master frames, from his take's 'glow' marker; the transform is 4.0 s). He is Adult Coco throughout: the
+Beats (master frames, from his take's 'glow' marker; the transform is 4.0 s). He is Adult Earnest throughout: the
 cloud wraps him and opens on him again, nothing is swapped.
   glow        the magic cloud's glow rises from the cloud in his hands (the seed)
   expand      curls bubble out of the cloud in his hands and grow
@@ -49,7 +49,7 @@ Every movement is a smooth function of time (C2 eases, no linear segments), keye
 with the function's own slopes; the swirl slows smoothly and never stops dead.
 
 Glow and opacity travel as the X scale of the empties ctl_glow and ctl_fade (three r187 cannot play material
-animation). Axes: Blender -Y faces the visitor (+Z in glTF), metres, the same origin as Adult Coco at rest.
+animation). Axes: Blender -Y faces the visitor (+Z in glTF), metres, the same origin as Adult Earnest at rest.
 """
 
 import json
@@ -71,7 +71,7 @@ ADULT_GLB = os.path.join(ROOT, "public", "models", "characters", "coco-sage.glb"
 FPS = 60
 COLL = "magic_cloud"
 ACTION = "transform"
-RIG = "coco-sage_rig"         # Adult Coco's rig in invitation.blend (build_coco_invite.py)
+RIG = "coco-sage_rig"         # Adult Earnest's rig in invitation.blend (build_coco_invite.py)
 FLOOR = 2.0 ** -10          # resting value of the control empties: never 0, exact after meshopt's filter
 
 ARGV = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
@@ -92,7 +92,7 @@ OFFSETS = {"glow": 0, "expand": 28, "engulf": 66, "luminous": 102, "cover": 138,
 RAMP = [(0.00, "#1abcda"), (0.20, "#22c2dc"), (0.34, "#2cd4e7"), (0.52, "#96ebfb"), (0.70, "#b6f3fe"),
         (0.85, "#d3feff"), (1.00, "#efffff")]
 
-# The shape of the cloud at its largest (Blender axes, metres), round Adult Coco (whose bounding box, sun and bolt
+# The shape of the cloud at its largest (Blender axes, metres), round Adult Earnest (whose bounding box, sun and bolt
 # included, is about x -0.69..0.68, y -0.48..0.48, z -0.95..0.95). Unchanged since the veil's matte
 # (veil-matte.webp) was rendered from it at luminous.
 CENTRE = Vector((-0.035, -0.06, -0.07))
@@ -101,7 +101,7 @@ SHELL_P = 3.4                        # superellipsoid exponent (2 = ellipsoid; h
 CORE = (0.76, 0.74, 1.00)            # half-axes of the inner glow at full size (inside the curls)
 CORE_P = 2.8
 N_SLOTS = 70                         # Fibonacci points before the far back is thinned out
-# Frames after luminous between which Adult Coco is fully hidden by the cloud (it is opaque there), measured with
+# Frames after luminous between which Adult Earnest is fully hidden by the cloud (it is opaque there), measured with
 # coverage masks rendered with the site's camera by blender/scripts/check_cloud_cover.py; written into
 # timeline.json as cloud.hiddenFrom / hiddenTo. The veil covers the screen at OFFSETS cover, inside this span.
 HIDDEN = (-9, 65)
@@ -538,7 +538,7 @@ def curl_tracks(B, seed, f):
 
 def core_track(B, seed, held_adult, f):
     """The inner glow swells inside the curls once they surround him (never seen as a blob of its own), and draws
-    back into the cloud in Adult Coco's hands before the curls part."""
+    back into the cloud in Adult Earnest's hands before the curls part."""
     grow = ss(B["engulf"] + 10, B["luminous"] + 24, f)
     shrink = ss(B["dissipate"], B["dissipate"] + 22, f)
     loc = np.array(CENTRE)[None] + (np.array(held_adult) - np.array(CENTRE))[None] * shrink[:, None]
@@ -550,7 +550,7 @@ def core_track(B, seed, held_adult, f):
 
 WISPS = [
     # While swirling: height z, tilt (deg) about a horizontal axis at azimuth az (deg), radius R. While luminous
-    # they tuck into the cloud (Rin). Those that stay settle round Adult Coco, low round his seat or behind his
+    # they tuck into the cloud (Rin). Those that stay settle round Adult Earnest, low round his seat or behind his
     # shoulders (never across his face): height zend, tilt tiltend, radius Rend, the arc starting at angle aend
     # (deg from +X, anticlockwise from above; -90 is the front).
     dict(z=-0.55, tilt=10, az=20, R=1.18, stay=True, zend=-0.80, tiltend=4, Rend=1.00, aend=-150),
@@ -565,7 +565,7 @@ WISP_TUCK = 0.62            # their radius while the cloud is luminous (inside t
 
 def wisp_tracks(B, f):
     """Ribbon tails that stream round him with the swirl, tuck into the cloud while it is luminous (so the cloud is
-    one clean form then), and come out again as it clears: three settle round Adult Coco and fade."""
+    one clean form then), and come out again as it clears: three settle round Adult Earnest and fade."""
     Phi = swirl_angle(B, f)
     Phi_end = Phi[-1]
     out = []
@@ -754,7 +754,7 @@ def key_track(act, ob, f, path, vals, indices=None, periodic=False):
 
 
 def adult_box(sc=None):
-    """Adult Coco's bounding box at rest (Blender axes), sun and bolt included: the union of the box measured on the
+    """Adult Earnest's bounding box at rest (Blender axes), sun and bolt included: the union of the box measured on the
     sculpt (blender/sculpt/meshy-cloud-monkey-sage.glb) and on his web copy's meshes in coco-sage.blend."""
     lo = np.minimum([-0.69, -0.48, -0.95], [-0.689, -0.483, -0.948])
     hi = np.maximum([0.68, 0.48, 0.95], [0.683, 0.483, 0.951])
@@ -762,7 +762,7 @@ def adult_box(sc=None):
 
 
 def adult_held_cloud():
-    """The middle of the cloud in Adult Coco's hands (its bone in coco-sage.json), where the inner glow draws back to."""
+    """The middle of the cloud in Adult Earnest's hands (its bone in coco-sage.json), where the inner glow draws back to."""
     p = os.path.join(ROOT, "blender", "characters", "coco-sage.json")
     try:
         with open(p, encoding="utf-8") as fh:
@@ -914,10 +914,10 @@ def write_timeline(B):
     gmax = [round(float(hi[0]), 4), round(float(hi[2]), 4), round(float(-lo[1]), 4)]
     tl["adultBox"] = [gmin, gmax]
     tl["cloud"] = {
-        "$comment": "The magic cloud (blender/scripts/build_magic_cloud.py), in the same frame as Adult Coco (glTF "
+        "$comment": "The magic cloud (blender/scripts/build_magic_cloud.py), in the same frame as Adult Earnest (glTF "
                     "axes, metres). He is fully hidden from hiddenFrom to hiddenTo, coverFrame included (coverage "
                     "masks with the site's camera, blender/scripts/check_cloud_cover.py). ctl_glow and ctl_fade carry "
-                    "glow and opacity as scale.x. adultBox: Adult Coco seated at his place, sun and bolt included.",
+                    "glow and opacity as scale.x. adultBox: Adult Earnest seated at his place, sun and bolt included.",
         "hiddenFrom": int(B["luminous"]) + HIDDEN[0], "hiddenTo": int(B["luminous"]) + HIDDEN[1],
         "centre": [round(CENTRE.x, 4), round(CENTRE.z, 4), round(-CENTRE.y, 4)],
     }

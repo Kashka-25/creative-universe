@@ -44,7 +44,7 @@ applyFirstEntry({ seen: introAlreadySeen, storageOk: introStorageAvailable, mark
 // React Router keeps (in sessionStorage) a list of the navigations made with its own view-transition
 // option, and plays a view transition by itself on any later Back or Forward between those pages.
 // The site never uses that option (see portfolio/transitions.ts welcomeNavigate); a list left in
-// this tab by an earlier version of the site is dropped, so Back and Forward never freeze Coco.
+// this tab by an earlier version of the site is dropped, so Back and Forward never freeze Earnest.
 try { window.sessionStorage.removeItem('remix-router-transitions'); } catch { /* storage blocked */ }
 
 // Hash routes so the site works from any static host (GitHub Pages included) with no server rules.

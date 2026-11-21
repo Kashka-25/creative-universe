@@ -1,4 +1,4 @@
-"""Coco's Awakening: Adult Coco's invitation take (the INVITATION page).
+"""Earnest's Awakening: Adult Earnest's invitation take (the INVITATION page).
 
     "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" --background --factory-startup \
         --python blender/scripts/build_coco_invite.py [-- options]
@@ -8,12 +8,12 @@
     --no-cloud          build and export his take only (the magic cloud and its keys are left as they are)
     --no-ride           leave the ride cloud (build_ride_cloud.py) as it is
 
-Run from the repository root. Re-runnable: it opens Adult Coco's own working file blender/characters/coco-sage.blend
+Run from the repository root. Re-runnable: it opens Adult Earnest's own working file blender/characters/coco-sage.blend
 (made by build_coco_sage.py) and IMMEDIATELY saves it under a new name, so that file is never written. His model,
 rig and home clips stay exactly as they are: the take is a new clip on the same rig, exported on its own.
 
 Writes
-  blender/characters/invitation.blend          Adult Coco + the take, one scene, 60 fps master timeline (+ the magic
+  blender/characters/invitation.blend          Adult Earnest + the take, one scene, 60 fps master timeline (+ the magic
                                                 cloud, stage 2)
   public/models/invitation/coco-invite.glb     his skeleton and ONE clip, "invite" (no meshes, no textures: a few
                                                 kB). The site plays it on the model it already has,
@@ -261,8 +261,8 @@ def export_take():
 
 def write_timeline(N, marks):
     tl = {
-        "$comment": "Coco's Awakening, invitation page. Frames are on one 60 fps master timeline (frame / fps = seconds "
-                    "into the take). Adult Coco's take: blender/scripts/build_coco_invite.py (the clip 'invite', played "
+        "$comment": "Earnest's Awakening, invitation page. Frames are on one 60 fps master timeline (frame / fps = seconds "
+                    "into the take). Adult Earnest's take: blender/scripts/build_coco_invite.py (the clip 'invite', played "
                     "on models/characters/coco-sage.glb; from its last frame, 'arrive', he breathes and floats with "
                     "that model's own 'breathe' and 'float'; at 'wake' the site layers that model's 'awaken' on it: he opens "
                     "his eyes, looks at the visitor ('gaze'), closes them ('eyesClose') and bows ('bow')). The magic "

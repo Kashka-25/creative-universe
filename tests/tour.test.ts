@@ -13,7 +13,7 @@ function anchorsAt(sy: number): Anchor[] {
     { name: 'bottom', rect: at(1700, 2400, 48, 1232) },     // the works grid, 1700 .. 4100
   ];
 }
-/** The hero's Coco place in view: all of it at the top, less as the page scrolls. */
+/** The hero's Earnest place in view: all of it at the top, less as the page scrolls. */
 const heroShareAt = (sy: number) => Math.max(0, Math.min(1, (650 - sy) / 520));
 
 /** The stop for each scroll position on the way, as the page is scrolled from `from` to `to` in `steps`. */
@@ -109,15 +109,15 @@ describe('the home journey: where he rests', () => {
   });
 });
 
-describe('the home journey: one Coco, and reduced motion', () => {
-  it('flies the hero\'s own Coco (no hand-off), gives him his cloud in flight, and has hooks on the page', () => {
+describe('the home journey: one Earnest, and reduced motion', () => {
+  it('flies the hero\'s own Earnest (no hand-off), gives him his cloud in flight, and has hooks on the page', () => {
     const home = readFileSync(new URL('../src/guide/HomeStage.tsx', import.meta.url), 'utf8');
     expect(home).toMatch(/const tourHere = tourOn\(page, vw0\) && !P\.away;/);
     expect(home).toMatch(/if \(stop === 'hero' && hero\) target = doc\(toRiding\(hero\)\);/);
     // his cloud is under him at every stop, the hero's included (Cassidy, 10 Nov 2026)
     expect(home).toContain('P.cushion += (1 - P.cushion)');
     const pages = readFileSync(new URL('../src/portfolio/pages.tsx', import.meta.url), 'utf8');
-    for (const n of ['realms', 'works', 'bottom']) expect(pages).toMatch(new RegExp(`data-coco-stop="${n}"`));
+    for (const n of ['realms', 'works', 'bottom']) expect(pages).toMatch(new RegExp(`data-earnest-stop="${n}"`));
   });
 
   it('under reduced motion his still appears at each stop with a fade (the hero keeps its painting)', () => {

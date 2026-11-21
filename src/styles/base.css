@@ -86,7 +86,7 @@ main:focus { outline: none; }
 
 /* A change of page inside the site: the new page's content and footer fade in (opacity only, on
    the compositor; no fill afterwards, so nothing is left as a stacking context). No view
-   transition: its snapshot phase holds every frame until the new page has rendered, and Coco is
+   transition: its snapshot phase holds every frame until the new page has rendered, and Earnest is
    live over the page (Layout.tsx). */
 .page-enter { animation: fade-in 420ms var(--ease) backwards; }
 
@@ -95,9 +95,9 @@ main:focus { outline: none; }
    (src/portfolio/transitions.ts; the invitation is 'invitation-page'), so the old one fades out
    exactly where it was, however far it was scrolled, and the new one fades in. Everything that
    persists is never crossfaded with a frozen copy of itself: the background and the header simply
-   become the new page's, and Coco's layer, the paper grain and the cloud veil stay live
-   throughout, so Coco never doubles, ghosts or jumps and the grain never drops out. During the
-   change things stack as on the page: background < content < Coco < header < grain < veil. */
+   become the new page's, and Earnest's layer, the paper grain and the cloud veil stay live
+   throughout, so Earnest never doubles, ghosts or jumps and the grain never drops out. During the
+   change things stack as on the page: background < content < Earnest < header < grain < veil. */
 @view-transition { navigation: auto; }
 ::view-transition-group(*) { z-index: 2; }
 ::view-transition-old(*) { animation: 260ms var(--ease) both vt-out; }
@@ -109,7 +109,7 @@ main:focus { outline: none; }
 ::view-transition-group(veil) { z-index: 6; animation: none; }
 ::view-transition-old(root), ::view-transition-old(guide), ::view-transition-old(site-header), ::view-transition-old(veil), ::view-transition-old(grain) { display: none; }
 ::view-transition-new(root), ::view-transition-new(guide), ::view-transition-new(site-header), ::view-transition-new(veil), ::view-transition-new(grain) { animation: none; }
-/* leaving the site for the welcome (no live Coco on the other side): he fades out with the page */
+/* leaving the site for the welcome (no live Earnest on the other side): he fades out with the page */
 ::view-transition-old(guide):only-child { display: block; animation: 260ms var(--ease) both vt-fade-out; }
 @keyframes vt-out { to { opacity: 0; transform: translateY(-6px); } }
 @keyframes vt-in { from { opacity: 0; transform: translateY(10px); } }

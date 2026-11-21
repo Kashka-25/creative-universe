@@ -1,10 +1,10 @@
-"""Adult Coco's open eyes, taken from Cassidy's own open-eyed sculpt, for the welcome's awakening beat.
+"""Adult Earnest's open eyes, taken from Cassidy's own open-eyed sculpt, for the welcome's awakening beat.
 
     "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup \
         --python blender/scripts/prep_coco_eyes.py
 
 Run from the project folder, before build_coco_sage.py (which reads what this writes). Nothing is drawn or repainted:
-the open eyes are the texture of blender/sculpt/coco-open.glb (Cassidy's open-eyed Adult Coco, never written), seen
+the open eyes are the texture of blender/sculpt/coco-open.glb (Cassidy's open-eyed Adult Earnest, never written), seen
 straight from the front, cut out along their own outline and laid onto the sage at his own closed lid lines.
 
   1. Two orthographic front views, flat texture colour (no lighting), the same scale per pixel: the sage's eyes
@@ -304,7 +304,7 @@ def main():
     img.file_format = "PNG"
     img.save()
     meta = {"$comment": "Made by blender/scripts/prep_coco_eyes.py from blender/sculpt/coco-open.glb (Cassidy's open-eyed "
-                        "Adult Coco). Cards in Blender metres on his face (x across, z up); atlas uv of each card; "
+                        "Adult Earnest). Cards in Blender metres on his face (x across, z up); atlas uv of each card; "
                         "lidLine: his closed lid line z(x) as a quadratic (numpy polyval order).",
             "scale": round(k, 5), "eyesUp": EYES_UP, "alphaMax": ALPHA_MAX, "alphaMin": ALPHA_MIN, "atlas": [W, H], "cards": cards}
     with open(OUT_JSON, "w", encoding="utf-8") as fh:

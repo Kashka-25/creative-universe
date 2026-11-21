@@ -1,4 +1,4 @@
-// How the magic cloud is drawn while it grows out of the cloud in his hands (part of Adult Coco's
+// How the magic cloud is drawn while it grows out of the cloud in his hands (part of Adult Earnest's
 // own model, drawn exactly as authored). Pure material settings (three's materials work without
 // WebGL), shared by InvitationStage and its tests. Code never hides or thins him or his cloud.
 //

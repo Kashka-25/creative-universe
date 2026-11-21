@@ -1,5 +1,5 @@
 {
-  "$comment": "Made by blender/scripts/prep_coco_eyes.py from blender/sculpt/coco-open.glb (Cassidy's open-eyed Adult Coco). Cards in Blender metres on his face (x across, z up); atlas uv of each card; lidLine: his closed lid line z(x) as a quadratic (numpy polyval order).",
+  "$comment": "Made by blender/scripts/prep_coco_eyes.py from blender/sculpt/coco-open.glb (Cassidy's open-eyed Adult Earnest). Cards in Blender metres on his face (x across, z up); atlas uv of each card; lidLine: his closed lid line z(x) as a quadratic (numpy polyval order).",
   "scale": 1.05183,
   "eyesUp": 0.0095,
   "alphaMax": 0.98,

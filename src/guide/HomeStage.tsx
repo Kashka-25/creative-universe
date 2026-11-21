@@ -1,10 +1,10 @@
-// Adult Coco, the visitor's companion: a closed-eyed sage seated on his cloud, the sun and lightning
+// Adult Earnest, the visitor's companion: a closed-eyed sage seated on his cloud, the sun and lightning
 // bolt behind him. One transparent layer fixed over the window, above the page's content and below
 // the header, the menu, dialogs and the cloud veil (pointer-events: none: he never blocks a click).
 //
 // Where he is (companion.ts decides, space.ts finds the empty space):
-// - At the top of home he is the hero's Coco: big (HERO.grow times his calm size), in the hero's own
-//   space ([data-guide-space]), scrolling with it. While the hero is on screen there is no other Coco.
+// - At the top of home he is the hero's Earnest: big (HERO.grow times his calm size), in the hero's own
+//   space ([data-guide-space]), scrolling with it. While the hero is on screen there is no other Earnest.
 // - Everywhere else (every page but About, and home once the hero has scrolled away) he is the
 //   companion, smaller (COMPANION_SCALE of his calm size), riding his swirl cloud like a magic carpet
 //   (Cassidy, 9 Nov 2026): he travels with the visitor in the window as they scroll, drifting towards
@@ -19,13 +19,13 @@
 //   visitor ("Keep him with me"): he flies in to peek from a bottom corner of the window, small and
 //   fixed to it, the one place he may sit over content; a control under that corner (focused by
 //   keyboard, or fixed to the window) keeps him out of it (companion.ts cornerSpot, controlInCorner).
-//   Back to the hero (scrolling up to it), the companion fades out quietly and the hero's Coco fades in.
+//   Back to the hero (scrolling up to it), the companion fades out quietly and the hero's Earnest fades in.
 // Every movement is a Blender clip from coco-sage.glb, played by ClipPlayer: 'breathe' loops, with
 // 'float' (a slow hover) layered on it when the model has it; arriving from the invitation he plays
 // 'settle' first (once the cloud starts to clear, so it is seen) and joins 'breathe' at its first
 // frame; rare drifts start on a breath's loop boundary; a face flutter now and then; small
 // reactions to the visitor. The sun and bolt behind him live ('radiance') and his third eye blinks
-// ('thirdeye'), two seamless loops layered on everything (characters/cocoLife.ts). His ride cloud follows his root bone (characters/rideCloud.ts).
+// ('thirdeye'), two seamless loops layered on everything (characters/earnestLife.ts). His ride cloud follows his root bone (characters/rideCloud.ts).
 // Loads coco-sage.glb through his own loader: if home gives up on him (too slow, a lost context, an
 // error) the download stops and whatever loaded is freed. The ride cloud (ride-cloud.glb, small) is
 // loaded only once he first becomes the companion, after the page is drawn, and kept (one copy).
@@ -41,7 +41,7 @@ import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { asset } from '../content';
 import { prefersReducedMotion, qualityTier, stageDpr } from '../intro/capability';
 import { ClipPlayer } from '../characters/ClipPlayer';
-import { createCocoLife, LIFE_LOOPS, type CocoLife } from '../characters/cocoLife';
+import { createEarnestLife, LIFE_LOOPS, type EarnestLife } from '../characters/earnestLife';
 import { createModelSource } from '../characters/modelSource';
 import { drawOnce, neverCullSkinned, restBox, texturesUnder, uploadGradually } from '../characters/sceneUtils';
 
@@ -65,7 +65,7 @@ const FPS = 30;
 /** His slow hover, an additive loop over 'breathe' (if the model has it). */
 const FLOAT = 'float';
 const ADDITIVE = new Set<string>([...DRIFTS, 'flutter', ...REACTIONS, FLOAT, ...LIFE_LOOPS]);
-/** The sun and bolt's life and his third eye's blinks (cocoLife.ts) ease in over this long. */
+/** The sun and bolt's life and his third eye's blinks (earnestLife.ts) ease in over this long. */
 const LIFE_IN_SECONDS = 2;
 /** On pages he is this much smaller than his calm size (Cassidy: a smaller character riding his cloud). */
 export const COMPANION_SCALE = 0.65;
@@ -73,11 +73,11 @@ export const COMPANION_SCALE = 0.65;
 const GUARD = { ...RIDING, sweepS: 0.12, sweepMax: 60 };
 /** A space must hold this long (s) before he leaves his corner peek for it. */
 const OPEN_S = ROAM.openS;
-/** Development only, with ?cocotrace in the address: one line per frame of where he is (for measuring). */
-const TRACE = import.meta.env.DEV && typeof location !== 'undefined' && location.search.includes('cocotrace');
+/** Development only, with ?earnesttrace in the address: one line per frame of where he is (for measuring). */
+const TRACE = import.meta.env.DEV && typeof location !== 'undefined' && location.search.includes('earnesttrace');
 /** Leaving for About, his layer fades out (intro.css); after this long (s) he is no longer drawn. */
 const AWAY_S = 0.8;
-/** With no room he fades out (intro.css, --coco-fade); after this long (s) he is unseen. */
+/** With no room he fades out (intro.css, --earnest-fade); after this long (s) he is unseen. */
 const FADE_S = 0.8;
 /** How often (s) he checks that the page's content has not come under him. */
 const CHECK_S = 0.1;
@@ -122,7 +122,7 @@ const freshPlace = () => ({
   init: false,
   /** Where he is drawn, in his layer's CSS px (centre, height), and his lean (rad). */
   x: 0, y: 0, h: 1, bank: 0,
-  /** The hero's Coco (top of home) or the companion. */
+  /** The hero's Earnest (top of home) or the companion. */
   mode: 'companion' as 'hero' | 'companion' | 'tour',
   /** In the hero: his place (document px; it scrolls with the hero). */
   spot: null as Spot | null,
@@ -237,10 +237,10 @@ function Adult({ arriving, away, onReady }: AdultProps) {
   }, [gltf, arriving]);
 
   // The sun and bolt behind him glow softly, the bolt shimmers now and then, his third eye glows round its
-  // blinks: Blender's control values turned into material settings every frame (cocoLife.ts).
-  const life = useRef<CocoLife | null>(null);
+  // blinks: Blender's control values turned into material settings every frame (earnestLife.ts).
+  const life = useRef<EarnestLife | null>(null);
   useEffect(() => {
-    const l = createCocoLife(gltf.scene);
+    const l = createEarnestLife(gltf.scene);
     life.current = l;
     return () => { l.dispose(); life.current = null; };
   }, [gltf]);
@@ -292,7 +292,7 @@ function Adult({ arriving, away, onReady }: AdultProps) {
   useEffect(() => () => {
     const el = gl.domElement.closest<HTMLElement>('.guide-layer');
     if (el) { delete el.dataset.appear; delete el.dataset.quick; delete el.dataset.fly; }
-    el?.style.removeProperty('--coco-fade');
+    el?.style.removeProperty('--earnest-fade');
     place.current = freshPlace();
   }, [gl]);
 
@@ -359,7 +359,7 @@ function Adult({ arriving, away, onReady }: AdultProps) {
       // content has come under him (a new page, a layout change): he leaves quickly, so he is never
       // seen over it for long (intro.css [data-quick]); otherwise he fades in and out slowly
       if (layerEl) { if (quick) layerEl.dataset.quick = ''; else delete layerEl.dataset.quick; }
-      layerEl?.style.setProperty('--coco-fade', String(v));
+      layerEl?.style.setProperty('--earnest-fade', String(v));
     };
     const gone = () => P.fade === 0 && wall - P.fadeAt >= FADE_S;
     const r = ride.current;
@@ -442,7 +442,7 @@ function Adult({ arriving, away, onReady }: AdultProps) {
       P.aim = createAim();
       P.checkedAt = -Infinity;
     }
-    // the hero at the top of home: is its Coco the one on screen?
+    // the hero at the top of home: is its Earnest the one on screen?
     const vw0 = window.innerWidth, vh0 = window.innerHeight;
     const heroEl = !P.away ? document.querySelector<HTMLElement>('[data-guide-space]') : null;
     let hero: Spot | null = null;
@@ -453,7 +453,7 @@ function Adult({ arriving, away, onReady }: AdultProps) {
     const heroView = { left: 0, top: 0, right: vw0, bottom: vh0 };
     const wantHero = !!hero && heroMode(P.mode === 'hero', visibleShare(hero, aspect, heroView));
 
-    // ── the home journey on a laptop or desktop (tour.ts): one Coco, the hero's own ──
+    // ── the home journey on a laptop or desktop (tour.ts): one Earnest, the hero's own ──
     const tourHere = tourOn(page, vw0) && !P.away;
     // his ride cloud is under him everywhere he is drawn (Cassidy, 10 Nov 2026): fetched once he is ready
     if (!P.away && readySent.current && Number.isNaN(P.rideWanted)) { P.rideWanted = wall; loadRide(); }
@@ -551,9 +551,9 @@ function Adult({ arriving, away, onReady }: AdultProps) {
       // his cloud: under him at every stop, the hero's included (eased in if it was not)
       P.cushion += (1 - P.cushion) * (1 - Math.exp(-dt * 3));
     } else if (wantHero && hero) {
-      // the hero's Coco sits on his ride cloud too, once it is here (it eases in under him)
+      // the hero's Earnest sits on his ride cloud too, once it is here (it eases in under him)
       if (P.mode !== 'hero') {
-        // back to the hero: the companion (if shown) fades out quietly first, then the hero's Coco fades in
+        // back to the hero: the companion (if shown) fades out quietly first, then the hero's Earnest fades in
         if (P.flight) endFlight();
         if (P.init && P.shown && P.seen && !gone()) { if (P.fade === 1) fade(0); }
         else { P.mode = 'hero'; P.riding = rideOk; P.cushion = rideOk ? 1 : 0; P.rider = null; P.corner = null; appearAt(doc(P.riding ? toRiding(hero) : hero)); }
@@ -565,7 +565,7 @@ function Adult({ arriving, away, onReady }: AdultProps) {
       }
     } else if (!P.away) {
       if (P.mode === 'hero') {
-        // the hero has scrolled away: its Coco goes with it, quietly; the companion makes his entrance
+        // the hero has scrolled away: its Earnest goes with it, quietly; the companion makes his entrance
         P.mode = 'companion';
         P.entered = false;
         P.rider = null;
@@ -739,7 +739,7 @@ function Adult({ arriving, away, onReady }: AdultProps) {
       const rest = P.mode === 'tour' && !!P.rider && Math.hypot(P.rider.vx, P.rider.vy) < 6;
       const tourRest = rest && P.stop !== 'corner' && P.stop !== 'hero';
       const ov = m && P.seen && P.fade === 1 && !peek && (P.mode === 'companion' || tourRest) ? overlapArea(spotBox(at, shapeNow), m.obstacles) : 0;
-      console.debug('cocotrace', JSON.stringify({ t: +wall.toFixed(4), x: +at.cx.toFixed(2), y: +at.cy.toFixed(2), h: +at.h.toFixed(2),
+      console.debug('earnesttrace', JSON.stringify({ t: +wall.toFixed(4), x: +at.cx.toFixed(2), y: +at.cy.toFixed(2), h: +at.h.toFixed(2),
         fade: P.fade, seen: P.seen, mode: P.mode, corner: P.corner || (P.flight?.corner ?? null), flight: !!P.flight, stop: P.stop, rest, ov: Math.round(ov), sy, vs: Math.round(P.vs) }));
     }
     const k = (2 * CAMERA_Z * Math.tan((FOV * Math.PI) / 360)) / H;      // world units per CSS px at z = 0

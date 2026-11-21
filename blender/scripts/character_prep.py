@@ -1,4 +1,4 @@
-"""Prepare a Creative Universe character (Little Coco, Coco) from Cassidy's sculpt.
+"""Prepare a Creative Universe character (Little Earnest, Earnest) from Cassidy's sculpt.
 
     blender --background --factory-startup --python blender/scripts/character_prep.py -- <name>
 
@@ -12,8 +12,8 @@ Writes:
 Every character gets the same skeleton names (root, hips, spine, chest, neck, head,
 upperarm/forearm/hand _L/_R; every bone points up with roll 0, so bone axes are his
 own) and the same face shapes (smile, grin, jawOpen, mouthO, cheekRaise, squint,
-browsUp, browsFurrow, browsSad, noseWrinkle). That shared language is what lets Coco
-keep Little Coco's mannerisms: the site drives both with the same code.
+browsUp, browsFurrow, browsSad, noseWrinkle). That shared language is what lets Earnest
+keep Little Earnest's mannerisms: the site drives both with the same code.
 
 Moods are recipes of face shapes plus, where sculpting can't show it, his face painted on
 from a picture with those shapes applied, lined up on his third eye, eyes and mouth and
@@ -27,7 +27,7 @@ sheet drawn at three-quarters from skewing his face:
     "paint": {"base": "own" | "closed", "erase": {"top", "bottom", "side"},
               "mouth": {"image", "outline", "at", "height"}, "eyes": "closed"}
 "eyes": "closed" lays just the eyes of his closed-eyed sculpt over his own face (for a sculpt
-whose closed-eyed version differs elsewhere, as Coco's older sage sculpt does).
+whose closed-eyed version differs elsewhere, as Earnest's older sage sculpt does).
 """
 
 import json
@@ -56,7 +56,7 @@ X_GAIN = CFG.get("expressiveness", 1.0)   # how big his expressions are
 def _landmarks():
     """His face's landmarks (x, z in Blender metres; A = the side on the viewer's left, B = the right).
 
-    Faces are rarely square to the camera (Little Coco's head is tilted about 9 degrees), so every
+    Faces are rarely square to the camera (Little Earnest's head is tilted about 9 degrees), so every
     feature has its own measured position, and expressions move along his face's own axes."""
     lm = CFG.get("landmarks")
     if lm:

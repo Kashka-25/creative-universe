@@ -403,7 +403,7 @@ a.text-button { display: inline-flex; align-items: center; }
 .studio__panel figcaption { text-align: center; font-weight: 650; font-size: 0.85rem; padding: 0.5rem; border-top: 1px solid var(--rule); color: var(--ink-soft); }
 @media (max-width: 860px) { .studio__grid { grid-template-columns: 1fr 1fr; } }
 
-/* The live hero: space kept empty for Coco (the guide layer draws him in the page's empty space). */
+/* The live hero: space kept empty for Earnest (the guide layer draws him in the page's empty space). */
 .hero-stage--live { display: grid; place-items: center; }
 .hero-stage--live > * { grid-area: 1 / 1; }
 /* A still of him while the 3D one loads; it fades away as he appears. */
@@ -418,7 +418,7 @@ a.text-button { display: inline-flex; align-items: center; }
 /* he fades in over the poster first (the layer's 700 ms), then only the poster fades: no dip */
 .hero-stage__poster.is-leaving { opacity: 0; transition-delay: 700ms; }
 
-/* ── Coco's swirl clouds, drifting behind a section's content (SkyClouds) ── */
+/* ── Earnest's swirl clouds, drifting behind a section's content (SkyClouds) ── */
 /* the host is a stacking context of its own, so the clouds sit above its background and below
    everything in it; they never take a click. The layer spans the window's width (the side gutters
    are room for clouds too), and SkyClouds places each cloud only where there is no content */

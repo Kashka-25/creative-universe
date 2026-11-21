@@ -1,4 +1,4 @@
-"""Coco's Awakening: checks that the magic cloud fully hides Adult Coco around the peak (invitation page).
+"""Earnest's Awakening: checks that the magic cloud fully hides Adult Earnest around the peak (invitation page).
 
     "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" --background \
         blender/characters/invitation.blend --python blender/scripts/check_cloud_cover.py [-- options]

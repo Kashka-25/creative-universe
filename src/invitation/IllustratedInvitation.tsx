@@ -1,5 +1,5 @@
 // The invitation without motion: for reduced motion, data saver, low memory, no WebGL, or when
-// the 3D take cannot load. A still of Adult Coco rendered in Blender from his own model (the same
+// the 3D take cannot load. A still of Adult Earnest rendered in Blender from his own model (the same
 // still home shows while he loads) if there is one, otherwise Cassidy's painting, still. No auto-advance: the visitor comes in when they choose.
 
 import { useEffect, useRef, useState } from 'react';
@@ -46,7 +46,7 @@ const PAINTING_ALT =
   "Cassidy's guide: a chimp in an orange beanie and dungarees, meditating on a turquoise cloud, a third eye on his forehead, the sun and a lightning bolt behind him.";
 
 const STILL_ALT =
-  'Coco meditating on his cloud, his eyes closed, a third eye on his forehead, the sun and a lightning bolt behind him.';
+  'Earnest meditating on his cloud, his eyes closed, a third eye on his forehead, the sun and a lightning bolt behind him.';
 
 export function IllustratedInvitation() {
   const [still, setStill] = useState<'trying' | 'shown' | 'missing'>('trying');

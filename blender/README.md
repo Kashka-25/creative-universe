@@ -110,9 +110,9 @@ npm run check:guide -- --register
 
 > **Pipeline self-test without Blender:** `npm run test:guide-pipeline` builds a crude contract-complete GLB, optimises it and checks it. It was used to verify this whole path end to end.
 
-## Coco's Awakening: the invitation take
+## Earnest's Awakening: the invitation take
 
-The invitation page (`#/invitation`) is hosted by **Adult Coco** (`coco-sage`). Run these from the project folder, after `build_coco_sage.py` has made `blender/characters/coco-sage.blend`:
+The invitation page (`#/invitation`) is hosted by **Adult Earnest** (`coco-sage`). Run these from the project folder, after `build_coco_sage.py` has made `blender/characters/coco-sage.blend`:
 
 ```bash
 "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python blender/scripts/build_coco_invite.py
@@ -123,13 +123,13 @@ The invitation page (`#/invitation`) is hosted by **Adult Coco** (`coco-sage`). 
 - `build_ride_cloud.py` builds the swirl cloud he rides on from the magic cloud's own curls, wisp and colours. Its clips: `ride` (the welcome, on the master timeline: its curls billow up and its wisp streams while he floats down, idles, then from `glow` swells into the base of the magic cloud and thins away inside it before he is hidden), `rest` (a seamless 20 s idle loop under him on pages) and `flyin` (2 s: the path of his flight to a new space on a page, as `ctl_progress` / `ctl_lift` / `ctl_bank`, and a soft shimmer as he lands; its last frame is `rest` frame 0). The site makes it follow his root bone, so his own motion carries it.
 - `check_cloud_cover.py` renders coverage masks with the site's camera and prints the frames on which no pixel of him shows. `HIDDEN` in `build_magic_cloud.py` records that span.
 
-## Adult Coco's living details
+## Adult Earnest's living details
 
-Three additions to Adult Coco (9 Nov 2026), all keyed in Blender and layered by the site:
+Three additions to Adult Earnest (9 Nov 2026), all keyed in Blender and layered by the site:
 
 - **The sun and bolt come to life** (`radiance`, a seamless 40 s loop): the sun turns and breathes a little on its own `sun` bone, its glow swells, and the bolt shimmers softly now and then (never more than 3 times a second).
 - **His third eye blinks** (`thirdeye`, a seamless 32 s loop): it is a painted eye, so a `third_eye` bone closes it onto its lid line four times at irregular moments, with a soft glow after each blink.
-- **The welcome's awakening** (`awaken`, 6 s): he slowly opens his eyes, looks at the visitor, closes them again and bows his head in honour. His open eyes are Cassidy's own open-eyed Coco (`blender/sculpt/coco-open.glb`, never written), cut out and laid onto his lid lines by `prep_coco_eyes.py`.
+- **The welcome's awakening** (`awaken`, 6 s): he slowly opens his eyes, looks at the visitor, closes them again and bows his head in honour. His open eyes are Cassidy's own open-eyed Earnest (`blender/sculpt/coco-open.glb`, never written), cut out and laid onto his lid lines by `prep_coco_eyes.py`.
 
 ```bash
 "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup --python blender/scripts/prep_coco_eyes.py
@@ -139,7 +139,7 @@ Three additions to Adult Coco (9 Nov 2026), all keyed in Blender and layered by 
 
 - `prep_coco_eyes.py` writes `blender/characters/coco-sage-eyes.png` and `.json`: two eye cards (colour from coco-open; alpha is the order in which each eye is revealed as his lids part).
 - `coco_sage_life.py` (imported by `build_coco_sage.py`) adds the bones, weights, the eye cards and the three clips. Settings are in `coco-sage.json` under `life`.
-- Glow and the eyes' opening travel as the X scale of the control bones `ctl_sun`, `ctl_bolt`, `ctl_eye` and `ctl_eyes` (value = scale.x − 1). The site turns them into material settings (`src/characters/cocoLife.ts`).
+- Glow and the eyes' opening travel as the X scale of the control bones `ctl_sun`, `ctl_bolt`, `ctl_eye` and `ctl_eyes` (value = scale.x − 1). The site turns them into material settings (`src/characters/earnestLife.ts`).
 - `build_coco_invite.py` puts the markers `wake`, `gaze`, `eyesClose` and `bow` after `welcome`, and moves the glow (and everything after it) later by the beat's length.
 
 ## The section clouds, spinning

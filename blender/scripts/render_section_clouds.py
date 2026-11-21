@@ -1,4 +1,4 @@
-"""Scattered clouds: six small clouds of Coco's own swirl cloud, for the sections of the site's pages, each a still
+"""Scattered clouds: six small clouds of Earnest's own swirl cloud, for the sections of the site's pages, each a still
 and a seamless spinning loop.
 
     "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" --background --factory-startup \
@@ -7,7 +7,7 @@ and a seamless spinning loop.
 
 Run from the repository root. Builds nothing in any .blend and opens none: it starts from an empty scene, makes
 the magic cloud's own curl and wisp meshes and colour ramp (blender/scripts/build_magic_cloud.py: curl_bun, wisp,
-ramp_srgb, the colours sampled from the cloud in Young Coco's hands), arranges them into small clusters and renders
+ramp_srgb, the colours sampled from the cloud in Young Earnest's hands), arranges them into small clusters and renders
 each one, front three-quarter, in light like the site's invitation stage (warm sky, warm key from the upper right,
 cool fill from the left, a soft turquoise glow), on a transparent background. The site floats them with CSS.
 

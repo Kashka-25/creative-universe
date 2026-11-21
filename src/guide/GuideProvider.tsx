@@ -1,4 +1,4 @@
-// Coco, the visitor's companion. No story here: he floats in the page's negative space, meditating,
+// Earnest, the visitor's companion. No story here: he floats in the page's negative space, meditating,
 // on every page but About (space.ts companionOn), where he fades out until the visitor goes
 // elsewhere. The welcome itself lives on its own page (#/invitation).
 //
@@ -27,9 +27,9 @@ const HOME_LOAD_MS = 10_000;
 
 export interface GuideValue {
   mode: IntroMode;
-  /** Coco is drawn in 3D (otherwise the living painting stands in the hero). */
+  /** Earnest is drawn in 3D (otherwise the living painting stands in the hero). */
   live3D: boolean;
-  /** The 3D Coco is loaded and drawing. */
+  /** The 3D Earnest is loaded and drawing. */
   ready: boolean;
   /** 3D failed (missing model, lost context, too slow): the painting stands in. */
   failed: boolean;
@@ -139,7 +139,7 @@ export function GuideProvider({ children }: { children: ReactNode }) {
       spent += Math.min(Math.max(0, now - last), 100);
       last = now;
       if (spent >= HOME_LOAD_MS) {
-        console.warn('[guide] Coco took too long to load; showing the painting');
+        console.warn('[guide] Earnest took too long to load; showing the painting');
         fail();
         return;
       }

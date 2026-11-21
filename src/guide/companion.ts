@@ -1,8 +1,8 @@
-// Where Coco goes, and how he gets there, once the page has been still for a moment. Pure (tested in
+// Where Earnest goes, and how he gets there, once the page has been still for a moment. Pure (tested in
 // node); HomeStage (3D) and PosterCompanion (his still) read it. space.ts finds the empty space.
 //
-// - At the top of home he is the hero's Coco: big, in the hero's own space, scrolling with it. While
-//   the hero is on screen there is no other Coco anywhere (heroMode, with hysteresis).
+// - At the top of home he is the hero's Earnest: big, in the hero's own space, scrolling with it. While
+//   the hero is on screen there is no other Earnest anywhere (heroMode, with hysteresis).
 // - Everywhere else (every page but About, and home once the hero has scrolled away) he is the
 //   companion. He moves only once the page has been still (no scroll, no resize) for DWELL_S, and
 //   only if his place has to change (planMove: 'stay' when where he is is still good).
@@ -41,7 +41,7 @@ export const HERO = {
   widthShare: 0.92,
   /** How much larger than his calm companion size he is in the hero (Cassidy: about 25-35%). */
   grow: 1.3,
-  /** The hero's Coco hands over to the companion once less than this share of him is in view ... */
+  /** The hero's Earnest hands over to the companion once less than this share of him is in view ... */
   leave: 0.45,
   /** ... and takes over again once more than this share is (hysteresis: no flicker at the edge). */
   back: 0.6,
@@ -54,7 +54,7 @@ export function heroSpot(stage: Rect, aspect: number, maxH: number): Spot {
   return { cx: (stage.left + stage.right) / 2, cy: (stage.top + stage.bottom) / 2, h: size };
 }
 
-/** Whether the hero's Coco is the one on screen now (`share`: how much of his hero place is in view). */
+/** Whether the hero's Earnest is the one on screen now (`share`: how much of his hero place is in view). */
 export function heroMode(wasHero: boolean, share: number): boolean {
   return wasHero ? share >= HERO.leave : share > HERO.back;
 }
@@ -68,7 +68,7 @@ export type Plan =
   | { kind: 'appear'; to: Spot; corner: boolean };
 
 export interface PlanInput {
-  /** On About: no Coco. */
+  /** On About: no Earnest. */
   away: boolean;
   /** Reduced motion: he never flies, he appears. */
   reduced: boolean;

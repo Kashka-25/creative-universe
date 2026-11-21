@@ -1,4 +1,4 @@
-// Coco's swirl clouds, scattered through the pages' sections: where each one sits, how large, and
+// Earnest's swirl clouds, scattered through the pages' sections: where each one sits, how large, and
 // how it drifts. Pure and seeded by the section (tested in node): the same section laid out the same
 // way always shows its clouds in the same places, visit after visit. The stills are Blender renders
 // listed in public/models/clouds/clouds.json; any that is missing is simply not shown. Each may have a

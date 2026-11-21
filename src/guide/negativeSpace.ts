@@ -218,14 +218,14 @@ export function createLayoutCache(refreshS = 2): LayoutCache {
 }
 
 /**
- * The home page's stops for Coco's journey (tour.ts), by their hooks ([data-coco-stop]), in window
+ * The home page's stops for Earnest's journey (tour.ts), by their hooks ([data-earnest-stop]), in window
  * px. A heading is measured by its text (its own box spans the column), so "stage right" of it is the
  * room beside the words.
  */
 export function stopAnchors(): { name: 'realms' | 'works' | 'bottom'; rect: Rect }[] {
   const out: { name: 'realms' | 'works' | 'bottom'; rect: Rect }[] = [];
-  for (const el of document.querySelectorAll<HTMLElement>('[data-coco-stop]')) {
-    const name = el.dataset.cocoStop;
+  for (const el of document.querySelectorAll<HTMLElement>('[data-earnest-stop]')) {
+    const name = el.dataset.earnestStop;
     if (name !== 'realms' && name !== 'works' && name !== 'bottom') continue;
     let r = el.getBoundingClientRect();
     if (name !== 'bottom' && typeof document.createRange === 'function') {

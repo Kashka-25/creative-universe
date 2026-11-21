@@ -1,4 +1,4 @@
-"""Coco's ride cloud: the fluffy swirl cloud Adult Coco rides on (the welcome screen and every page).
+"""Earnest's ride cloud: the fluffy swirl cloud Adult Earnest rides on (the welcome screen and every page).
 
     "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" --background --factory-startup \
         --python blender/scripts/build_coco_invite.py
@@ -10,7 +10,7 @@ removed first; nothing else in invitation.blend is touched.
 Writes
   blender/characters/invitation.blend        + collection "ride_cloud" (its root follows his rig's 'root' bone
                                                through a Child Of constraint, so the scene shows him riding it)
-  public/models/clouds/ride-cloud.glb        the cloud, at rest under Adult Coco's seat (the same frame as his
+  public/models/clouds/ride-cloud.glb        the cloud, at rest under Adult Earnest's seat (the same frame as his
                                                model, glTF axes), and three clips:
       ride    the welcome, on the 60 fps master timeline (frame 0 = 'floatIn'): it carries him down from above
               the window (its outer curls billow up a touch and its wisp streams out while he sinks, and both
