@@ -1,0 +1,40 @@
+{
+  "$comment": "A commissioned website concept (repo Kashka-25/quinta-da-libelula, its own project; this site only links out). Card and page words approved by Cassidy (11 Nov 2026); the quote is from Cassidy's brief. Facts about the Quinta come from quintadalibelula.center. The live link is an unlisted preview sent to Quinta da Libélula for approval: do not merge this entry until they have agreed to it being shown publicly. Cover and previews are screenshots of the demo.",
+  "title": "Quinta da Libélula",
+  "realm": "digital",
+  "collection": "Client Work",
+  "category": "Website concept",
+  "description": "A concept for a new Quinta da Libélula website, an eco retreat in the hills of Coimbra, Portugal. “Don't just build a website. Create a digital sanctuary.”",
+  "portfolioDescription": "A dragonfly arrives in a sunlit forest, melts into the Quinta's emblem, and is reborn as a radiant lotus dragonfly that flies into the homepage.",
+  "credits": "Facts and photographs from quintadalibelula.center. Dragonfly models made with Meshy.",
+  "cover": "media/quinta-da-libelula.webp",
+  "action": { "kind": "visit", "url": "https://kashka-25.github.io/quinta-da-libelula/" },
+  "preview": {
+    "images": [
+      {
+        "src": "content/previews/quinta-intro-arrival.webp",
+        "alt": "The opening: an iridescent 3D dragonfly hovers in a misty, sunlit forest, under the line \"In the green hills of Coimbra, something is listening.\""
+      },
+      {
+        "src": "content/previews/quinta-intro-melt.webp",
+        "alt": "The dragonfly melting into flowing streams of iridescent pigment, under the line \"Let go of the shape you arrived in.\""
+      },
+      {
+        "src": "content/previews/quinta-intro-emblem.webp",
+        "alt": "The pigment settled into the round Quinta da Libélula Retreats emblem in the forest, with an \"Enter the Experience\" button below."
+      },
+      {
+        "src": "content/previews/quinta-intro-rebirth.webp",
+        "alt": "After Enter: a golden lotus dragonfly rises over the homepage's misty mountains as the forest dissolves."
+      },
+      {
+        "src": "content/previews/quinta-home.webp",
+        "alt": "The homepage: \"Some places invite you to visit. Others invite you to return to yourself.\" over a mountain valley, with the lotus dragonfly hovering beside it."
+      },
+      {
+        "src": "content/previews/quinta-land.webp",
+        "alt": "The Land: an illustrated map of the hillside at dusk with places to tap, and a card showing the domes on their wooden walkway."
+      }
+    ]
+  }
+}
