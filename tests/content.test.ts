@@ -338,6 +338,7 @@ describe('content pipeline', () => {
     expect(generated.about.contact).toEqual([
       { label: 'Email: yourownuniverse.life@gmail.com', href: 'mailto:yourownuniverse.life@gmail.com' },
       { label: 'Instagram: @_FreeTheDream_', href: 'https://www.instagram.com/_freethedream_/' },
+      { label: 'Support my work on Ko-fi: ko-fi.com/yourownuniverse', href: 'https://ko-fi.com/yourownuniverse' },
     ]);
   });
 });
